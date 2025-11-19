@@ -20,6 +20,9 @@ const RootLayout = () => (
       <Link to="/connect" className="[&.active]:font-bold">
         Connect
       </Link>
+      <Link to="/ui" className="[&.active]:font-bold">
+        UI
+      </Link>
     </div>
     <hr />
     <Outlet />

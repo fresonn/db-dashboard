@@ -9,9 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UiRouteImport } from './routes/ui'
 import { Route as ConnectRouteImport } from './routes/connect'
 import { Route as IndexRouteImport } from './routes/index'
 
+const UiRoute = UiRouteImport.update({
+  id: '/ui',
+  path: '/ui',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConnectRoute = ConnectRouteImport.update({
   id: '/connect',
   path: '/connect',
@@ -26,31 +32,42 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/connect': typeof ConnectRoute
+  '/ui': typeof UiRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/connect': typeof ConnectRoute
+  '/ui': typeof UiRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/connect': typeof ConnectRoute
+  '/ui': typeof UiRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/connect'
+  fullPaths: '/' | '/connect' | '/ui'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/connect'
-  id: '__root__' | '/' | '/connect'
+  to: '/' | '/connect' | '/ui'
+  id: '__root__' | '/' | '/connect' | '/ui'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConnectRoute: typeof ConnectRoute
+  UiRoute: typeof UiRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/ui': {
+      id: '/ui'
+      path: '/ui'
+      fullPath: '/ui'
+      preLoaderRoute: typeof UiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/connect': {
       id: '/connect'
       path: '/connect'
@@ -71,6 +88,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConnectRoute: ConnectRoute,
+  UiRoute: UiRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

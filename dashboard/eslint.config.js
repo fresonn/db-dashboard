@@ -1,23 +1,46 @@
-import js from '@eslint/js'
 import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import tseslint from 'typescript-eslint'
-import { defineConfig, globalIgnores } from 'eslint/config'
+import js from '@eslint/js'
+import pluginReact from 'eslint-plugin-react'
+import tseslint from '@typescript-eslint/eslint-plugin'
+import parserTs from '@typescript-eslint/parser'
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 
-export default defineConfig([
-  globalIgnores(['dist']),
+/** @type {import('eslint').Linter.Config[]} */
+export default [
+  js.configs.recommended,
+  eslintPluginPrettierRecommended,
+
+  // General configuration for all files
   {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      js.configs.recommended,
-      tseslint.configs.recommended,
-      reactHooks.configs.flat.recommended,
-      reactRefresh.configs.vite,
-    ],
+    files: ['**/*.{ts,tsx,js,jsx}'],
     languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
+      parser: parserTs,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: {
+          jsx: true
+        }
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        ...globals.es2021
+      }
     },
-  },
-])
+    plugins: {
+      react: pluginReact,
+      'react-hooks': pluginReact,
+      '@typescript-eslint': tseslint
+    },
+    rules: {
+      'prettier/prettier': ['warn', {}, { usePrettierrc: true }],
+      '@typescript-eslint/no-unused-vars': ['warn']
+    },
+    settings: {
+      react: {
+        version: 'detect'
+      }
+    }
+  }
+]

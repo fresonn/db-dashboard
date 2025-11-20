@@ -13,7 +13,7 @@ const TanStackRouterDevtools = import.meta.env.PROD
 
 const RootLayout = () => (
   <>
-    <div className="flex gap-2 p-2">
+    {/* <div className="flex gap-2 p-2">
       <Link to="/" className="[&.active]:font-bold">
         Home
       </Link>{' '}
@@ -23,8 +23,7 @@ const RootLayout = () => (
       <Link to="/ui" className="[&.active]:font-bold">
         UI
       </Link>
-    </div>
-    <hr />
+    </div> */}
     <Outlet />
     <Suspense>
       <TanStackRouterDevtools position="bottom-right" />

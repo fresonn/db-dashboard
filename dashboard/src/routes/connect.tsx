@@ -1,13 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { ConnectView } from '@/views/connect'
 
 export const Route = createFileRoute('/connect')({
-  component: Connect
+  component: ConnectView
 })
-
-function Connect() {
-  return (
-    <div className="p-2">
-      <h3>Connect to postgres</h3>
-    </div>
-  )
-}

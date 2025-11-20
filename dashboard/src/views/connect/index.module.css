@@ -1,0 +1,55 @@
+/* .view {
+  background-color: #ffffff;
+  opacity: 0.7;
+  background-image: radial-gradient(#000000 0.75px, #ffffff 0.75px);
+  background-size: 15px 15px;
+  height: 100dvh;
+}
+.view {
+  background-color: #ffffff;
+  opacity: 1;
+  background-image: radial-gradient(#000000 0.75px, #ffffff 0.75px);
+  background-size: 15px 15px;
+}
+
+.view {
+  background-color: #fff;
+  opacity: 0.;
+  background-image:
+    radial-gradient(#000000 0.65px, transparent 0.65px),
+    radial-gradient(#000000 0.65px, #ffffff 0.65px);
+  background-size: 26px 26px;
+  background-position:
+    0 0,
+    13px 13px;
+} */
+
+.view {
+  --pattern-dot-color: #bfbfbf;
+
+  position: relative;
+  height: 100dvh;
+  background-color: #ffffff;
+  /* opacity: 0.3; */
+  background-image:
+    radial-gradient(var(--pattern-dot-color) 0.8px, transparent 0.8px),
+    radial-gradient(var(--pattern-dot-color) 0.8px, #ffffff 0.8px);
+  background-size: 32px 32px;
+  background-position:
+    0 0,
+    16px 16px;
+}
+
+.logo {
+  margin-right: 8px;
+  width: 64px;
+  height: 64px;
+}
+
+:global(.dark) .view {
+  --pattern-dot-color: #2e2e2e;
+  background-color: #0a0a0a;
+  background-image:
+    radial-gradient(var(--pattern-dot-color) 0.8px, transparent 0.8px),
+    radial-gradient(var(--pattern-dot-color) 0.8px, #0a0a0a 0.8px);
+}

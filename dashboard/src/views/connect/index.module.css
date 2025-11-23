@@ -1,43 +1,52 @@
-/* .view {
-  background-color: #ffffff;
-  opacity: 0.7;
-  background-image: radial-gradient(#000000 0.75px, #ffffff 0.75px);
-  background-size: 15px 15px;
-  height: 100dvh;
-}
 .view {
-  background-color: #ffffff;
-  opacity: 1;
-  background-image: radial-gradient(#000000 0.75px, #ffffff 0.75px);
-  background-size: 15px 15px;
-}
+  height: 100%;
+  width: 100%;
 
-.view {
   background-color: #fff;
-  opacity: 0.;
+  opacity: 1;
   background-image:
-    radial-gradient(#000000 0.65px, transparent 0.65px),
-    radial-gradient(#000000 0.65px, #ffffff 0.65px);
-  background-size: 26px 26px;
+    linear-gradient(30deg, #000000 12%, transparent 12.5%, transparent 87%, #000000 87.5%, #000000),
+    linear-gradient(
+      150deg,
+      #000000 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #000000 87.5%,
+      #000000
+    ),
+    linear-gradient(30deg, #000000 12%, transparent 12.5%, transparent 87%, #000000 87.5%, #000000),
+    linear-gradient(
+      150deg,
+      #000000 12%,
+      transparent 12.5%,
+      transparent 87%,
+      #000000 87.5%,
+      #000000
+    ),
+    linear-gradient(
+      60deg,
+      #00000077 25%,
+      transparent 25.5%,
+      transparent 75%,
+      #00000077 75%,
+      #00000077
+    ),
+    linear-gradient(
+      60deg,
+      #00000077 25%,
+      transparent 25.5%,
+      transparent 75%,
+      #00000077 75%,
+      #00000077
+    );
+  background-size: 54px 95px;
   background-position:
     0 0,
-    13px 13px;
-} */
-
-.view {
-  --pattern-dot-color: #bfbfbf;
-
-  position: relative;
-  height: 100dvh;
-  background-color: #ffffff;
-  /* opacity: 0.3; */
-  background-image:
-    radial-gradient(var(--pattern-dot-color) 0.8px, transparent 0.8px),
-    radial-gradient(var(--pattern-dot-color) 0.8px, #ffffff 0.8px);
-  background-size: 32px 32px;
-  background-position:
     0 0,
-    16px 16px;
+    27px 47px,
+    27px 47px,
+    0 0,
+    27px 47px;
 }
 
 .logo {
@@ -47,9 +56,5 @@
 }
 
 :global(.dark) .view {
-  --pattern-dot-color: #2e2e2e;
-  background-color: #0a0a0a;
-  background-image:
-    radial-gradient(var(--pattern-dot-color) 0.8px, transparent 0.8px),
-    radial-gradient(var(--pattern-dot-color) 0.8px, #0a0a0a 0.8px);
+  background-color: #222222;
 }

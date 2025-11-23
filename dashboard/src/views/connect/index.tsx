@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import styles from './index.module.css'
 import { Button } from '@/components/ui/button'
@@ -15,26 +15,7 @@ import {
 import { Database, EthernetPort, Info, KeyRound, Server, UserRound } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/shadcn/popover'
-
-{
-  /* <UserRoundCheck /> */
-  // <KeyRound />
-  // <PcCase />
-  // <HardDrive />
-  // <Server />
-}
-
-export function TypographyH1({ children }: { children: ReactNode }) {
-  return (
-    <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance">
-      {children}
-    </h1>
-  )
-}
-
-export function TypographySmall({ children }: { children: ReactNode }) {
-  return <small className="text-sm leading-none font-medium">{children}</small>
-}
+import { TypographyH1, TypographySmall } from '@/components/ui/typography'
 
 export function ConnectView() {
   const [theme] = useTheme()
@@ -42,22 +23,21 @@ export function ConnectView() {
   const [loading, setLoading] = useState(false)
 
   return (
-    <div className={styles.view}>
-      <div className="flex h-full items-center justify-center">
-        <div className="relative w-full max-w-[700px] rounded-xl border bg-white px-12 py-10 shadow-lg dark:border-none dark:bg-neutral-900">
-          <div className="flex items-center">
+    <main className="grid h-screen grid-cols-[2fr_1fr]">
+      <section className="relative flex items-center justify-center dark:bg-neutral-900">
+        <div className="absolute top-8 right-10">
+          <ThemeToggle />
+        </div>
+        <div className="w-full max-w-[700px] px-12 py-10">
+          <div className="flex items-center justify-center">
             <img
               src={theme === 'light' ? postgresLogoDark : postgresLogo}
               className="mr-2 size-16"
               alt="postgresql logo"
             />
             <TypographyH1>Simple Dashboard</TypographyH1>
-            <div className="ml-auto">
-              <ThemeToggle />
-            </div>
           </div>
-
-          <div className="mb-6 pt-10">
+          <div className="mb-10 pt-10">
             <ul className="*:mb-4">
               <li>
                 <Input label="Connection name" placeholder="My VPS postgres..." />
@@ -124,16 +104,14 @@ export function ConnectView() {
               </li>
             </ul>
           </div>
-          <Button
-            loading={loading}
-            onClick={() => setLoading((prev) => !prev)}
-            fullWidth
-            size="icon-lg"
-          >
+          <Button loading={loading} onClick={() => setLoading((prev) => !prev)} fullWidth size="lg">
             Connect
           </Button>
         </div>
-      </div>
-    </div>
+      </section>
+      <section className={'flex items-center justify-center bg-white/90'}>
+        <div className={styles.view} />
+      </section>
+    </main>
   )
 }

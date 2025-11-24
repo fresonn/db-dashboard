@@ -22,8 +22,9 @@ type AppConfig struct {
 }
 
 type EnvironmentVars struct {
-	Port int `env:"SERVER_PORT"`
-	// Optional
+	IsDev      bool
+	Port       int    `env:"SERVER_PORT"`
+	Runtime    string `env:"RUNTIME"`
 	PgHost     string `env:"PG_HOST"`
 	PgPort     int    `env:"PG_PORT"`
 	PgUser     string `env:"PG_USER"`
@@ -40,6 +41,8 @@ func New() AppConfig {
 	if err != nil {
 		log.Fatalln("environment variables parse error", err)
 	}
+
+	envCfg.IsDev = envCfg.Runtime == DevRuntime
 
 	persistentCfg, err := configFromEnvs(envCfg)
 	if err != nil {

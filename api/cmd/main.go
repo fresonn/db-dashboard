@@ -2,6 +2,7 @@ package main
 
 import (
 	"dashboard/api/internal/config"
+	"dashboard/api/internal/scopes/app"
 	"dashboard/api/pkg/logger"
 	"flag"
 	"fmt"
@@ -31,10 +32,9 @@ func init() {
 func main() {
 
 	lgr := logger.New(logger.LiveLoggerVariant)
-
 	cfg := config.New()
 
-	lgr.Info("hello logger")
+	application := app.New(cfg, lgr)
 
-	fmt.Printf("Result config: %+v\n", cfg)
+	application.Run()
 }

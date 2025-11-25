@@ -5,6 +5,9 @@ import (
 	"dashboard/api/gen/openapi"
 	"dashboard/api/internal/config"
 	"dashboard/api/internal/delivery/rest"
+	"dashboard/api/internal/postgres"
+	"dashboard/api/internal/scopes/cluster"
+	"dashboard/api/internal/scopes/cluster/repo"
 	"dashboard/api/internal/utils"
 	"errors"
 	"fmt"
@@ -28,11 +31,16 @@ type App struct {
 
 func New(cfg config.AppConfig, logger *slog.Logger) *App {
 
-	r := chi.NewRouter()
+	pgManager := postgres.New(cfg, logger)
 
+	clusterStorage := repo.New(cfg, logger, pgManager)
+
+	cluserScope := cluster.New(cfg, logger, clusterStorage, pgManager)
+
+	r := chi.NewRouter()
 	r.Use(requestIDMiddleware)
 
-	restHandler := rest.New()
+	restHandler := rest.New(cluserScope)
 
 	strictHandler := openapi.NewStrictHandler(restHandler, nil)
 
@@ -61,7 +69,7 @@ func (a *App) Run() {
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	if a.config.Env.IsDev {
-		a.log.Info(fmt.Sprintf("http server is running http://localhost%s", server.Addr))
+		a.log.Info(fmt.Sprintf("http server is running http://localhost%s/api", server.Addr))
 	}
 
 	defer cancel()

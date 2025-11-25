@@ -42,7 +42,7 @@ func LoadPersistentConfig() (*PersistentConfigV1, error) {
 	migratedCfg, changed := Migrate(cfg)
 	if changed {
 		slog.Warn("config.json outdated, try to migrate")
-		_ = Save(migratedCfg) // it's not critical if it's not saved
+		_ = migratedCfg.Save() // it's not critical if it's not saved
 	}
 
 	return cfg, nil
@@ -81,14 +81,13 @@ func Migrate(cfg *PersistentConfigV1) (*PersistentConfigV1, bool) {
 	return cfg, changed
 }
 
-// todo: as method of PersistentConfigV1
-func Save(cfg *PersistentConfigV1) error {
+func (p *PersistentConfigV1) Save() error {
 	dir := filepath.Dir(ConfigPath)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return err
 	}
 
-	data, err := json.MarshalIndent(cfg, "", "  ")
+	data, err := json.MarshalIndent(p, "", "  ")
 	if err != nil {
 		return err
 	}

@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"net/http"
 
+	clusterEntities "dashboard/api/internal/scopes/cluster/entities"
+
 	"github.com/go-chi/chi/v5"
 	strictnethttp "github.com/oapi-codegen/runtime/strictmiddleware/nethttp"
 )
@@ -21,8 +23,22 @@ const (
 	PgConnectionStatusLost       ConnectionStatus = "lost"
 )
 
+// BadRequestError defines model for BadRequestError.
+type BadRequestError struct {
+	Error string `json:"error"`
+}
+
+// ClusterConnectData defines model for ClusterConnectData.
+type ClusterConnectData = clusterEntities.AuthData
+
 // ConnectionStatus PostgreSQL connection state
 type ConnectionStatus string
+
+// Error defines model for Error.
+type Error struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
 
 // GetStatusResponse defines model for GetStatusResponse.
 type GetStatusResponse struct {
@@ -35,8 +51,19 @@ type GetStatusResponseError struct {
 	Message string `json:"message"`
 }
 
+// RequestValidationError defines model for RequestValidationError.
+type RequestValidationError struct {
+	Message string `json:"message"`
+}
+
+// ClusterConnectJSONRequestBody defines body for ClusterConnect for application/json ContentType.
+type ClusterConnectJSONRequestBody = ClusterConnectData
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// Connect to Postgres cluster
+	// (POST /cluster/connect)
+	ClusterConnect(w http.ResponseWriter, r *http.Request)
 	// Get server current status
 	// (GET /cluster/status)
 	GetStatus(w http.ResponseWriter, r *http.Request)
@@ -45,6 +72,12 @@ type ServerInterface interface {
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
 
 type Unimplemented struct{}
+
+// Connect to Postgres cluster
+// (POST /cluster/connect)
+func (_ Unimplemented) ClusterConnect(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
 
 // Get server current status
 // (GET /cluster/status)
@@ -60,6 +93,20 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// ClusterConnect operation middleware
+func (siw *ServerInterfaceWrapper) ClusterConnect(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ClusterConnect(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
 
 // GetStatus operation middleware
 func (siw *ServerInterfaceWrapper) GetStatus(w http.ResponseWriter, r *http.Request) {
@@ -189,10 +236,60 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	}
 
 	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/cluster/connect", wrapper.ClusterConnect)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/cluster/status", wrapper.GetStatus)
 	})
 
 	return r
+}
+
+type ClusterConnectRequestObject struct {
+	Body *ClusterConnectJSONRequestBody
+}
+
+type ClusterConnectResponseObject interface {
+	VisitClusterConnectResponse(w http.ResponseWriter) error
+}
+
+type ClusterConnect200JSONResponse GetStatusResponse
+
+func (response ClusterConnect200JSONResponse) VisitClusterConnectResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ClusterConnect400JSONResponse BadRequestError
+
+func (response ClusterConnect400JSONResponse) VisitClusterConnectResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ClusterConnect422JSONResponse RequestValidationError
+
+func (response ClusterConnect422JSONResponse) VisitClusterConnectResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ClusterConnectdefaultJSONResponse struct {
+	Body       Error
+	StatusCode int
+}
+
+func (response ClusterConnectdefaultJSONResponse) VisitClusterConnectResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
 }
 
 type GetStatusRequestObject struct {
@@ -222,6 +319,9 @@ func (response GetStatus400JSONResponse) VisitGetStatusResponse(w http.ResponseW
 
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
+	// Connect to Postgres cluster
+	// (POST /cluster/connect)
+	ClusterConnect(ctx context.Context, request ClusterConnectRequestObject) (ClusterConnectResponseObject, error)
 	// Get server current status
 	// (GET /cluster/status)
 	GetStatus(ctx context.Context, request GetStatusRequestObject) (GetStatusResponseObject, error)
@@ -254,6 +354,37 @@ type strictHandler struct {
 	ssi         StrictServerInterface
 	middlewares []StrictMiddlewareFunc
 	options     StrictHTTPServerOptions
+}
+
+// ClusterConnect operation middleware
+func (sh *strictHandler) ClusterConnect(w http.ResponseWriter, r *http.Request) {
+	var request ClusterConnectRequestObject
+
+	var body ClusterConnectJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ClusterConnect(ctx, request.(ClusterConnectRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ClusterConnect")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ClusterConnectResponseObject); ok {
+		if err := validResponse.VisitClusterConnectResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
 }
 
 // GetStatus operation middleware

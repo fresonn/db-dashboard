@@ -36,8 +36,63 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetStatusResponseError"
+  /cluster/connect:
+    post:
+      tags:
+        - cluster
+      summary: Connect to Postgres cluster
+      description: Connect to Postgres cluster
+      operationId: ClusterConnect
+      requestBody:
+        required: true
+        description: Request's data payload
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClusterConnectData"
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetStatusResponse"
+        422:
+          description: Request data invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RequestValidationError"
+        400:
+          description: Connection attempt failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestError"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   schemas:
+    RequestValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: some body fields are invalid
+      required:
+        - message
+    BadRequestError:
+      type: object
+      properties:
+        error:
+          type: string
+          example: error details
+      required:
+        - error
     ConnectionStatus:
       type: string
       enum: [active, lost, connecting, error]
@@ -64,3 +119,46 @@ components:
         message:
           type: string
           example: failed to get cluster status
+    ClusterConnectData: # internal/scopes/cluster/entities/entities.go
+      x-go-type: clusterEntities.AuthData
+      x-go-type-import:
+        path: dashboard/api/internal/scopes/cluster/entities
+        name: clusterEntities
+      x-go-type-name: clusterEntities.AuthData
+      type: object
+      required:
+        - host
+        - port
+        - user
+        - password
+        - database
+        - sslmode
+      properties:
+        host:
+          type: string
+          example: 127.0.0.1
+        port:
+          type: integer
+          example: 5432
+        user:
+          type: string
+          example: postgres
+        password:
+          type: string
+          example: postgres
+        database:
+          type: string
+          example: postgres
+        sslmode:
+          type: string
+          example: ""
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message

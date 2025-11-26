@@ -1,8 +1,8 @@
 package main
 
 import (
+	"dashboard/api/internal/app"
 	"dashboard/api/internal/config"
-	"dashboard/api/internal/scopes/app"
 	"dashboard/api/pkg/logger"
 	"flag"
 	"fmt"

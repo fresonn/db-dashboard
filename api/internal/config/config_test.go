@@ -235,7 +235,7 @@ func TestLoadPersistentConfig(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			cleanUp() // before each test
 
-			err := Save(tt.input)
+			err := tt.input.Save()
 			if tt.wantErr {
 				require.Error(t, err)
 				return

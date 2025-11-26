@@ -2,7 +2,6 @@ package config
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"log/slog"
 	"os"
@@ -58,7 +57,6 @@ func New() AppConfig {
 	}
 
 	persistentCfg, err = LoadPersistentConfig()
-	fmt.Println("from LoadPersistentConfig cfg =>", persistentCfg)
 	if err != nil {
 
 		slog.Warn("volume data for connection not found or damaged")

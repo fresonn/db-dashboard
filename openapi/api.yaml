@@ -25,11 +25,11 @@ paths:
                 success:
                   summary: Status received successfully
                   value:
-                    postgres_connection: active
+                    postgres_connection: connected
                 connection lost:
                   summary: Status with lost connection
                   value:
-                    postgres_connection: lost
+                    postgres_connection: disconnected
         400:
           description: Request server status failed
           content:
@@ -75,6 +75,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /cluster/disconnect:
+    post:
+      tags:
+        - cluster
+      summary: Disconnect from Postgres cluster
+      description: Disconnect from Postgres cluster
+      operationId: ClusterDisconnect
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetStatusResponse"
+        400:
+          description: Disonnection attempt failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestError"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   schemas:
     RequestValidationError:
@@ -95,11 +121,11 @@ components:
         - error
     ConnectionStatus:
       type: string
-      enum: [active, lost, connecting, error]
+      enum: [connecting, connected, disconnected, error]
       x-enum-varnames:
-        - PgConnectionStatusActive,
-        - PgConnectionStatusLost,
         - PgConnectionStatusConnecting,
+        - PgConnectionStatusConnected,
+        - PgConnectionStatusDisconnected,
         - PgConnectionStatusError,
       description: PostgreSQL connection state
     GetStatusResponse:
@@ -109,7 +135,7 @@ components:
       properties:
         postgres_connection:
           $ref: "#/components/schemas/ConnectionStatus"
-          example: active
+          example: connected
           description: Represents connection state between dashboard and postgres
     GetStatusResponseError:
       type: object

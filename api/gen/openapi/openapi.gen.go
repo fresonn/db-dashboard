@@ -17,10 +17,10 @@ import (
 
 // Defines values for ConnectionStatus.
 const (
-	PgConnectionStatusActive     ConnectionStatus = "active"
-	PgConnectionStatusConnecting ConnectionStatus = "connecting"
-	PgConnectionStatusError      ConnectionStatus = "error"
-	PgConnectionStatusLost       ConnectionStatus = "lost"
+	PgConnectionStatusConnected    ConnectionStatus = "connected"
+	PgConnectionStatusConnecting   ConnectionStatus = "connecting"
+	PgConnectionStatusDisconnected ConnectionStatus = "disconnected"
+	PgConnectionStatusError        ConnectionStatus = "error"
 )
 
 // BadRequestError defines model for BadRequestError.
@@ -64,6 +64,9 @@ type ServerInterface interface {
 	// Connect to Postgres cluster
 	// (POST /cluster/connect)
 	ClusterConnect(w http.ResponseWriter, r *http.Request)
+	// Disconnect from Postgres cluster
+	// (POST /cluster/disconnect)
+	ClusterDisconnect(w http.ResponseWriter, r *http.Request)
 	// Get server current status
 	// (GET /cluster/status)
 	GetStatus(w http.ResponseWriter, r *http.Request)
@@ -76,6 +79,12 @@ type Unimplemented struct{}
 // Connect to Postgres cluster
 // (POST /cluster/connect)
 func (_ Unimplemented) ClusterConnect(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Disconnect from Postgres cluster
+// (POST /cluster/disconnect)
+func (_ Unimplemented) ClusterDisconnect(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -99,6 +108,20 @@ func (siw *ServerInterfaceWrapper) ClusterConnect(w http.ResponseWriter, r *http
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.ClusterConnect(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ClusterDisconnect operation middleware
+func (siw *ServerInterfaceWrapper) ClusterDisconnect(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ClusterDisconnect(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -239,6 +262,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Post(options.BaseURL+"/cluster/connect", wrapper.ClusterConnect)
 	})
 	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/cluster/disconnect", wrapper.ClusterDisconnect)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/cluster/status", wrapper.GetStatus)
 	})
 
@@ -292,6 +318,43 @@ func (response ClusterConnectdefaultJSONResponse) VisitClusterConnectResponse(w 
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
+type ClusterDisconnectRequestObject struct {
+}
+
+type ClusterDisconnectResponseObject interface {
+	VisitClusterDisconnectResponse(w http.ResponseWriter) error
+}
+
+type ClusterDisconnect200JSONResponse GetStatusResponse
+
+func (response ClusterDisconnect200JSONResponse) VisitClusterDisconnectResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ClusterDisconnect400JSONResponse BadRequestError
+
+func (response ClusterDisconnect400JSONResponse) VisitClusterDisconnectResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ClusterDisconnectdefaultJSONResponse struct {
+	Body       Error
+	StatusCode int
+}
+
+func (response ClusterDisconnectdefaultJSONResponse) VisitClusterDisconnectResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
 type GetStatusRequestObject struct {
 }
 
@@ -322,6 +385,9 @@ type StrictServerInterface interface {
 	// Connect to Postgres cluster
 	// (POST /cluster/connect)
 	ClusterConnect(ctx context.Context, request ClusterConnectRequestObject) (ClusterConnectResponseObject, error)
+	// Disconnect from Postgres cluster
+	// (POST /cluster/disconnect)
+	ClusterDisconnect(ctx context.Context, request ClusterDisconnectRequestObject) (ClusterDisconnectResponseObject, error)
 	// Get server current status
 	// (GET /cluster/status)
 	GetStatus(ctx context.Context, request GetStatusRequestObject) (GetStatusResponseObject, error)
@@ -380,6 +446,30 @@ func (sh *strictHandler) ClusterConnect(w http.ResponseWriter, r *http.Request) 
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(ClusterConnectResponseObject); ok {
 		if err := validResponse.VisitClusterConnectResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ClusterDisconnect operation middleware
+func (sh *strictHandler) ClusterDisconnect(w http.ResponseWriter, r *http.Request) {
+	var request ClusterDisconnectRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ClusterDisconnect(ctx, request.(ClusterDisconnectRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ClusterDisconnect")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ClusterDisconnectResponseObject); ok {
+		if err := validResponse.VisitClusterDisconnectResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

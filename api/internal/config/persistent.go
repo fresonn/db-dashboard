@@ -95,7 +95,7 @@ func (p *PersistentConfigV1) Save() error {
 	return os.WriteFile(ConfigPath, data, 0o600)
 }
 
-func removePersistentConfig() error {
+func RemovePersistentConfig() error {
 	err := os.Remove(ConfigPath)
 
 	if err != nil {

@@ -60,7 +60,7 @@ func New() AppConfig {
 	if err != nil {
 
 		slog.Warn("volume data for connection not found or damaged")
-		_ = removePersistentConfig()
+		_ = RemovePersistentConfig()
 
 		return AppConfig{
 			Env:              envCfg,
@@ -71,7 +71,7 @@ func New() AppConfig {
 	err = ValidatePersistentConfig(persistentCfg)
 	if err != nil {
 		slog.Warn("volume /data/config.json is damaged")
-		_ = removePersistentConfig()
+		_ = RemovePersistentConfig()
 		return AppConfig{
 			Env:              envCfg,
 			PersistentConfig: nil,

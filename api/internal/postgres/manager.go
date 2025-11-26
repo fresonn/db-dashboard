@@ -47,7 +47,7 @@ func New(config config.AppConfig, logger *slog.Logger) *Manager {
 		if err := m.UpdateConnection(ctx, config.PersistentConfig.Connection); err != nil {
 			logger.Error("failed to connect from sqlc", "error", err)
 		} else {
-			logger.Info("✅ connected to Postgres from config")
+			logger.Info("✅ load from persistent config")
 		}
 	}
 
@@ -143,6 +143,30 @@ func (m *Manager) UpdateConnection(ctx context.Context, newConn config.Connectio
 	m.status = StatusConnected
 
 	m.mu.Unlock()
+
+	return nil
+}
+
+func (m *Manager) Disconnect() error {
+	m.mu.Lock()
+
+	defer m.mu.Unlock()
+
+	err := config.RemovePersistentConfig()
+	if err != nil {
+		return err
+	}
+
+	if m.sqlxDB != nil {
+		m.sqlxDB.Close()
+		m.sqlxDB = nil
+	}
+
+	if m.config.PersistentConfig != nil {
+		m.config.PersistentConfig.Connection = config.Connection{}
+	}
+
+	m.status = StatusDisconnected
 
 	return nil
 }

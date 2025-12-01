@@ -1,0 +1,6 @@
+{
+  "type": "object",
+  "properties": { "message": { "type": "string", "example": "some body fields are invalid" } },
+  "required": ["message"],
+  "x-readme-ref-name": "RequestValidationError"
+}

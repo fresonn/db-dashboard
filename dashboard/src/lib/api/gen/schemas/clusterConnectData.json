@@ -1,0 +1,19 @@
+{
+  "x-go-type": "clusterEntities.AuthData",
+  "x-go-type-import": {
+    "path": "dashboard/api/internal/scopes/cluster/entities",
+    "name": "clusterEntities"
+  },
+  "x-go-type-name": "clusterEntities.AuthData",
+  "type": "object",
+  "required": ["host", "port", "user", "password", "database", "sslmode"],
+  "properties": {
+    "host": { "type": "string", "example": "127.0.0.1" },
+    "port": { "type": "integer", "example": 5432 },
+    "user": { "type": "string", "example": "postgres" },
+    "password": { "type": "string", "example": "postgres" },
+    "database": { "type": "string", "example": "postgres" },
+    "sslmode": { "type": "string", "example": "" }
+  },
+  "x-readme-ref-name": "ClusterConnectData"
+}

@@ -1,0 +1,6 @@
+{
+  "type": "object",
+  "required": ["message"],
+  "properties": { "message": { "type": "string", "example": "failed to get cluster status" } },
+  "x-readme-ref-name": "GetStatusResponseError"
+}

@@ -1,0 +1,12 @@
+{
+  "type": "string",
+  "enum": ["connecting", "connected", "disconnected", "error"],
+  "x-enum-varnames": [
+    "PgConnectionStatusConnecting,",
+    "PgConnectionStatusConnected,",
+    "PgConnectionStatusDisconnected,",
+    "PgConnectionStatusError,"
+  ],
+  "description": "PostgreSQL connection state",
+  "x-readme-ref-name": "ConnectionStatus"
+}

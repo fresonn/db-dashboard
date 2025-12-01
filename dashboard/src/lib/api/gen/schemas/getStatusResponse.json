@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "required": ["postgres_connection"],
+  "properties": {
+    "postgres_connection": {
+      "example": "connected",
+      "description": "Represents connection state between dashboard and postgres",
+      "type": "string",
+      "enum": ["connecting", "connected", "disconnected", "error"],
+      "x-enum-varnames": [
+        "PgConnectionStatusConnecting,",
+        "PgConnectionStatusConnected,",
+        "PgConnectionStatusDisconnected,",
+        "PgConnectionStatusError,"
+      ],
+      "x-readme-ref-name": "ConnectionStatus"
+    }
+  },
+  "x-readme-ref-name": "GetStatusResponse"
+}

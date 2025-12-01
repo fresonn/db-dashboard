@@ -5,6 +5,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+  --color-theme-color: oklch(79.2% 0.209 151.711);
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);

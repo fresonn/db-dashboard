@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Input } from '@/components/ui/input'
 import styles from './index.module.css'
 import { Button } from '@/components/ui/button'
 import postgresLogo from '@/assets/postgresql-logo.svg?url'
@@ -40,7 +39,26 @@ export function ConnectView() {
           <div className="mb-10 pt-10">
             <ul className="*:mb-4">
               <li>
-                <Input label="Connection name" placeholder="My VPS postgres..." />
+                <Label htmlFor="database-input">Database (optional)</Label>
+                <InputGroup>
+                  <InputGroupAddon>
+                    <Database />
+                  </InputGroupAddon>
+                  <InputGroupInput id="database-input" placeholder="postgres" className="pl-2!" />
+                  <InputGroupAddon align="inline-end">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <InputGroupButton className="cursor-pointer rounded-full" size="icon-xs">
+                          <Info />
+                        </InputGroupButton>
+                      </PopoverTrigger>
+                      <PopoverContent className="text-sm leading-normal">
+                        By default it tries to connect to{' '}
+                        <TypographySmall>postgres</TypographySmall> database
+                      </PopoverContent>
+                    </Popover>
+                  </InputGroupAddon>
+                </InputGroup>
               </li>
               <li className="flex">
                 <div className="mr-8">
@@ -77,28 +95,6 @@ export function ConnectView() {
                   <InputGroupInput id="password-input" type="password" />
                   <InputGroupAddon>
                     <KeyRound />
-                  </InputGroupAddon>
-                </InputGroup>
-              </li>
-              <li>
-                <Label htmlFor="database-input">Database (optional)</Label>
-                <InputGroup>
-                  <InputGroupAddon>
-                    <Database />
-                  </InputGroupAddon>
-                  <InputGroupInput id="database-input" placeholder="postgres" className="pl-2!" />
-                  <InputGroupAddon align="inline-end">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <InputGroupButton className="cursor-pointer rounded-full" size="icon-xs">
-                          <Info />
-                        </InputGroupButton>
-                      </PopoverTrigger>
-                      <PopoverContent className="text-sm leading-normal">
-                        By default it tries to connect to{' '}
-                        <TypographySmall>postgres</TypographySmall> database
-                      </PopoverContent>
-                    </Popover>
                   </InputGroupAddon>
                 </InputGroup>
               </li>

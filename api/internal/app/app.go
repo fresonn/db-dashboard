@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -39,6 +40,11 @@ func New(cfg config.AppConfig, logger *slog.Logger) *App {
 
 	r := chi.NewRouter()
 	r.Use(requestIDMiddleware)
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"*"}, // todo: make it dynamic
+		AllowedHeaders:   []string{"*"},
+		AllowCredentials: true,
+	}))
 
 	restHandler := rest.New(cluserScope)
 

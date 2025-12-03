@@ -3,18 +3,21 @@
  * Do not edit manually.
  */
 
-export type RequestValidationError = {
+/**
+ * @description Error part that should be present in all errors
+ */
+export type ErrorBase = {
   /**
    * @type string
    */
   message: string
 }
 
-export type BadRequestError = {
+export type RequestValidationError = ErrorBase & {
   /**
    * @type string
    */
-  error: string
+  reason: string
 }
 
 export const connectionStatus = {
@@ -39,13 +42,6 @@ export type GetStatusResponse = {
   postgres_connection: ConnectionStatus
 }
 
-export type GetStatusResponseError = {
-  /**
-   * @type string
-   */
-  message: string
-}
-
 export type ClusterConnectData = {
   /**
    * @type string
@@ -64,24 +60,13 @@ export type ClusterConnectData = {
    */
   password: string
   /**
-   * @type string
+   * @type string | undefined
    */
-  database: string
+  database?: string
   /**
    * @type string
    */
   sslmode: string
-}
-
-export type Error = {
-  /**
-   * @type string
-   */
-  code: string
-  /**
-   * @type string
-   */
-  message: string
 }
 
 /**
@@ -92,7 +77,7 @@ export type GetStatus200 = GetStatusResponse
 /**
  * @description Request server status failed
  */
-export type GetStatus400 = GetStatusResponseError
+export type GetStatus400 = ErrorBase
 
 export type GetStatusQueryResponse = GetStatus200
 
@@ -109,7 +94,7 @@ export type ClusterConnect200 = GetStatusResponse
 /**
  * @description Connection attempt failed
  */
-export type ClusterConnect400 = BadRequestError
+export type ClusterConnect400 = ErrorBase
 
 /**
  * @description Request data invalid
@@ -119,7 +104,7 @@ export type ClusterConnect422 = RequestValidationError
 /**
  * @description Unexpected error
  */
-export type ClusterConnectError = Error
+export type ClusterConnectError = ErrorBase
 
 /**
  * @description Request\'s data payload
@@ -142,12 +127,12 @@ export type ClusterDisconnect200 = GetStatusResponse
 /**
  * @description Disonnection attempt failed
  */
-export type ClusterDisconnect400 = BadRequestError
+export type ClusterDisconnect400 = ErrorBase
 
 /**
  * @description Unexpected error
  */
-export type ClusterDisconnectError = Error
+export type ClusterDisconnectError = ErrorBase
 
 export type ClusterDisconnectMutationResponse = ClusterDisconnect200
 

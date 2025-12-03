@@ -1,34 +1,59 @@
 import { lazy, Suspense } from 'react'
-import { createRootRoute, Link, Outlet } from '@tanstack/react-router'
+import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
+import type { QueryClient } from '@tanstack/react-query'
+import { clusterStatusQuery } from '@/lib/api/cluster-status'
+import { OfflineApiGuard } from '@/components/offline-api-guard'
+import { Toaster } from 'sonner'
+
+export interface RouterContext {
+  queryClient: QueryClient
+}
 
 const TanStackRouterDevtools = import.meta.env.PROD
   ? () => null
   : lazy(() =>
       import('@tanstack/react-router-devtools').then((res) => ({
         default: res.TanStackRouterDevtools
-        // For Embedded Mode
-        // default: res.TanStackRouterDevtoolsPanel
       }))
     )
 
-const RootLayout = () => (
-  <>
-    {/* <div className="flex gap-2 p-2">
-      <Link to="/" className="[&.active]:font-bold">
-        Home
-      </Link>{' '}
-      <Link to="/connect" className="[&.active]:font-bold">
-        Connect
-      </Link>
-      <Link to="/ui" className="[&.active]:font-bold">
-        UI
-      </Link>
-    </div> */}
-    <Outlet />
-    <Suspense>
-      <TanStackRouterDevtools position="bottom-right" />
-    </Suspense>
-  </>
-)
+export const Route = createRootRouteWithContext<RouterContext>()({
+  async beforeLoad({ context }) {
+    try {
+      const clusterStatus = await context.queryClient.ensureQueryData(clusterStatusQuery)
+      return {
+        clusterStatus,
+        connectionError: null
+      }
+    } catch (error) {
+      return {
+        connectionError: error + ''
+      }
+    }
+  },
+  component: () => {
+    const context = Route.useRouteContext()
 
-export const Route = createRootRoute({ component: RootLayout })
+    return (
+      <main className="">
+        <OfflineApiGuard open={!!context.connectionError} />
+        <Outlet />
+        <Toaster
+          position="bottom-right"
+          visibleToasts={4}
+          toastOptions={{
+            classNames: {
+              toast: '!border-border dark:!bg-neutral-900 !bg-background !text-foreground',
+              description: '!text-muted-foreground',
+              success: '!border-green-500/30 !text-green-500',
+              error: '!border-red-500/30 dark:!text-red-400 !text-red-600'
+            }
+          }}
+        />
+        <Suspense>
+          <TanStackRouterDevtools position="bottom-right" />
+        </Suspense>
+      </main>
+    )
+  }
+})

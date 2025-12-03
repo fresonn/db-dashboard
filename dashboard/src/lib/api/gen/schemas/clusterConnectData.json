@@ -6,7 +6,7 @@
   },
   "x-go-type-name": "clusterEntities.AuthData",
   "type": "object",
-  "required": ["host", "port", "user", "password", "database", "sslmode"],
+  "required": ["host", "port", "user", "password", "sslmode"],
   "properties": {
     "host": { "type": "string", "example": "127.0.0.1" },
     "port": { "type": "integer", "example": 5432 },

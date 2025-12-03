@@ -1,30 +1,74 @@
-import { useState } from 'react'
-import { Input } from '@/components/ui/input'
-import styles from './index.module.css'
-import { Button } from '@/components/ui/button'
-import postgresLogo from '@/assets/postgresql-logo.svg?url'
 import postgresLogoDark from '@/assets/postgresql-logo-black.svg?url'
+import postgresLogo from '@/assets/postgresql-logo.svg?url'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/shadcn/popover'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
+import { TypographyH1, TypographySmall } from '@/components/ui/typography'
 import { useTheme } from '@/hooks/use-theme'
+import { useClusterConnect } from '@/lib/api/gen'
+import { valibotResolver } from '@hookform/resolvers/valibot'
+import { Database, EthernetPort, Info, KeyRound, Server, UserRound } from 'lucide-react'
+import { Controller, useForm, type SubmitHandler } from 'react-hook-form'
+import styles from './index.module.css'
+import { validationSchema, type FormSubmitData } from './validation-schema'
+import { toast } from 'sonner'
+import { capitalize } from '@/lib/utils'
+import { hasErrorField } from '@/lib/api/types'
+import { useNavigate } from '@tanstack/react-router'
+import { ErrorMessage } from '@/components/ui/error-message'
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput
 } from '@/components/ui/shadcn/input-group'
-import { Database, EthernetPort, Info, KeyRound, Server, UserRound } from 'lucide-react'
-import { Label } from '@/components/ui/label'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/shadcn/popover'
-import { TypographyH1, TypographySmall } from '@/components/ui/typography'
 
 export function ConnectView() {
+  const navigate = useNavigate()
   const [theme] = useTheme()
 
-  const [loading, setLoading] = useState(false)
+  const { isPending, mutate } = useClusterConnect({
+    mutation: {
+      onError: (error) => {
+        toast.error(capitalize(error.message), {
+          description: hasErrorField(error, 'reason') && error.reason,
+          duration: 3000
+        })
+      },
+      onSuccess: () => {
+        navigate({
+          to: '/overview'
+        })
+      }
+    }
+  })
+
+  const { register, handleSubmit, control } = useForm({
+    mode: 'onBlur',
+    resolver: valibotResolver(validationSchema),
+    defaultValues: {
+      host: '',
+      port: '',
+      user: '',
+      password: ''
+    }
+  })
+
+  const onSubmit: SubmitHandler<FormSubmitData> = (values) => {
+    if (values.database === '') {
+      values.database = undefined
+    }
+
+    mutate({ data: { ...values } })
+  }
 
   return (
-    <main className="grid h-screen grid-cols-[2fr_1fr]">
-      <section className="relative flex items-center justify-center dark:bg-neutral-900">
+    <div className="grid h-screen grid-cols-[2fr_1fr]">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="relative flex items-center justify-center dark:bg-neutral-900"
+      >
         <div className="absolute top-8 right-10">
           <ThemeToggle />
         </div>
@@ -38,55 +82,20 @@ export function ConnectView() {
             <TypographyH1>Simple Dashboard</TypographyH1>
           </div>
           <div className="mb-10 pt-10">
-            <ul className="*:mb-4">
-              <li>
-                <Input label="Connection name" placeholder="My VPS postgres..." />
-              </li>
-              <li className="flex">
-                <div className="mr-8">
-                  <Label htmlFor="host-input">Host</Label>
-                  <InputGroup>
-                    <InputGroupInput id="host-input" placeholder="127.0.0.1" />
-                    <InputGroupAddon>
-                      <Server />
-                    </InputGroupAddon>
-                  </InputGroup>
-                </div>
-                <div>
-                  <Label htmlFor="port-input">Port</Label>
-                  <InputGroup>
-                    <InputGroupInput id="port-input" type="number" placeholder="5432" />
-                    <InputGroupAddon>
-                      <EthernetPort />
-                    </InputGroupAddon>
-                  </InputGroup>
-                </div>
-              </li>
-              <li>
-                <Label htmlFor="user-input">User</Label>
-                <InputGroup>
-                  <InputGroupInput id="user-input" placeholder="postgres" />
-                  <InputGroupAddon>
-                    <UserRound />
-                  </InputGroupAddon>
-                </InputGroup>
-              </li>
-              <li>
-                <Label htmlFor="password-input">Password</Label>
-                <InputGroup>
-                  <InputGroupInput id="password-input" type="password" />
-                  <InputGroupAddon>
-                    <KeyRound />
-                  </InputGroupAddon>
-                </InputGroup>
-              </li>
-              <li>
-                <Label htmlFor="database-input">Database (optional)</Label>
+            <ul>
+              <li className="mb-5">
+                <Label htmlFor="conncet-database-input">Database (optional)</Label>
                 <InputGroup>
                   <InputGroupAddon>
                     <Database />
                   </InputGroupAddon>
-                  <InputGroupInput id="database-input" placeholder="postgres" className="pl-2!" />
+                  <InputGroupInput
+                    id="conncet-database-input"
+                    placeholder="postgres"
+                    className="pl-2!"
+                    autoComplete="off"
+                    {...register('database')}
+                  />
                   <InputGroupAddon align="inline-end">
                     <Popover>
                       <PopoverTrigger asChild>
@@ -102,16 +111,123 @@ export function ConnectView() {
                   </InputGroupAddon>
                 </InputGroup>
               </li>
+              <li className="flex">
+                <div className="mr-8 w-full max-w-1/2">
+                  <Controller
+                    name="host"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <>
+                        <Label htmlFor="connect-host-input">Host</Label>
+                        <InputGroup className="mb-1">
+                          <InputGroupInput
+                            {...field}
+                            id="connect-host-input"
+                            placeholder="127.0.0.1"
+                            autoComplete="off"
+                            aria-invalid={fieldState.invalid}
+                          />
+                          <InputGroupAddon>
+                            <Server />
+                          </InputGroupAddon>
+                        </InputGroup>
+                        <ErrorMessage show={fieldState.invalid}>
+                          {fieldState.error?.message}
+                        </ErrorMessage>
+                      </>
+                    )}
+                  />
+                </div>
+                <div>
+                  <Controller
+                    name="port"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <>
+                        <Label htmlFor="conncet-port-input">Port</Label>
+                        <InputGroup className="mb-1">
+                          <InputGroupInput
+                            {...field}
+                            id="conncet-port-input"
+                            type="number"
+                            placeholder="5432"
+                            autoComplete="off"
+                            aria-invalid={fieldState.invalid}
+                          />
+                          <InputGroupAddon>
+                            <EthernetPort />
+                          </InputGroupAddon>
+                        </InputGroup>
+                        <ErrorMessage show={fieldState.invalid}>
+                          {fieldState.error?.message}
+                        </ErrorMessage>
+                      </>
+                    )}
+                  />
+                </div>
+              </li>
+              <li>
+                <Controller
+                  name="user"
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <>
+                      <Label htmlFor="conncet-user-input">User</Label>
+                      <InputGroup className="mb-1">
+                        <InputGroupInput
+                          id="conncet-user-input"
+                          placeholder="postgres"
+                          autoComplete="off"
+                          aria-invalid={fieldState.invalid}
+                          {...field}
+                        />
+                        <InputGroupAddon>
+                          <UserRound />
+                        </InputGroupAddon>
+                      </InputGroup>
+                      <ErrorMessage show={fieldState.invalid}>
+                        {fieldState.error?.message}
+                      </ErrorMessage>
+                    </>
+                  )}
+                />
+              </li>
+              <li>
+                <Controller
+                  name="password"
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <>
+                      <Label htmlFor="connect-password-input">Password</Label>
+                      <InputGroup className="mb-1">
+                        <InputGroupInput
+                          id="connect-password-input"
+                          type="password"
+                          aria-invalid={fieldState.invalid}
+                          autoComplete="off"
+                          {...field}
+                        />
+                        <InputGroupAddon>
+                          <KeyRound />
+                        </InputGroupAddon>
+                      </InputGroup>
+                      <ErrorMessage show={fieldState.invalid}>
+                        {fieldState.error?.message}
+                      </ErrorMessage>
+                    </>
+                  )}
+                />
+              </li>
             </ul>
           </div>
-          <Button loading={loading} onClick={() => setLoading((prev) => !prev)} fullWidth size="lg">
+          <Button type="submit" loading={isPending} fullWidth size="lg">
             Connect
           </Button>
         </div>
-      </section>
-      <section className={'flex items-center justify-center bg-white/90'}>
+      </form>
+      <div className="flex items-center justify-center">
         <div className={styles.view} />
-      </section>
-    </main>
+      </div>
+    </div>
   )
 }

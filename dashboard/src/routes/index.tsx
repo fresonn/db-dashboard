@@ -1,13 +1,14 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/')({
-  component: Index
+  beforeLoad({ context }) {
+    if (!context.clusterStatus) {
+      throw redirect({
+        to: '/connect'
+      })
+    }
+    throw redirect({
+      to: context.clusterStatus.postgres_connection === 'connected' ? '/overview' : '/connect'
+    })
+  }
 })
-
-function Index() {
-  return (
-    <div className="p-2">
-      <h3>Welcome Home!</h3>
-    </div>
-  )
-}

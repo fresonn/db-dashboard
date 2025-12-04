@@ -4,6 +4,7 @@ import pluginReact from 'eslint-plugin-react'
 import tseslint from '@typescript-eslint/eslint-plugin'
 import parserTs from '@typescript-eslint/parser'
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
+import queryPlugin from '@tanstack/eslint-plugin-query'
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
@@ -28,12 +29,15 @@ export default [
         ...globals.es2021
       }
     },
+    ignores: ['**/.kubb/**', 'dist/**', 'pnpm-lock.yaml'],
     plugins: {
       react: pluginReact,
       'react-hooks': pluginReact,
-      '@typescript-eslint': tseslint
+      '@typescript-eslint': tseslint,
+      '@tanstack/query': queryPlugin
     },
     rules: {
+      'no-unused-vars': ['warn'],
       'prettier/prettier': ['warn', {}, { usePrettierrc: true }],
       '@typescript-eslint/no-unused-vars': ['warn']
     },

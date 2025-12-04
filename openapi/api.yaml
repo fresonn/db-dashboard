@@ -157,7 +157,6 @@ components:
         - port
         - user
         - password
-        - database
         - sslmode
       properties:
         host:

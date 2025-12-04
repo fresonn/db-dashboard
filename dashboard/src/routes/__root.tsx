@@ -34,13 +34,13 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     const context = Route.useRouteContext()
 
     return (
-      <>
+      <main>
         <OfflineApiGuard open={!!context.connectionError} />
         <Outlet />
         <Suspense>
           <TanStackRouterDevtools position="bottom-right" />
         </Suspense>
-      </>
+      </main>
     )
   }
 })

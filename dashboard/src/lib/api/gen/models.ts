@@ -64,9 +64,9 @@ export type ClusterConnectData = {
    */
   password: string
   /**
-   * @type string
+   * @type string | undefined
    */
-  database: string
+  database?: string
   /**
    * @type string
    */

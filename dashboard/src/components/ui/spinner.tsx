@@ -6,7 +6,7 @@ export function Spinner({ ...props }: React.ComponentProps<'svg'>) {
     <Loader2Icon
       role="status"
       aria-label="Loading"
-      stroke-width="3"
+      strokeWidth={3}
       className="size-5 animate-spin"
       {...props}
     />

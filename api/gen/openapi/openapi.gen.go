@@ -23,20 +23,14 @@ const (
 	PgConnectionStatusError        ConnectionStatus = "error"
 )
 
-// BadRequestError defines model for BadRequestError.
-type BadRequestError struct {
-	Error string `json:"error"`
-}
-
 // ClusterConnectData defines model for ClusterConnectData.
 type ClusterConnectData = clusterEntities.AuthData
 
 // ConnectionStatus PostgreSQL connection state
 type ConnectionStatus string
 
-// Error defines model for Error.
-type Error struct {
-	Code    string `json:"code"`
+// ErrorBase Error part that should be present in all errors
+type ErrorBase struct {
 	Message string `json:"message"`
 }
 
@@ -46,14 +40,10 @@ type GetStatusResponse struct {
 	PostgresConnection ConnectionStatus `json:"postgres_connection"`
 }
 
-// GetStatusResponseError defines model for GetStatusResponseError.
-type GetStatusResponseError struct {
-	Message string `json:"message"`
-}
-
 // RequestValidationError defines model for RequestValidationError.
 type RequestValidationError struct {
 	Message string `json:"message"`
+	Reason  string `json:"reason"`
 }
 
 // ClusterConnectJSONRequestBody defines body for ClusterConnect for application/json ContentType.
@@ -288,7 +278,7 @@ func (response ClusterConnect200JSONResponse) VisitClusterConnectResponse(w http
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ClusterConnect400JSONResponse BadRequestError
+type ClusterConnect400JSONResponse ErrorBase
 
 func (response ClusterConnect400JSONResponse) VisitClusterConnectResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -307,7 +297,7 @@ func (response ClusterConnect422JSONResponse) VisitClusterConnectResponse(w http
 }
 
 type ClusterConnectdefaultJSONResponse struct {
-	Body       Error
+	Body       ErrorBase
 	StatusCode int
 }
 
@@ -334,7 +324,7 @@ func (response ClusterDisconnect200JSONResponse) VisitClusterDisconnectResponse(
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ClusterDisconnect400JSONResponse BadRequestError
+type ClusterDisconnect400JSONResponse ErrorBase
 
 func (response ClusterDisconnect400JSONResponse) VisitClusterDisconnectResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -344,7 +334,7 @@ func (response ClusterDisconnect400JSONResponse) VisitClusterDisconnectResponse(
 }
 
 type ClusterDisconnectdefaultJSONResponse struct {
-	Body       Error
+	Body       ErrorBase
 	StatusCode int
 }
 
@@ -371,7 +361,7 @@ func (response GetStatus200JSONResponse) VisitGetStatusResponse(w http.ResponseW
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetStatus400JSONResponse GetStatusResponseError
+type GetStatus400JSONResponse ErrorBase
 
 func (response GetStatus400JSONResponse) VisitGetStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")

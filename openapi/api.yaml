@@ -35,7 +35,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetStatusResponseError"
+                $ref: "#/components/schemas/ErrorBase"
   /cluster/connect:
     post:
       tags:
@@ -68,13 +68,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BadRequestError"
+                $ref: "#/components/schemas/ErrorBase"
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/ErrorBase"
   /cluster/disconnect:
     post:
       tags:
@@ -94,31 +94,33 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BadRequestError"
+                $ref: "#/components/schemas/ErrorBase"
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: "#/components/schemas/ErrorBase"
 components:
   schemas:
-    RequestValidationError:
+    ErrorBase:
       type: object
+      description: Error part that should be present in all errors
+      required:
+        - message
       properties:
         message:
           type: string
-          example: some body fields are invalid
-      required:
-        - message
-    BadRequestError:
-      type: object
-      properties:
-        error:
-          type: string
-          example: error details
-      required:
-        - error
+    RequestValidationError:
+      allOf:
+        - $ref: "#/components/schemas/ErrorBase"
+        - type: object
+          properties:
+            reason:
+              type: string
+              example: the body fields are invalid
+          required:
+            - reason
     ConnectionStatus:
       type: string
       enum: [connecting, connected, disconnected, error]
@@ -137,14 +139,6 @@ components:
           $ref: "#/components/schemas/ConnectionStatus"
           example: connected
           description: Represents connection state between dashboard and postgres
-    GetStatusResponseError:
-      type: object
-      required:
-        - message
-      properties:
-        message:
-          type: string
-          example: failed to get cluster status
     ClusterConnectData: # internal/scopes/cluster/entities/entities.go
       x-go-type: clusterEntities.AuthData
       x-go-type-import:
@@ -177,13 +171,3 @@ components:
         sslmode:
           type: string
           example: ""
-    Error:
-      type: object
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-      required:
-        - code
-        - message

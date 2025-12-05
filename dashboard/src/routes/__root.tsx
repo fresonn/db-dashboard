@@ -3,6 +3,7 @@ import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
 import type { QueryClient } from '@tanstack/react-query'
 import { clusterStatusQuery } from '@/lib/api/cluster-status'
 import { OfflineApiGuard } from '@/components/offline-api-guard'
+import { Toaster } from 'sonner'
 
 export interface RouterContext {
   queryClient: QueryClient
@@ -34,9 +35,20 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     const context = Route.useRouteContext()
 
     return (
-      <main>
+      <main className="">
         <OfflineApiGuard open={!!context.connectionError} />
         <Outlet />
+        <Toaster
+          position="bottom-right"
+          visibleToasts={4}
+          toastOptions={{
+            classNames: {
+              toast: '!border-border dark:!bg-neutral-900 !bg-background !text-foreground',
+              success: '!border-green-500/30 !text-green-500',
+              error: '!border-red-500/30 !text-red-500'
+            }
+          }}
+        />
         <Suspense>
           <TanStackRouterDevtools position="bottom-right" />
         </Suspense>

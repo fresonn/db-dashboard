@@ -44,6 +44,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
           toastOptions={{
             classNames: {
               toast: '!border-border dark:!bg-neutral-900 !bg-background !text-foreground',
+              description: '!text-muted-foreground',
               success: '!border-green-500/30 !text-green-500',
               error: '!border-red-500/30 !text-red-500'
             }

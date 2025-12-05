@@ -3,14 +3,12 @@ export type { ClusterDisconnectMutationKey } from './hooks/useClusterDisconnect.
 export type { GetStatusQueryKey } from './hooks/useGetStatus.ts'
 export type { GetStatusSuspenseQueryKey } from './hooks/useGetStatusSuspense.ts'
 export type {
+  ErrorBase,
   RequestValidationError,
-  BadRequestError,
   ConnectionStatusEnumKey,
   ConnectionStatus,
   GetStatusResponse,
-  GetStatusResponseError,
   ClusterConnectData,
-  Error,
   GetStatus200,
   GetStatus400,
   GetStatusQueryResponse,

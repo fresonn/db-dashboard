@@ -18,36 +18,45 @@ import { Database, EthernetPort, Info, KeyRound, Server, UserRound } from 'lucid
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import styles from './index.module.css'
 import { validationSchema, type FormSubmitData } from './validation-schema'
+import { toast } from 'sonner'
+import { capitalize } from '@/lib/utils'
+import { hasErrorField } from '@/lib/api/types'
+import { useNavigate } from '@tanstack/react-router'
 
 export function ConnectView() {
+  const navigate = useNavigate()
   const [theme] = useTheme()
 
-  const { isPending, mutateAsync } = useClusterConnect()
+  const { isPending, mutate } = useClusterConnect({
+    mutation: {
+      onError: (error) => {
+        console.log(error)
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors }
-  } = useForm({
+        toast.error(capitalize(error.message), {
+          description: hasErrorField(error, 'reason') && error.reason,
+          duration: 3000
+        })
+      },
+      onSuccess: () => {
+        navigate({
+          to: '/overview'
+        })
+      }
+    }
+  })
+
+  const { register, handleSubmit } = useForm({
     mode: 'onSubmit',
     resolver: valibotResolver(validationSchema),
     shouldUnregister: true
   })
 
-  const onSubmit: SubmitHandler<FormSubmitData> = async (values) => {
+  const onSubmit: SubmitHandler<FormSubmitData> = (values) => {
     if (values.database === '') {
       values.database = undefined
     }
 
-    try {
-      const resp = await mutateAsync({
-        data: { ...values }
-      })
-
-      console.log('resp', resp)
-    } catch (error) {
-      console.log('e', error)
-    }
+    mutate({ data: { ...values } })
   }
 
   return (

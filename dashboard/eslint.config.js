@@ -39,8 +39,7 @@ export default [
     rules: {
       'no-unused-vars': ['warn'],
       'prettier/prettier': ['warn', {}, { usePrettierrc: true }],
-      '@typescript-eslint/no-unused-vars': ['warn'],
-      'eslint/no-unused-vars': ['warn']
+      '@typescript-eslint/no-unused-vars': ['warn']
     },
     settings: {
       react: {

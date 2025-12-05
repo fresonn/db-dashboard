@@ -41,12 +41,13 @@ func (h *Handler) ClusterConnect(ctx context.Context, request openapi.ClusterCon
 		var ve validator.ValidationErrors
 		if errors.As(err, &ve) {
 			return openapi.ClusterConnect422JSONResponse{
-				Message: err.Error(),
+				Message: "Request validation failed",
+				Reason:  err.Error(),
 			}, nil
 		}
 
 		return openapi.ClusterConnect400JSONResponse{
-			Error: err.Error(),
+			Message: err.Error(),
 		}, nil
 	}
 
@@ -60,7 +61,7 @@ func (h *Handler) ClusterDisconnect(ctx context.Context, _request openapi.Cluste
 	err := h.cluster.Disconnect(ctx)
 	if err != nil {
 		return openapi.ClusterDisconnect400JSONResponse{
-			Error: err.Error(),
+			Message: err.Error(),
 		}, nil
 	}
 

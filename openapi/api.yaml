@@ -101,6 +101,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorBase"
+  /cluster/version:
+    get:
+      tags:
+        - cluster
+      summary: Get detailed Postgres version info
+      description: Get detailed Postgres version info
+      operationId: PostgresVersion
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetPostgresVersionResponse"
+        400:
+          description: Attempt failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorBase"
 components:
   schemas:
     ErrorBase:
@@ -111,6 +131,7 @@ components:
       properties:
         message:
           type: string
+          example: something went wrong
     RequestValidationError:
       allOf:
         - $ref: "#/components/schemas/ErrorBase"
@@ -171,3 +192,24 @@ components:
         sslmode:
           type: string
           example: ""
+    GetPostgresVersionResponse:
+      x-go-type: clusterEntities.PostgresVersion
+      x-go-type-import:
+        path: dashboard/api/internal/scopes/cluster/entities
+        name: clusterEntities
+      x-go-type-name: clusterEntities.PostgresVersion
+      type: object
+      required:
+        - version
+        - compiler
+        - bitDepth
+      properties:
+        version:
+          type: string
+          example: PostgreSQL 15.3 on x86_64-pc-linux-gnu
+        compiler:
+          type: string
+          example: compiled by gcc (Ubuntu 11.3.0) 11.3.0
+        bitDepth:
+          type: string
+          example: 64-bit

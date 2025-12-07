@@ -34,6 +34,9 @@ type ErrorBase struct {
 	Message string `json:"message"`
 }
 
+// GetPostgresVersionResponse defines model for GetPostgresVersionResponse.
+type GetPostgresVersionResponse = clusterEntities.PostgresVersion
+
 // GetStatusResponse defines model for GetStatusResponse.
 type GetStatusResponse struct {
 	// PostgresConnection PostgreSQL connection state
@@ -60,6 +63,9 @@ type ServerInterface interface {
 	// Get server current status
 	// (GET /cluster/status)
 	GetStatus(w http.ResponseWriter, r *http.Request)
+	// Get detailed Postgres version info
+	// (GET /cluster/version)
+	PostgresVersion(w http.ResponseWriter, r *http.Request)
 }
 
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
@@ -81,6 +87,12 @@ func (_ Unimplemented) ClusterDisconnect(w http.ResponseWriter, r *http.Request)
 // Get server current status
 // (GET /cluster/status)
 func (_ Unimplemented) GetStatus(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get detailed Postgres version info
+// (GET /cluster/version)
+func (_ Unimplemented) PostgresVersion(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -126,6 +138,20 @@ func (siw *ServerInterfaceWrapper) GetStatus(w http.ResponseWriter, r *http.Requ
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetStatus(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostgresVersion operation middleware
+func (siw *ServerInterfaceWrapper) PostgresVersion(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostgresVersion(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -257,6 +283,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/cluster/status", wrapper.GetStatus)
 	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/cluster/version", wrapper.PostgresVersion)
+	})
 
 	return r
 }
@@ -370,6 +399,31 @@ func (response GetStatus400JSONResponse) VisitGetStatusResponse(w http.ResponseW
 	return json.NewEncoder(w).Encode(response)
 }
 
+type PostgresVersionRequestObject struct {
+}
+
+type PostgresVersionResponseObject interface {
+	VisitPostgresVersionResponse(w http.ResponseWriter) error
+}
+
+type PostgresVersion200JSONResponse GetPostgresVersionResponse
+
+func (response PostgresVersion200JSONResponse) VisitPostgresVersionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostgresVersion400JSONResponse ErrorBase
+
+func (response PostgresVersion400JSONResponse) VisitPostgresVersionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
 	// Connect to Postgres cluster
@@ -381,6 +435,9 @@ type StrictServerInterface interface {
 	// Get server current status
 	// (GET /cluster/status)
 	GetStatus(ctx context.Context, request GetStatusRequestObject) (GetStatusResponseObject, error)
+	// Get detailed Postgres version info
+	// (GET /cluster/version)
+	PostgresVersion(ctx context.Context, request PostgresVersionRequestObject) (PostgresVersionResponseObject, error)
 }
 
 type StrictHandlerFunc = strictnethttp.StrictHTTPHandlerFunc
@@ -484,6 +541,30 @@ func (sh *strictHandler) GetStatus(w http.ResponseWriter, r *http.Request) {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetStatusResponseObject); ok {
 		if err := validResponse.VisitGetStatusResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostgresVersion operation middleware
+func (sh *strictHandler) PostgresVersion(w http.ResponseWriter, r *http.Request) {
+	var request PostgresVersionRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostgresVersion(ctx, request.(PostgresVersionRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostgresVersion")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostgresVersionResponseObject); ok {
+		if err := validResponse.VisitPostgresVersionResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

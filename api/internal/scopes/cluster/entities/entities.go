@@ -28,3 +28,9 @@ func (a AuthData) PrettyLog() {
 		slog.Any("sslmode", a.SSLMode),
 	)
 }
+
+type PostgresVersion struct {
+	Version  string `json:"version"`
+	Compiler string `json:"compiler"`
+	BitDepth string `json:"bitDepth"`
+}

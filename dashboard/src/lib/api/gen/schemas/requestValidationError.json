@@ -1,6 +1,17 @@
 {
-  "type": "object",
-  "properties": { "message": { "type": "string", "example": "some body fields are invalid" } },
-  "required": ["message"],
+  "allOf": [
+    {
+      "type": "object",
+      "description": "Error part that should be present in all errors",
+      "required": ["message"],
+      "properties": { "message": { "type": "string" } },
+      "x-readme-ref-name": "ErrorBase"
+    },
+    {
+      "type": "object",
+      "properties": { "reason": { "type": "string", "example": "the body fields are invalid" } },
+      "required": ["reason"]
+    }
+  ],
   "x-readme-ref-name": "RequestValidationError"
 }

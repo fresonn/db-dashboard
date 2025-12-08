@@ -1,5 +1,5 @@
 import { ThemeToggle } from '@/components/ui/theme-toggle'
-import { TypographyH1 } from '@/components/ui/typography'
+import { Typography } from '@/components/ui/typography'
 import { VersionWidget, VersionWidgetSkeleton } from './version'
 import { Widget } from './common'
 import { Button } from '@/components/ui/button'
@@ -17,7 +17,9 @@ export function DashboardGrid({ children }: { children: ReactNode }) {
 export function Overview() {
   return (
     <div className="p-5">
-      <TypographyH1>Overview</TypographyH1>
+      <Typography variant="h1" as="h1">
+        Overview
+      </Typography>
       <ThemeToggle />
 
       <Refect />

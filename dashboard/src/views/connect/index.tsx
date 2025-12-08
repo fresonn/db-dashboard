@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/shadcn/popover'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
-import { TypographyH1, TypographySmall } from '@/components/ui/typography'
+import { Typography } from '@/components/ui/typography'
 import { useTheme } from '@/hooks/use-theme'
 import { useClusterConnect } from '@/lib/api/gen'
 import { valibotResolver } from '@hookform/resolvers/valibot'
@@ -79,7 +79,9 @@ export function ConnectView() {
               className="mr-2 size-16"
               alt="postgresql logo"
             />
-            <TypographyH1>Simple Dashboard</TypographyH1>
+            <Typography variant="h1" as="h1">
+              Simple Dashboard
+            </Typography>
           </div>
           <div className="mb-10 pt-10">
             <ul>
@@ -104,8 +106,9 @@ export function ConnectView() {
                         </InputGroupButton>
                       </PopoverTrigger>
                       <PopoverContent className="text-sm leading-normal">
-                        By default it tries to connect to{' '}
-                        <TypographySmall>postgres</TypographySmall> database
+                        <Typography variant="small" as="h1">
+                          By default dashboard tries to connect to <b>postgres</b> database
+                        </Typography>
                       </PopoverContent>
                     </Popover>
                   </InputGroupAddon>

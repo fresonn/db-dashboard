@@ -1,25 +1,53 @@
-import type { ReactNode } from 'react'
+import React from 'react'
+import { cva, type VariantProps } from 'cva'
 
-export type TypographyProps = {
-  children: ReactNode
+const typography = cva('antialiased', {
+  variants: {
+    variant: {
+      h1: 'scroll-m-20 text-4xl font-semibold tracking-tight',
+      h2: 'scroll-m-20 text-3xl font-semibold tracking-tight',
+      h3: 'scroll-m-20 text-2xl font-semibold tracking-tight',
+      h4: 'scroll-m-20 text-xl font-semibold tracking-tight',
+      p: 'leading-7 [&:not(:first-child)]:mt-4',
+      muted: 'text-muted-foreground text-sm',
+      lead: 'text-muted-foreground text-xl',
+      small: 'text-sm leading-normal',
+      code: 'font-code text-sm leading-none font-medium tracking-wide text-balance',
+      blockquote: 'border-muted text-muted-foreground mt-6 border-l-4 pl-4 italic'
+    }
+  },
+  defaultVariants: {
+    variant: 'p'
+  }
+})
+
+export type TypographyTags =
+  | 'p'
+  | 'span'
+  | 'h1'
+  | 'h2'
+  | 'h3'
+  | 'h4'
+  | 'small'
+  | 'code'
+  | 'blockquote'
+
+export interface TypographyProps extends React.HTMLAttributes<HTMLElement> {
+  children: React.ReactNode
+  as?: TypographyTags
 }
 
-export function TypographyH1({ children }: TypographyProps) {
+export function Typography({
+  variant,
+  className,
+  children,
+  as,
+  ...props
+}: VariantProps<typeof typography> & TypographyProps) {
+  const Tag = as ?? 'p'
   return (
-    <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance select-none">
+    <Tag className={typography({ variant, className })} {...props}>
       {children}
-    </h1>
-  )
-}
-
-export function TypographySmall({ children }: TypographyProps) {
-  return <small className="text-sm leading-none font-medium">{children}</small>
-}
-
-export function TypographyCode({ children }: TypographyProps) {
-  return (
-    <p className="font-code text-sm leading-none font-medium tracking-wide text-balance">
-      {children}
-    </p>
+    </Tag>
   )
 }

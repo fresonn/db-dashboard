@@ -5,7 +5,9 @@ import { ErrorBoundary } from '@/components/error-boundary'
 export function WidgetErrorFallback() {
   return (
     <div className="flex h-full flex-col items-center justify-center text-red-700 dark:text-yellow-400">
-      <TriangleAlert className="size-8" strokeWidth={1.5} />
+      <div>
+        <TriangleAlert className="size-8" strokeWidth={1.5} />
+      </div>
       <p className="text-center">Failed to fetch</p>
     </div>
   )

@@ -1,5 +1,5 @@
 import { usePostgresVersionSuspense } from '@/lib/api/gen'
-import { TypographyCode } from '@/components/ui/typography'
+import { Typography } from '@/components/ui/typography'
 import ContentLoader from 'react-content-loader'
 
 export function VersionWidgetSkeleton() {
@@ -26,8 +26,12 @@ export function VersionWidget() {
 
   return (
     <div className="pt-2">
-      <TypographyCode>{data.version}</TypographyCode>
-      {data.bitDepth !== '' && <TypographyCode>{data.bitDepth}</TypographyCode>}
+      <Typography variant="code">{data.version}</Typography>
+      {data.bitDepth !== '' && (
+        <Typography className="mt-1.5" variant="code">
+          {data.bitDepth}
+        </Typography>
+      )}
     </div>
   )
 }

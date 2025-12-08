@@ -1,0 +1,16 @@
+{
+  "x-go-type": "clusterEntities.PostgresVersion",
+  "x-go-type-import": {
+    "path": "dashboard/api/internal/scopes/cluster/entities",
+    "name": "clusterEntities"
+  },
+  "x-go-type-name": "clusterEntities.PostgresVersion",
+  "type": "object",
+  "required": ["version", "compiler", "bitDepth"],
+  "properties": {
+    "version": { "type": "string", "example": "PostgreSQL 15.3 on x86_64-pc-linux-gnu" },
+    "compiler": { "type": "string", "example": "compiled by gcc (Ubuntu 11.3.0) 11.3.0" },
+    "bitDepth": { "type": "string", "example": "64-bit" }
+  },
+  "x-readme-ref-name": "GetPostgresVersionResponse"
+}

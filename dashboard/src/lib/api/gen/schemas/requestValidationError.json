@@ -4,7 +4,7 @@
       "type": "object",
       "description": "Error part that should be present in all errors",
       "required": ["message"],
-      "properties": { "message": { "type": "string" } },
+      "properties": { "message": { "type": "string", "example": "something went wrong" } },
       "x-readme-ref-name": "ErrorBase"
     },
     {

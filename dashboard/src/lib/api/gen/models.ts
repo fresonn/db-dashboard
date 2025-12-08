@@ -69,6 +69,21 @@ export type ClusterConnectData = {
   sslmode: string
 }
 
+export type GetPostgresVersionResponse = {
+  /**
+   * @type string
+   */
+  version: string
+  /**
+   * @type string
+   */
+  compiler: string
+  /**
+   * @type string
+   */
+  bitDepth: string
+}
+
 /**
  * @description Server current status
  */
@@ -139,4 +154,21 @@ export type ClusterDisconnectMutationResponse = ClusterDisconnect200
 export type ClusterDisconnectMutation = {
   Response: ClusterDisconnect200
   Errors: ClusterDisconnect400
+}
+
+/**
+ * @description Successful operation
+ */
+export type PostgresVersion200 = GetPostgresVersionResponse
+
+/**
+ * @description Attempt failed
+ */
+export type PostgresVersion400 = ErrorBase
+
+export type PostgresVersionQueryResponse = PostgresVersion200
+
+export type PostgresVersionQuery = {
+  Response: PostgresVersion200
+  Errors: PostgresVersion400
 }

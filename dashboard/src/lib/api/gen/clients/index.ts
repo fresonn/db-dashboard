@@ -1,3 +1,4 @@
 export { clusterConnect } from './clusterConnect.ts'
 export { clusterDisconnect } from './clusterDisconnect.ts'
 export { getStatus } from './getStatus.ts'
+export { postgresVersion } from './postgresVersion.ts'

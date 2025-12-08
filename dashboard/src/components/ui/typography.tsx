@@ -15,3 +15,11 @@ export function TypographyH1({ children }: TypographyProps) {
 export function TypographySmall({ children }: TypographyProps) {
   return <small className="text-sm leading-none font-medium">{children}</small>
 }
+
+export function TypographyCode({ children }: TypographyProps) {
+  return (
+    <p className="font-code text-sm leading-none font-medium tracking-wide text-balance">
+      {children}
+    </p>
+  )
+}

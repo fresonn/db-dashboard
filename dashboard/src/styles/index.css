@@ -9,6 +9,11 @@
   --color-theme-color: oklch(79.2% 0.209 151.711);
 }
 
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -80,10 +85,13 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --skeleton-bg: theme(colors.gray.200);
+  --skeleton-fg: theme(colors.gray.100);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: oklch(14.1% 0.005 285.823);
+  --background: #181818;
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
@@ -114,6 +122,8 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --skeleton-bg: theme(colors.neutral.700);
+  --skeleton-fg: theme(colors.neutral.500);
 }
 
 @layer base {

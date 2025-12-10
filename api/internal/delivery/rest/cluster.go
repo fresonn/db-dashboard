@@ -68,3 +68,15 @@ func (h *Handler) PostgresVersion(ctx context.Context, request openapi.PostgresV
 
 	return openapi.PostgresVersion200JSONResponse(version), nil
 }
+
+func (h *Handler) PostgresUptime(ctx context.Context, request openapi.PostgresUptimeRequestObject) (openapi.PostgresUptimeResponseObject, error) {
+
+	uptime, err := h.cluster.Uptime(ctx)
+	if err != nil {
+		return openapi.PostgresUptime400JSONResponse{
+			Message: err.Error(),
+		}, nil
+	}
+
+	return openapi.PostgresUptime200JSONResponse(uptime), nil
+}

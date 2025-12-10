@@ -121,6 +121,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorBase"
+  /cluster/uptime:
+    get:
+      tags:
+        - cluster
+      summary: Get Postgres uptime info
+      description: Get Postgres uptime info
+      operationId: PostgresUptime
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetPostgresUptimeResponse"
+        400:
+          description: Attempt failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorBase"
 components:
   schemas:
     ErrorBase:
@@ -213,3 +233,17 @@ components:
         bitDepth:
           type: string
           example: 64-bit
+    GetPostgresUptimeResponse:
+      x-go-type: clusterEntities.PostgresUptime
+      x-go-type-import:
+        path: dashboard/api/internal/scopes/cluster/entities
+        name: clusterEntities
+      x-go-type-name: clusterEntities.PostgresUptime
+      type: object
+      description: Returns an ISO-8601 string with timezone
+      required:
+        - startedAt
+      properties:
+        startedAt:
+          type: string
+          example: 2025-12-05 13:45:06.746931+02

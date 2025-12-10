@@ -4,6 +4,7 @@ import (
 	"context"
 	"dashboard/api/internal/config"
 	"dashboard/api/internal/postgres"
+	"dashboard/api/internal/scopes/cluster/entities"
 	"dashboard/api/pkg/logger"
 	"log/slog"
 
@@ -20,6 +21,7 @@ type Cluster struct {
 
 type ClusterStorage interface {
 	Version() (string, error)
+	Uptime() (entities.PostgresUptime, error)
 }
 
 func New(config config.AppConfig, lgr *slog.Logger, storage ClusterStorage, pgManager *postgres.Manager) *Cluster {

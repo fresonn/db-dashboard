@@ -1,6 +1,9 @@
 package entities
 
-import "log/slog"
+import (
+	"log/slog"
+	"time"
+)
 
 type AuthData struct {
 	Host     string  `json:"host" validate:"required,hostname"`
@@ -33,4 +36,8 @@ type PostgresVersion struct {
 	Version  string `json:"version"`
 	Compiler string `json:"compiler"`
 	BitDepth string `json:"bitDepth"`
+}
+
+type PostgresUptime struct {
+	StartedAt time.Time `json:"startedAt" db:"cluster_started_at"`
 }

@@ -34,6 +34,9 @@ type ErrorBase struct {
 	Message string `json:"message"`
 }
 
+// GetPostgresUptimeResponse Returns an ISO-8601 string with timezone
+type GetPostgresUptimeResponse = clusterEntities.PostgresUptime
+
 // GetPostgresVersionResponse defines model for GetPostgresVersionResponse.
 type GetPostgresVersionResponse = clusterEntities.PostgresVersion
 
@@ -63,6 +66,9 @@ type ServerInterface interface {
 	// Get server current status
 	// (GET /cluster/status)
 	GetStatus(w http.ResponseWriter, r *http.Request)
+	// Get Postgres uptime info
+	// (GET /cluster/uptime)
+	PostgresUptime(w http.ResponseWriter, r *http.Request)
 	// Get detailed Postgres version info
 	// (GET /cluster/version)
 	PostgresVersion(w http.ResponseWriter, r *http.Request)
@@ -87,6 +93,12 @@ func (_ Unimplemented) ClusterDisconnect(w http.ResponseWriter, r *http.Request)
 // Get server current status
 // (GET /cluster/status)
 func (_ Unimplemented) GetStatus(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get Postgres uptime info
+// (GET /cluster/uptime)
+func (_ Unimplemented) PostgresUptime(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -138,6 +150,20 @@ func (siw *ServerInterfaceWrapper) GetStatus(w http.ResponseWriter, r *http.Requ
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetStatus(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostgresUptime operation middleware
+func (siw *ServerInterfaceWrapper) PostgresUptime(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostgresUptime(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -284,6 +310,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Get(options.BaseURL+"/cluster/status", wrapper.GetStatus)
 	})
 	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/cluster/uptime", wrapper.PostgresUptime)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/cluster/version", wrapper.PostgresVersion)
 	})
 
@@ -399,6 +428,31 @@ func (response GetStatus400JSONResponse) VisitGetStatusResponse(w http.ResponseW
 	return json.NewEncoder(w).Encode(response)
 }
 
+type PostgresUptimeRequestObject struct {
+}
+
+type PostgresUptimeResponseObject interface {
+	VisitPostgresUptimeResponse(w http.ResponseWriter) error
+}
+
+type PostgresUptime200JSONResponse GetPostgresUptimeResponse
+
+func (response PostgresUptime200JSONResponse) VisitPostgresUptimeResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostgresUptime400JSONResponse ErrorBase
+
+func (response PostgresUptime400JSONResponse) VisitPostgresUptimeResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type PostgresVersionRequestObject struct {
 }
 
@@ -435,6 +489,9 @@ type StrictServerInterface interface {
 	// Get server current status
 	// (GET /cluster/status)
 	GetStatus(ctx context.Context, request GetStatusRequestObject) (GetStatusResponseObject, error)
+	// Get Postgres uptime info
+	// (GET /cluster/uptime)
+	PostgresUptime(ctx context.Context, request PostgresUptimeRequestObject) (PostgresUptimeResponseObject, error)
 	// Get detailed Postgres version info
 	// (GET /cluster/version)
 	PostgresVersion(ctx context.Context, request PostgresVersionRequestObject) (PostgresVersionResponseObject, error)
@@ -541,6 +598,30 @@ func (sh *strictHandler) GetStatus(w http.ResponseWriter, r *http.Request) {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetStatusResponseObject); ok {
 		if err := validResponse.VisitGetStatusResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostgresUptime operation middleware
+func (sh *strictHandler) PostgresUptime(w http.ResponseWriter, r *http.Request) {
+	var request PostgresUptimeRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostgresUptime(ctx, request.(PostgresUptimeRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostgresUptime")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostgresUptimeResponseObject); ok {
+		if err := validResponse.VisitPostgresUptimeResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

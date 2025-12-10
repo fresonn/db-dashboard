@@ -2,9 +2,8 @@ import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { Typography } from '@/components/ui/typography'
 import { VersionWidget, VersionWidgetSkeleton } from './version'
 import { Widget } from './common'
-import { Button } from '@/components/ui/button'
-import { useQueryClient } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
+import { UptimeWidget, UptimeWidgetSkeleton } from './uptime'
 
 export function DashboardGrid({ children }: { children: ReactNode }) {
   return (
@@ -22,8 +21,6 @@ export function Overview() {
       </Typography>
       <ThemeToggle />
 
-      <Refect />
-
       <div className="mt-20">
         <DashboardGrid>
           <Widget
@@ -33,20 +30,16 @@ export function Overview() {
           >
             <VersionWidget />
           </Widget>
-          <div className="col-span-3 row-span-2 dark:bg-neutral-800"></div>
-          <div className="col-span-2 row-span-2 dark:bg-neutral-800"></div>
+          <Widget
+            title="Uptime"
+            className="col-span-3 row-span-2"
+            skeleton={<UptimeWidgetSkeleton />}
+          >
+            <UptimeWidget />
+          </Widget>
+          {/* <div className="animate-in fade-in in-from-top col-span-2 row-span-2 duration-300 dark:bg-neutral-800"></div> */}
         </DashboardGrid>
       </div>
     </div>
   )
-}
-
-function Refect() {
-  const queryClient = useQueryClient()
-
-  const handleClick = () => {
-    queryClient.refetchQueries({ queryKey: [{ url: '/cluster/version' }] })
-  }
-
-  return <Button onClick={handleClick}>Refetch</Button>
 }

@@ -85,6 +85,16 @@ export type GetPostgresVersionResponse = {
 }
 
 /**
+ * @description Returns an ISO-8601 string with timezone
+ */
+export type GetPostgresUptimeResponse = {
+  /**
+   * @type string
+   */
+  startedAt: string
+}
+
+/**
  * @description Server current status
  */
 export type GetStatus200 = GetStatusResponse
@@ -171,4 +181,21 @@ export type PostgresVersionQueryResponse = PostgresVersion200
 export type PostgresVersionQuery = {
   Response: PostgresVersion200
   Errors: PostgresVersion400
+}
+
+/**
+ * @description Successful operation
+ */
+export type PostgresUptime200 = GetPostgresUptimeResponse
+
+/**
+ * @description Attempt failed
+ */
+export type PostgresUptime400 = ErrorBase
+
+export type PostgresUptimeQueryResponse = PostgresUptime200
+
+export type PostgresUptimeQuery = {
+  Response: PostgresUptime200
+  Errors: PostgresUptime400
 }

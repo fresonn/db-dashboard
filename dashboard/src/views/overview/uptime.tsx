@@ -1,8 +1,9 @@
-import { usePostgresVersionSuspense } from '@/lib/api/gen'
+import { usePostgresUptimeSuspense } from '@/lib/api/gen'
 import { Typography } from '@/components/ui/typography'
 import ContentLoader from 'react-content-loader'
+import { TimeTicker } from '@/components/ui/time-ticker'
 
-export function VersionWidgetSkeleton() {
+export function UptimeWidgetSkeleton() {
   return (
     <ContentLoader
       className="h-full pt-2"
@@ -11,13 +12,12 @@ export function VersionWidgetSkeleton() {
       width="100%"
     >
       <rect x="0" y="0" width="100%" rx="6" ry="6" height="16" />
-      <rect x="0" y="60%" width="25%" rx="6" ry="6" height="16" />
     </ContentLoader>
   )
 }
 
-export function VersionWidget() {
-  const { data } = usePostgresVersionSuspense({
+export function UptimeWidget() {
+  const { data } = usePostgresUptimeSuspense({
     query: {
       retry: false
     }
@@ -25,12 +25,9 @@ export function VersionWidget() {
 
   return (
     <div className="animate-in fade-in slide-in-from-top-8 pt-2 duration-300">
-      <Typography variant="code">{data.version}</Typography>
-      {data.bitDepth !== '' && (
-        <Typography className="mt-1.5" variant="code">
-          {data.bitDepth}
-        </Typography>
-      )}
+      <Typography variant="code">
+        <TimeTicker startedAtIso={data.startedAt} />
+      </Typography>
     </div>
   )
 }

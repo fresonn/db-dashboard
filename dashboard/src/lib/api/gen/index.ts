@@ -2,6 +2,8 @@ export type { ClusterConnectMutationKey } from './hooks/useClusterConnect.ts'
 export type { ClusterDisconnectMutationKey } from './hooks/useClusterDisconnect.ts'
 export type { GetStatusQueryKey } from './hooks/useGetStatus.ts'
 export type { GetStatusSuspenseQueryKey } from './hooks/useGetStatusSuspense.ts'
+export type { PostgresUptimeQueryKey } from './hooks/usePostgresUptime.ts'
+export type { PostgresUptimeSuspenseQueryKey } from './hooks/usePostgresUptimeSuspense.ts'
 export type { PostgresVersionQueryKey } from './hooks/usePostgresVersion.ts'
 export type { PostgresVersionSuspenseQueryKey } from './hooks/usePostgresVersionSuspense.ts'
 export type {
@@ -12,6 +14,7 @@ export type {
   GetStatusResponse,
   ClusterConnectData,
   GetPostgresVersionResponse,
+  GetPostgresUptimeResponse,
   GetStatus200,
   GetStatus400,
   GetStatusQueryResponse,
@@ -31,11 +34,16 @@ export type {
   PostgresVersion200,
   PostgresVersion400,
   PostgresVersionQueryResponse,
-  PostgresVersionQuery
+  PostgresVersionQuery,
+  PostgresUptime200,
+  PostgresUptime400,
+  PostgresUptimeQueryResponse,
+  PostgresUptimeQuery
 } from './models.ts'
 export { clusterConnect } from './clients/clusterConnect.ts'
 export { clusterDisconnect } from './clients/clusterDisconnect.ts'
 export { getStatus } from './clients/getStatus.ts'
+export { postgresUptime } from './clients/postgresUptime.ts'
 export { postgresVersion } from './clients/postgresVersion.ts'
 export { clusterConnectMutationKey } from './hooks/useClusterConnect.ts'
 export { clusterConnectMutationOptions } from './hooks/useClusterConnect.ts'
@@ -49,6 +57,12 @@ export { useGetStatus } from './hooks/useGetStatus.ts'
 export { getStatusSuspenseQueryKey } from './hooks/useGetStatusSuspense.ts'
 export { getStatusSuspenseQueryOptions } from './hooks/useGetStatusSuspense.ts'
 export { useGetStatusSuspense } from './hooks/useGetStatusSuspense.ts'
+export { postgresUptimeQueryKey } from './hooks/usePostgresUptime.ts'
+export { postgresUptimeQueryOptions } from './hooks/usePostgresUptime.ts'
+export { usePostgresUptime } from './hooks/usePostgresUptime.ts'
+export { postgresUptimeSuspenseQueryKey } from './hooks/usePostgresUptimeSuspense.ts'
+export { postgresUptimeSuspenseQueryOptions } from './hooks/usePostgresUptimeSuspense.ts'
+export { usePostgresUptimeSuspense } from './hooks/usePostgresUptimeSuspense.ts'
 export { postgresVersionQueryKey } from './hooks/usePostgresVersion.ts'
 export { postgresVersionQueryOptions } from './hooks/usePostgresVersion.ts'
 export { usePostgresVersion } from './hooks/usePostgresVersion.ts'

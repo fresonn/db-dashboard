@@ -1,0 +1,13 @@
+{
+  "x-go-type": "clusterEntities.PostgresUptime",
+  "x-go-type-import": {
+    "path": "dashboard/api/internal/scopes/cluster/entities",
+    "name": "clusterEntities"
+  },
+  "x-go-type-name": "clusterEntities.PostgresUptime",
+  "type": "object",
+  "description": "Returns an ISO-8601 string with timezone",
+  "required": ["startedAt"],
+  "properties": { "startedAt": { "type": "string", "example": "2025-12-05 13:45:06.746931+02" } },
+  "x-readme-ref-name": "GetPostgresUptimeResponse"
+}

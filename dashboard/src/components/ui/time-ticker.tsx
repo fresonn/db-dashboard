@@ -21,7 +21,7 @@ export function TimeTicker({ startedAtIso }: { startedAtIso: string }) {
       const parts: string[] = []
 
       if (days > 0) parts.push(`${days} days`)
-      if (hours > 0) parts.push(`${hours}h`)
+      if (hours > 0) parts.push(`${hours} hours`)
       if (minutes > 0 || hours > 0 || days > 0) {
         parts.push(`${minutes} min`)
       }

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { AlarmClockCheck, Database } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 
-export const Route = createFileRoute('/ui')({
+export const Route = createFileRoute('/_authenticated/ui')({
   component: RouteComponent
 })
 

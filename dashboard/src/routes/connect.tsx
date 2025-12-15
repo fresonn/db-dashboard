@@ -7,7 +7,7 @@ export const Route = createFileRoute('/connect')({
 
     if (context.clusterStatus.postgres_connection === 'connected') {
       if (import.meta.env.PROD) {
-        throw redirect({ to: '/overview' })
+        throw redirect({ to: '/' })
       }
     }
   },

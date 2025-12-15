@@ -35,7 +35,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     const context = Route.useRouteContext()
 
     return (
-      <main className="">
+      <>
         <OfflineApiGuard open={!!context.connectionError} />
         <Outlet />
         <Toaster
@@ -53,7 +53,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         <Suspense>
           <TanStackRouterDevtools position="bottom-right" />
         </Suspense>
-      </main>
+      </>
     )
   }
 })

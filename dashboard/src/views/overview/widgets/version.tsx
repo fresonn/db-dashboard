@@ -11,7 +11,7 @@ export function VersionWidgetSkeleton() {
       width="100%"
     >
       <rect x="0" y="0" width="100%" rx="6" ry="6" height="16" />
-      <rect x="0" y="60%" width="25%" rx="6" ry="6" height="16" />
+      <rect x="0" y="60%" width="45%" rx="6" ry="6" height="16" />
     </ContentLoader>
   )
 }
@@ -25,12 +25,10 @@ export function VersionWidget() {
 
   return (
     <div className="animate-in fade-in slide-in-from-top-8 pt-2 duration-300">
-      <Typography variant="code">{data.version}</Typography>
-      {data.bitDepth !== '' && (
-        <Typography className="mt-1.5" variant="code">
-          {data.bitDepth}
-        </Typography>
-      )}
+      <Typography variant="code">
+        {data.version}
+        {data.bitDepth && `, ${data.bitDepth}`}
+      </Typography>
     </div>
   )
 }

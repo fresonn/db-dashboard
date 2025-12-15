@@ -38,7 +38,7 @@ export function ConnectView() {
       },
       onSuccess: () => {
         navigate({
-          to: '/overview'
+          to: '/'
         })
       }
     }

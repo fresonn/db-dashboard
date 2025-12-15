@@ -9,82 +9,68 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as UiRouteImport } from './routes/ui'
-import { Route as OverviewRouteImport } from './routes/overview'
 import { Route as ConnectRouteImport } from './routes/connect'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedUiRouteImport } from './routes/_authenticated/ui'
 
-const UiRoute = UiRouteImport.update({
-  id: '/ui',
-  path: '/ui',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OverviewRoute = OverviewRouteImport.update({
-  id: '/overview',
-  path: '/overview',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ConnectRoute = ConnectRouteImport.update({
   id: '/connect',
   path: '/connect',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedUiRoute = AuthenticatedUiRouteImport.update({
+  id: '/ui',
+  path: '/ui',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
   '/connect': typeof ConnectRoute
-  '/overview': typeof OverviewRoute
-  '/ui': typeof UiRoute
+  '/ui': typeof AuthenticatedUiRoute
+  '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/connect': typeof ConnectRoute
-  '/overview': typeof OverviewRoute
-  '/ui': typeof UiRoute
+  '/ui': typeof AuthenticatedUiRoute
+  '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/connect': typeof ConnectRoute
-  '/overview': typeof OverviewRoute
-  '/ui': typeof UiRoute
+  '/_authenticated/ui': typeof AuthenticatedUiRoute
+  '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/connect' | '/overview' | '/ui'
+  fullPaths: '/connect' | '/ui' | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/connect' | '/overview' | '/ui'
-  id: '__root__' | '/' | '/connect' | '/overview' | '/ui'
+  to: '/connect' | '/ui' | '/'
+  id:
+    | '__root__'
+    | '/_authenticated'
+    | '/connect'
+    | '/_authenticated/ui'
+    | '/_authenticated/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   ConnectRoute: typeof ConnectRoute
-  OverviewRoute: typeof OverviewRoute
-  UiRoute: typeof UiRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/ui': {
-      id: '/ui'
-      path: '/ui'
-      fullPath: '/ui'
-      preLoaderRoute: typeof UiRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/overview': {
-      id: '/overview'
-      path: '/overview'
-      fullPath: '/overview'
-      preLoaderRoute: typeof OverviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/connect': {
       id: '/connect'
       path: '/connect'
@@ -92,21 +78,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnectRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/': {
+      id: '/_authenticated/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ui': {
+      id: '/_authenticated/ui'
+      path: '/ui'
+      fullPath: '/ui'
+      preLoaderRoute: typeof AuthenticatedUiRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedUiRoute: typeof AuthenticatedUiRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedUiRoute: AuthenticatedUiRoute,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   ConnectRoute: ConnectRoute,
-  OverviewRoute: OverviewRoute,
-  UiRoute: UiRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -26,7 +26,7 @@ export function Widget({
   className?: string
 }) {
   return (
-    <div className={`rounded-2xl bg-gray-100 p-4 dark:bg-neutral-800/80 ${className}`}>
+    <div className={`rounded-2xl bg-gray-100 p-4 dark:bg-neutral-800/60 ${className}`}>
       <div className="flex h-full flex-col">
         <Typography variant="h3" className="dark:text-theme-color">
           {title}

@@ -4,6 +4,7 @@ import { VersionWidget, VersionWidgetSkeleton } from './widgets/version'
 import { Widget } from './common'
 import type { ReactNode } from 'react'
 import { UptimeWidget, UptimeWidgetSkeleton } from './widgets/uptime'
+import { SidebarTrigger } from '@/components/ui/shadcn/sidebar'
 
 export function DashboardGrid({ children }: { children: ReactNode }) {
   return (
@@ -13,11 +14,12 @@ export function DashboardGrid({ children }: { children: ReactNode }) {
   )
 }
 
-export function Overview() {
+export function ClusterOverview() {
   return (
     <div className="p-5">
       <Typography variant="h1" as="h1">
         Overview
+        <SidebarTrigger variant="outline" className="scale-125 sm:scale-100" />
       </Typography>
       <ThemeToggle />
 

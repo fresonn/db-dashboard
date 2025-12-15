@@ -12,7 +12,7 @@ const typography = cva('antialiased', {
       muted: 'text-muted-foreground text-sm',
       lead: 'text-muted-foreground text-xl',
       small: 'text-sm leading-normal',
-      code: 'font-code text-sm leading-none font-medium tracking-wide text-balance',
+      code: 'font-code text-sm leading-none font-medium tracking-tight text-balance',
       blockquote: 'border-muted text-muted-foreground mt-6 border-l-4 pl-4 italic'
     }
   },

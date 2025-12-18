@@ -9,7 +9,7 @@ const typography = cva('antialiased', {
       h3: 'scroll-m-20 text-2xl font-semibold tracking-tight',
       h4: 'scroll-m-20 text-xl font-semibold tracking-tight',
       p: 'leading-7 [&:not(:first-child)]:mt-4',
-      muted: 'text-muted-foreground text-sm',
+      muted: 'text-muted-foreground text-sm font-medium',
       lead: 'text-muted-foreground text-xl',
       small: 'text-sm leading-normal',
       code: 'font-code text-sm leading-none font-medium tracking-tight text-balance',

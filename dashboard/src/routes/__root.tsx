@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
-import type { QueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { clusterStatusQuery } from '@/lib/api/cluster-status'
 import { OfflineApiGuard } from '@/components/offline-api-guard'
 import { Toaster } from 'sonner'
@@ -19,24 +19,39 @@ const TanStackRouterDevtools = import.meta.env.PROD
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   async beforeLoad({ context }) {
-    try {
-      const clusterStatus = await context.queryClient.ensureQueryData(clusterStatusQuery)
-      return {
-        clusterStatus,
-        connectionError: null
-      }
-    } catch (error) {
-      return {
-        connectionError: error + ''
-      }
+    await context.queryClient.prefetchQuery(clusterStatusQuery)
+
+    const clusterStatus = context.queryClient.getQueryData(clusterStatusQuery.queryKey)
+
+    return {
+      clusterStatus: clusterStatus
     }
   },
   component: () => {
-    const context = Route.useRouteContext()
+    const { clusterStatus } = Route.useRouteContext()
+
+    const queryClient = useQueryClient()
+
+    const { isError, isFetching } = useQuery({
+      ...clusterStatusQuery,
+      placeholderData: clusterStatus,
+      staleTime: Infinity,
+      gcTime: Infinity,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      retry: false
+    })
+
+    const handleRetry = () => {
+      queryClient.refetchQueries({
+        queryKey: clusterStatusQuery.queryKey
+      })
+    }
 
     return (
       <>
-        <OfflineApiGuard open={!!context.connectionError} />
+        <OfflineApiGuard open={isError} onRetry={handleRetry} loading={isFetching} />
         <Outlet />
         <Toaster
           position="bottom-right"

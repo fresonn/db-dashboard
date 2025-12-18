@@ -1,27 +1,43 @@
+import { Button } from './ui/button'
 import { TriangleAlert } from 'lucide-react'
+import { Typography } from '@/components/ui/typography'
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader
+} from '@/components/ui/shadcn/alert-dialog'
 
-export function OfflineApiGuard({ open }: { open: boolean }) {
-  if (!open) return
-
+export function OfflineApiGuard({
+  open,
+  loading,
+  onRetry
+}: {
+  open: boolean
+  onRetry(): void
+  loading: boolean
+}) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl">
-        <div className="mb-6 text-center">
-          <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-red-100 text-red-600">
-            <TriangleAlert className="size-10" />
+    <AlertDialog open={open}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <div className="mb-5 flex justify-center text-red-500">
+            <div className="flex size-16 items-center justify-center rounded-full bg-red-500/20">
+              <TriangleAlert className="size-10" />
+            </div>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900">No connection to the api server</h2>
-          <p className="mt-3 text-gray-600">
-            Failed to connect to the backend. Check your internet connection and server status.
-          </p>
-        </div>
-        <button
-          onClick={() => window.location.reload()}
-          className="w-full rounded-lg bg-red-600 px-6 py-3 font-medium text-white transition hover:bg-red-700"
-        >
-          Try again
-        </button>
-      </div>
-    </div>
+          <Typography variant="h3">No connection with api</Typography>
+          <Typography variant="muted">
+            Connection to dashboard api server failed or lost. Check the logs or the correctness of
+            the launch data
+          </Typography>
+        </AlertDialogHeader>
+        <AlertDialogFooter className="pt-4">
+          <Button size="lg" fullWidth loading={loading} onClick={onRetry}>
+            Refresh
+          </Button>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }

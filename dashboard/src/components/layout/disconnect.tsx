@@ -4,6 +4,7 @@ import { useClusterDisconnect } from '@/lib/api/gen'
 import { toast } from 'sonner'
 import { capitalize } from '@/lib/utils'
 import { useNavigate } from '@tanstack/react-router'
+import { SidebarMenuButton } from '../ui/shadcn/sidebar'
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -38,10 +39,12 @@ export function DisconnectDialog() {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button className="text-sm text-red-500" variant="ghost">
-          <LogOut />
-          Disconnect
-        </Button>
+        <SidebarMenuButton asChild className="cursor-pointer" tooltip="Disconnect">
+          <div className="text-red-500">
+            <LogOut strokeWidth={3} />
+            Disconnect
+          </div>
+        </SidebarMenuButton>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

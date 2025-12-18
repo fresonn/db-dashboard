@@ -64,7 +64,7 @@ function SidebarMenuLink({ item, href }: { item: NavLink; href: string }) {
   return (
     <SidebarMenuItem>
       <SidebarMenuButton asChild isActive={checkIsActive(href, item)} tooltip={item.title}>
-        <Link to={item.url} onClick={() => setOpenMobile(false)}>
+        <Link preload={false} to={item.url} onClick={() => setOpenMobile(false)}>
           {item.icon && <item.icon />}
           <span>{item.title}</span>
           {item.badge && <NavBadge>{item.badge}</NavBadge>}

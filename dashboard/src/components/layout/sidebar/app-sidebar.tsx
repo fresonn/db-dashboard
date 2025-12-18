@@ -3,6 +3,7 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem
@@ -28,9 +29,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <NavGroup key={props.title} {...props} />
         ))}
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="px-0">
         <Separator />
-        <DisconnectDialog />
+        <SidebarGroup>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <DisconnectDialog />
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
       </SidebarFooter>
     </Sidebar>
   )

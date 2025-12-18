@@ -15,9 +15,9 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-theme-color dark:text-black dark:hover:bg-green-500',
+          'bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-theme-color dark:text-black dark:hover:bg-green-400',
         destructive:
-          'bg-destructive hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 text-white',
+          'bg-destructive hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 text-white dark:bg-red-500',
         outline:
           'bg-background hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 border shadow-xs',
         secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
@@ -51,15 +51,26 @@ export function Button({
   asChild = false,
   children,
   loading,
+  onClick,
   fullWidth = false,
   ...props
 }: ButtonProps) {
   const Comp = asChild ? Slot : 'button'
 
+  const onClickMiddleware: React.MouseEventHandler<HTMLButtonElement> = (e) => {
+    if (loading) {
+      e.preventDefault()
+      return
+    }
+
+    onClick?.(e)
+  }
+
   return (
     <Comp
       data-slot="button"
       className={buttonVariants({ fullWidth, variant, size, className })}
+      onClick={onClickMiddleware}
       {...props}
     >
       {loading && (

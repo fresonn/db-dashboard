@@ -58,7 +58,7 @@ export const sidebarData: SidebarData = {
         },
         {
           title: 'Tasks',
-          url: '/tasks',
+          url: '/ui',
           icon: ListTodo
         },
         {

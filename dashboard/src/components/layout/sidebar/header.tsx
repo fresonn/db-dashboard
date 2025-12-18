@@ -44,7 +44,7 @@ export function Header() {
         <PostgresLogo className="h-full w-full" variant={theme} />
       </div>
 
-      <Typography className={title({ open })} variant="h3" as="h3">
+      <Typography className={title({ open })} variant="h4" as="h4">
         Simple Dashboard
       </Typography>
     </div>

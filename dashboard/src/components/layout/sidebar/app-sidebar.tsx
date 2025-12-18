@@ -7,9 +7,11 @@ import {
   SidebarMenu,
   SidebarMenuItem
 } from '@/components/ui/shadcn/sidebar'
-import { sidebarData } from './sidebar-data'
+import { sidebarData } from './data'
 import { NavGroup } from './nav-group'
 import { Header } from './header'
+import { DisconnectDialog } from '../disconnect'
+import { Separator } from '@/components/ui/shadcn/separator'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -26,7 +28,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <NavGroup key={props.title} {...props} />
         ))}
       </SidebarContent>
-      <SidebarFooter>Footer</SidebarFooter>
+      <SidebarFooter>
+        <Separator />
+        <DisconnectDialog />
+      </SidebarFooter>
     </Sidebar>
   )
 }

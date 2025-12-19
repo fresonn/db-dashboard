@@ -17,6 +17,7 @@ type Cluster struct {
 	pgManager *postgres.Manager
 	validate  *validator.Validate
 	storage   ClusterStorage
+	cache     Cache
 }
 
 type ClusterStorage interface {
@@ -24,14 +25,28 @@ type ClusterStorage interface {
 	Uptime() (entities.PostgresUptime, error)
 }
 
-func New(config config.AppConfig, lgr *slog.Logger, storage ClusterStorage, pgManager *postgres.Manager) *Cluster {
+type Cache interface {
+	PgVersion(ctx context.Context) (entities.PostgresVersion, bool)
+	SetPgVersion(ctx context.Context, version entities.PostgresVersion)
+}
+
+type Options struct {
+	Config          config.AppConfig
+	Logger          *slog.Logger
+	PostgresManager *postgres.Manager
+	Storage         ClusterStorage
+	Cache           Cache
+}
+
+func New(options Options) *Cluster {
 
 	return &Cluster{
-		config:    config,
-		logger:    logger.WithScopeLogger(lgr, "cluster"),
+		config:    options.Config,
+		logger:    logger.WithScopeLogger(options.Logger, "cluster"),
 		validate:  validator.New(validator.WithRequiredStructEnabled()),
-		storage:   storage,
-		pgManager: pgManager,
+		storage:   options.Storage,
+		pgManager: options.PostgresManager,
+		cache:     options.Cache,
 	}
 }
 

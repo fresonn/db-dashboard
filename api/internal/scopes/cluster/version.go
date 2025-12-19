@@ -8,8 +8,16 @@ import (
 
 func (c *Cluster) Version(ctx context.Context) (entities.PostgresVersion, error) {
 
+	c.logger.DebugContext(ctx, "try to get postgres version")
+
+	if pgVersion, ok := c.cache.PgVersion(ctx); ok {
+		c.logger.DebugContext(ctx, "got postgres version", "version", pgVersion.Version)
+		return pgVersion, nil
+	}
+
 	rawVersion, err := c.storage.Version()
 	if err != nil {
+		c.logger.ErrorContext(ctx, "postgres version", "error", err)
 		return entities.PostgresVersion{}, err
 	}
 
@@ -32,9 +40,15 @@ func (c *Cluster) Version(ctx context.Context) (entities.PostgresVersion, error)
 	bitDepth := strings.TrimSpace(parts[len(parts)-1])
 	compiler := strings.TrimSpace(strings.Join(parts[1:len(parts)-1], ","))
 
-	return entities.PostgresVersion{
+	pgVersion := entities.PostgresVersion{
 		Version:  version,
 		Compiler: compiler,
 		BitDepth: bitDepth,
-	}, nil
+	}
+
+	c.cache.SetPgVersion(ctx, pgVersion)
+
+	c.logger.DebugContext(ctx, "got postgres version", "version", pgVersion.Version)
+
+	return pgVersion, nil
 }

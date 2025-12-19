@@ -7,7 +7,8 @@ import (
 	"dashboard/api/internal/delivery/rest"
 	"dashboard/api/internal/postgres"
 	"dashboard/api/internal/scopes/cluster"
-	"dashboard/api/internal/scopes/cluster/repo"
+	clusterCache "dashboard/api/internal/scopes/cluster/repo/cache"
+	repo "dashboard/api/internal/scopes/cluster/repo/storage"
 	"dashboard/api/internal/utils"
 	"errors"
 	"fmt"
@@ -36,7 +37,15 @@ func New(cfg config.AppConfig, logger *slog.Logger) *App {
 
 	clusterStorage := repo.New(cfg, logger, pgManager)
 
-	cluserScope := cluster.New(cfg, logger, clusterStorage, pgManager)
+	clusterCache := clusterCache.New(&cfg, logger)
+
+	cluserScope := cluster.New(cluster.Options{
+		Config:          cfg,
+		Logger:          logger,
+		PostgresManager: pgManager,
+		Storage:         clusterStorage,
+		Cache:           clusterCache,
+	})
 
 	r := chi.NewRouter()
 	r.Use(requestIDMiddleware)

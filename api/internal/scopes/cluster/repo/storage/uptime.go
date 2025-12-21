@@ -1,8 +1,10 @@
 package repo
 
-import "dashboard/api/internal/scopes/cluster/entities"
+import (
+	"dashboard/api/internal/scopes/cluster/entities"
+)
 
-const PG_RUNTIME_QUERY = "SELECT pg_postmaster_start_time() as cluster_started_at"
+const PG_RUNTIME_QUERY = "SELECT pg_postmaster_start_time() as cluster_started_at;"
 
 func (s *Storage) Uptime() (entities.PostgresUptime, error) {
 

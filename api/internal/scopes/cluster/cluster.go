@@ -28,6 +28,8 @@ type ClusterStorage interface {
 type Cache interface {
 	PgVersion(ctx context.Context) (entities.PostgresVersion, bool)
 	SetPgVersion(ctx context.Context, version entities.PostgresVersion)
+	ClusterUptime(ctx context.Context) (entities.PostgresUptime, bool)
+	SetClusterUptime(ctx context.Context, version entities.PostgresUptime)
 }
 
 type Options struct {

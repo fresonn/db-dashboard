@@ -3,16 +3,17 @@ package config
 import (
 	"errors"
 	"log"
-	"log/slog"
 	"os"
 
 	"github.com/caarlos0/env/v11"
 )
 
+type RuntimeVariant string
+
 const (
-	LiveRuntime = "live"
-	DevRuntime  = "dev"
-	TestRuntime = "test"
+	LiveRuntime RuntimeVariant = "live"
+	DevRuntime  RuntimeVariant = "dev"
+	TestRuntime RuntimeVariant = "test"
 )
 
 type AppConfig struct {
@@ -22,14 +23,14 @@ type AppConfig struct {
 
 type EnvironmentVars struct {
 	IsDev      bool
-	Port       int    `env:"SERVER_PORT"`
-	Runtime    string `env:"RUNTIME"`
-	PgHost     string `env:"PG_HOST"`
-	PgPort     int    `env:"PG_PORT"`
-	PgUser     string `env:"PG_USER"`
-	PgPassword string `env:"PG_PASSWORD"`
-	PgDatabase string `env:"PG_DATABASE"`
-	PgSSLMode  string `env:"PG_SSLMODE"`
+	Port       int            `env:"SERVER_PORT" envDefault:"7999"`
+	Runtime    RuntimeVariant `env:"RUNTIME" envDefault:"live"`
+	PgHost     string         `env:"PG_HOST"`
+	PgPort     int            `env:"PG_PORT"`
+	PgUser     string         `env:"PG_USER"`
+	PgPassword string         `env:"PG_PASSWORD"`
+	PgDatabase string         `env:"PG_DATABASE"`
+	PgSSLMode  string         `env:"PG_SSLMODE"`
 }
 
 func New() AppConfig {
@@ -45,7 +46,7 @@ func New() AppConfig {
 
 	persistentCfg, err := configFromEnvs(envCfg)
 	if err != nil {
-		slog.Error("parse environment variables ", "error", err)
+		log.Println(err)
 		os.Exit(1)
 	}
 
@@ -58,8 +59,7 @@ func New() AppConfig {
 
 	persistentCfg, err = LoadPersistentConfig()
 	if err != nil {
-
-		slog.Warn("volume data for connection not found or damaged")
+		log.Println("volume data for connection not found, await for manual connection")
 		_ = RemovePersistentConfig()
 
 		return AppConfig{
@@ -70,7 +70,7 @@ func New() AppConfig {
 
 	err = ValidatePersistentConfig(persistentCfg)
 	if err != nil {
-		slog.Warn("volume /data/config.json is damaged")
+		log.Println("volume /data/config.json is damaged")
 		_ = RemovePersistentConfig()
 		return AppConfig{
 			Env:              envCfg,
@@ -125,7 +125,7 @@ func configFromEnvs(envs EnvironmentVars) (*PersistentConfigV1, error) {
 	// }
 
 	if foundCount > 0 && foundCount != acceptedCount {
-		return nil, errors.New("specify all necessary PG_* envs or remove all for manual Postgres authentication")
+		return nil, errors.New("specify all necessary PG_* envs or remove all for manual authentication")
 	}
 
 	if foundCount == acceptedCount {

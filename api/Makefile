@@ -1,5 +1,7 @@
 go:
 	@go run ./cmd/main.go -runtime=dev
+live:
+	@SERVER_PORT=8001 go run ./cmd/main.go
 oapi:
 	@go tool oapi-codegen -config oapi-codegen.yaml ../openapi/api.yaml
 oapi-version:

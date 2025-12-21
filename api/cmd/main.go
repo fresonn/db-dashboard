@@ -21,18 +21,17 @@ func init() {
 	runtimeFlag := flag.String("runtime", "", "specify runtime flag value: -runtime=<value>")
 	flag.Parse()
 
-	if *runtimeFlag == config.DevRuntime {
+	if *runtimeFlag == string(config.DevRuntime) {
 		if err := godotenv.Load(".env"); err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println("⚙️ Dev runtime, loaded .env")
+		log.Println("⚙️ Dev runtime, loaded .env")
 	}
 }
 
 func main() {
-
-	lgr := logger.New(logger.LiveLoggerVariant)
 	cfg := config.New()
+	lgr := logger.New(cfg)
 
 	application := app.New(cfg, lgr)
 

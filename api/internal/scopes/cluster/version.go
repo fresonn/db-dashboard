@@ -17,7 +17,7 @@ func (c *Cluster) Version(ctx context.Context) (entities.PostgresVersion, error)
 
 	rawVersion, err := c.storage.Version()
 	if err != nil {
-		c.logger.ErrorContext(ctx, "postgres version", "error", err)
+		c.logger.ErrorContext(ctx, "get postgres version", "error", err)
 		return entities.PostgresVersion{}, err
 	}
 

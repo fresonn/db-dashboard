@@ -16,6 +16,7 @@ func (c *Cluster) Uptime(ctx context.Context) (entities.PostgresUptime, error) {
 
 	uptime, err := c.storage.Uptime()
 	if err != nil {
+		c.logger.ErrorContext(ctx, "get cluster uptime", "error", err)
 		return entities.PostgresUptime{}, err
 	}
 

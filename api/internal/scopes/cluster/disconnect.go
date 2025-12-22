@@ -22,6 +22,8 @@ func (c *Cluster) Disconnect(ctx context.Context) error {
 		return err
 	}
 
+	c.cache.DeleteAll(ctx)
+
 	c.logger.Info("postgres disconnected")
 
 	return nil

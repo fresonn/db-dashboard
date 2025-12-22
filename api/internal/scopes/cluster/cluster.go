@@ -26,6 +26,7 @@ type ClusterStorage interface {
 }
 
 type Cache interface {
+	DeleteAll(ctx context.Context)
 	PgVersion(ctx context.Context) (entities.PostgresVersion, bool)
 	SetPgVersion(ctx context.Context, version entities.PostgresVersion)
 	ClusterUptime(ctx context.Context) (entities.PostgresUptime, bool)

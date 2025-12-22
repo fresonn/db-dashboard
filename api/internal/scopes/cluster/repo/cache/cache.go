@@ -26,6 +26,11 @@ func New(config *config.AppConfig, logger *slog.Logger) *Cache {
 	}
 }
 
+func (c *Cache) DeleteAll(ctx context.Context) {
+	c.logger.DebugContext(ctx, "clear cluster cache")
+	c.cache.DeleteAll()
+}
+
 func (c *Cache) SetPgVersion(ctx context.Context, version entities.PostgresVersion) {
 	c.logger.DebugContext(ctx, "cache set", "key", pgVersionKey, "value", version)
 	c.cache.Set(pgVersionKey, version, ttlcache.NoTTL)

@@ -30,3 +30,7 @@ func (i *Store[V]) Set(key string, value V, ttl time.Duration) *ttlcache.Item[st
 func (c *Store[V]) Get(key string, opts ...ttlcache.Option[string, V]) *ttlcache.Item[string, V] {
 	return c.ttlcache.Get(key, opts...)
 }
+
+func (c *Store[V]) DeleteAll() {
+	c.ttlcache.DeleteAll()
+}

@@ -1,5 +1,3 @@
-import postgresLogoDark from '@/assets/postgresql-logo-black.svg?url'
-import postgresLogo from '@/assets/postgresql-logo.svg?url'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/shadcn/popover'
@@ -23,6 +21,7 @@ import {
   InputGroupButton,
   InputGroupInput
 } from '@/components/ui/shadcn/input-group'
+import { PostgresLogo } from '@/components/ui/pg-logo'
 
 export function ConnectView() {
   const navigate = useNavigate()
@@ -65,21 +64,14 @@ export function ConnectView() {
 
   return (
     <div className="grid h-screen grid-cols-[2fr_1fr]">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="relative flex items-center justify-center dark:bg-neutral-900"
-      >
+      <form onSubmit={handleSubmit(onSubmit)} className="relative flex items-center justify-center">
         <div className="absolute top-8 right-10">
           <ThemeToggle />
         </div>
         <div className="w-full max-w-[700px] px-12 py-10">
           <div className="flex items-center justify-center">
-            <img
-              src={theme === 'light' ? postgresLogoDark : postgresLogo}
-              className="mr-2 size-16"
-              alt="postgresql logo"
-            />
-            <Typography variant="h1" as="h1">
+            <PostgresLogo className="mr-2 size-16" variant={theme} />
+            <Typography variant="h1" as="h2">
               Simple Dashboard
             </Typography>
           </div>

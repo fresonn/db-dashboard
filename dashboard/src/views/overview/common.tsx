@@ -26,9 +26,9 @@ export function Widget({
   className?: string
 }) {
   return (
-    <div className={`dark:bg-section-box rounded-2xl bg-gray-100 p-4 ${className}`}>
+    <div className={`dark:bg-section-box rounded-xl border bg-gray-100 p-4 ${className}`}>
       <div className="flex h-full flex-col">
-        <Typography variant="h3" className="dark:text-theme-color">
+        <Typography variant="h4" className="dark:text-theme-color">
           {title}
         </Typography>
         <div className="min-h-0 flex-1">

@@ -8,7 +8,7 @@
 @theme {
   --color-theme-color: oklch(79.2% 0.209 151.711);
   --color-theme-color: #00ff85;
-  --color-section-box: #202020;
+  --color-section-box: #1d1e1f;
 }
 
 @theme inline {
@@ -87,7 +87,7 @@
 }
 
 .dark {
-  --background: #171717;
+  --background: #131314;
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);

@@ -5,6 +5,12 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 
 export default defineConfig({
+  server: {
+    host: true
+  },
+  preview: {
+    host: true
+  },
   plugins: [
     tanstackRouter({
       target: 'react',

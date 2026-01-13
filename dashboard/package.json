@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host",
+    "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview --host",
+    "preview": "vite preview",
     "oapi": "kubb generate",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix"

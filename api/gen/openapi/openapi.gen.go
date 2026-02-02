@@ -26,7 +26,7 @@ const (
 // ClusterConnectData defines model for ClusterConnectData.
 type ClusterConnectData = clusterEntities.AuthData
 
-// ConnectionStatus PostgreSQL connection state
+// ConnectionStatus Represents connection state between dashboard and postgres
 type ConnectionStatus string
 
 // ErrorBase Error part that should be present in all errors
@@ -42,7 +42,7 @@ type GetPostgresVersionResponse = clusterEntities.PostgresVersion
 
 // GetStatusResponse defines model for GetStatusResponse.
 type GetStatusResponse struct {
-	// PostgresConnection PostgreSQL connection state
+	// PostgresConnection Represents connection state between dashboard and postgres
 	PostgresConnection ConnectionStatus `json:"postgres_connection"`
 }
 

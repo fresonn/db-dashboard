@@ -10,3 +10,7 @@ tests:
 	@go test ./...
 coverprofile:
 	@go test ./... -coverprofile=c.out -covermode=atomic && go tool cover -html=c.out
+lint-oapi:
+	vacuum dashboard ../openapi/api.yaml
+lint-oapi-raw:
+	vacuum lint -d ../openapi/api.yaml

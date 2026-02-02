@@ -2,6 +2,7 @@ openapi: 3.0.0
 info:
   title: Simple dashboard for PostgreSQL
   version: 0.0.1
+  description: Collection of all available REST handlers
 servers:
   - url: http://localhost:8001/api
 tags:
@@ -15,7 +16,7 @@ paths:
       summary: Get server current status
       operationId: GetStatus
       responses:
-        200:
+        "200":
           description: Server current status
           content:
             application/json:
@@ -30,7 +31,7 @@ paths:
                   summary: Status with lost connection
                   value:
                     postgres_connection: disconnected
-        400:
+        "400":
           description: Request server status failed
           content:
             application/json:
@@ -51,19 +52,19 @@ paths:
             schema:
               $ref: "#/components/schemas/ClusterConnectData"
       responses:
-        200:
+        "200":
           description: Successful operation
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetStatusResponse"
-        422:
+        "422":
           description: Request data invalid
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/RequestValidationError"
-        400:
+        "400":
           description: Connection attempt failed
           content:
             application/json:
@@ -83,13 +84,13 @@ paths:
       description: Disconnect from Postgres cluster
       operationId: ClusterDisconnect
       responses:
-        200:
+        "200":
           description: Successful operation
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetStatusResponse"
-        400:
+        "400":
           description: Disonnection attempt failed
           content:
             application/json:
@@ -109,13 +110,13 @@ paths:
       description: Get detailed Postgres version info
       operationId: PostgresVersion
       responses:
-        200:
+        "200":
           description: Successful operation
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetPostgresVersionResponse"
-        400:
+        "400":
           description: Attempt failed
           content:
             application/json:
@@ -129,13 +130,13 @@ paths:
       description: Get Postgres uptime info
       operationId: PostgresUptime
       responses:
-        200:
+        "200":
           description: Successful operation
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetPostgresUptimeResponse"
-        400:
+        "400":
           description: Attempt failed
           content:
             application/json:
@@ -164,13 +165,14 @@ components:
             - reason
     ConnectionStatus:
       type: string
+      description: Represents connection state between dashboard and postgres
+      example: connected
       enum: [connecting, connected, disconnected, error]
       x-enum-varnames:
         - PgConnectionStatusConnecting,
         - PgConnectionStatusConnected,
         - PgConnectionStatusDisconnected,
         - PgConnectionStatusError,
-      description: PostgreSQL connection state
     GetStatusResponse:
       type: object
       required:
@@ -178,8 +180,6 @@ components:
       properties:
         postgres_connection:
           $ref: "#/components/schemas/ConnectionStatus"
-          example: connected
-          description: Represents connection state between dashboard and postgres
     ClusterConnectData: # internal/scopes/cluster/entities/entities.go
       x-go-type: clusterEntities.AuthData
       x-go-type-import:

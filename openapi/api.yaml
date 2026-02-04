@@ -142,6 +142,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorBase"
+  /cluster/postmaster-settings:
+    get:
+      tags:
+        - cluster
+      summary: Get global cluster settings
+      description: Returns some settings from pg_settings in the "postmaster" context.
+      operationId: PostmasterSettings
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetPostgresPostmasterSettings"
+        "400":
+          description: Attempt failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorBase"
 components:
   schemas:
     ErrorBase:
@@ -173,6 +193,32 @@ components:
         - PgConnectionStatusConnected,
         - PgConnectionStatusDisconnected,
         - PgConnectionStatusError,
+    PostgresSetting:
+      type: object
+      description: Represents some columns from "pg_catalog.pg_settings"
+      x-go-type: clusterEntities.Setting
+      x-go-type-import:
+        path: dashboard/api/internal/scopes/cluster/entities
+        name: Setting
+      x-go-type-name: clusterEntities.Setting
+      required:
+        - name
+        - setting
+        - unit
+        - description
+      properties:
+        name:
+          type: string
+          example: shared_buffers
+        setting:
+          type: string
+          example: "32768"
+        unit:
+          type: string
+          example: 8kB
+        description:
+          type: string
+          example: Sets the number of...
     GetStatusResponse:
       type: object
       required:
@@ -247,3 +293,16 @@ components:
         startedAt:
           type: string
           example: 2025-12-05 13:45:06.746931+02
+    GetPostgresPostmasterSettings:
+      x-go-type: clusterEntities.PostmasterSettings
+      x-go-type-import:
+        path: dashboard/api/internal/scopes/cluster/entities
+        name: PostmasterSettings
+      x-go-type-name: clusterEntities.PostmasterSettings
+      type: object
+      description: Represents some settings from pg_settings in the "postmaster" context.
+      properties:
+        settings:
+          type: array
+          items:
+            $ref: "#/components/schemas/PostgresSetting"

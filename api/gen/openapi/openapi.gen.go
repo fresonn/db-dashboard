@@ -34,6 +34,9 @@ type ErrorBase struct {
 	Message string `json:"message"`
 }
 
+// GetPostgresPostmasterSettings Represents some settings from pg_settings in the "postmaster" context.
+type GetPostgresPostmasterSettings = clusterEntities.PostmasterSettings
+
 // GetPostgresUptimeResponse Returns an ISO-8601 string with timezone
 type GetPostgresUptimeResponse = clusterEntities.PostgresUptime
 
@@ -45,6 +48,9 @@ type GetStatusResponse struct {
 	// PostgresConnection Represents connection state between dashboard and postgres
 	PostgresConnection ConnectionStatus `json:"postgres_connection"`
 }
+
+// PostgresSetting Represents some columns from "pg_catalog.pg_settings"
+type PostgresSetting = clusterEntities.Setting
 
 // RequestValidationError defines model for RequestValidationError.
 type RequestValidationError struct {
@@ -63,6 +69,9 @@ type ServerInterface interface {
 	// Disconnect from Postgres cluster
 	// (POST /cluster/disconnect)
 	ClusterDisconnect(w http.ResponseWriter, r *http.Request)
+	// Get global cluster settings
+	// (GET /cluster/postmaster-settings)
+	PostmasterSettings(w http.ResponseWriter, r *http.Request)
 	// Get server current status
 	// (GET /cluster/status)
 	GetStatus(w http.ResponseWriter, r *http.Request)
@@ -87,6 +96,12 @@ func (_ Unimplemented) ClusterConnect(w http.ResponseWriter, r *http.Request) {
 // Disconnect from Postgres cluster
 // (POST /cluster/disconnect)
 func (_ Unimplemented) ClusterDisconnect(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get global cluster settings
+// (GET /cluster/postmaster-settings)
+func (_ Unimplemented) PostmasterSettings(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -136,6 +151,20 @@ func (siw *ServerInterfaceWrapper) ClusterDisconnect(w http.ResponseWriter, r *h
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.ClusterDisconnect(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostmasterSettings operation middleware
+func (siw *ServerInterfaceWrapper) PostmasterSettings(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostmasterSettings(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -307,6 +336,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Post(options.BaseURL+"/cluster/disconnect", wrapper.ClusterDisconnect)
 	})
 	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/cluster/postmaster-settings", wrapper.PostmasterSettings)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/cluster/status", wrapper.GetStatus)
 	})
 	r.Group(func(r chi.Router) {
@@ -403,6 +435,31 @@ func (response ClusterDisconnectdefaultJSONResponse) VisitClusterDisconnectRespo
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
+type PostmasterSettingsRequestObject struct {
+}
+
+type PostmasterSettingsResponseObject interface {
+	VisitPostmasterSettingsResponse(w http.ResponseWriter) error
+}
+
+type PostmasterSettings200JSONResponse GetPostgresPostmasterSettings
+
+func (response PostmasterSettings200JSONResponse) VisitPostmasterSettingsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostmasterSettings400JSONResponse ErrorBase
+
+func (response PostmasterSettings400JSONResponse) VisitPostmasterSettingsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type GetStatusRequestObject struct {
 }
 
@@ -486,6 +543,9 @@ type StrictServerInterface interface {
 	// Disconnect from Postgres cluster
 	// (POST /cluster/disconnect)
 	ClusterDisconnect(ctx context.Context, request ClusterDisconnectRequestObject) (ClusterDisconnectResponseObject, error)
+	// Get global cluster settings
+	// (GET /cluster/postmaster-settings)
+	PostmasterSettings(ctx context.Context, request PostmasterSettingsRequestObject) (PostmasterSettingsResponseObject, error)
 	// Get server current status
 	// (GET /cluster/status)
 	GetStatus(ctx context.Context, request GetStatusRequestObject) (GetStatusResponseObject, error)
@@ -574,6 +634,30 @@ func (sh *strictHandler) ClusterDisconnect(w http.ResponseWriter, r *http.Reques
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(ClusterDisconnectResponseObject); ok {
 		if err := validResponse.VisitClusterDisconnectResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostmasterSettings operation middleware
+func (sh *strictHandler) PostmasterSettings(w http.ResponseWriter, r *http.Request) {
+	var request PostmasterSettingsRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostmasterSettings(ctx, request.(PostmasterSettingsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostmasterSettings")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostmasterSettingsResponseObject); ok {
+		if err := validResponse.VisitPostmasterSettingsResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

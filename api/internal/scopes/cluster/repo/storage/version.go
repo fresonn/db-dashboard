@@ -1,4 +1,4 @@
-package repo
+package storage
 
 const PG_VERSION_QUERY = "SELECT version()"
 

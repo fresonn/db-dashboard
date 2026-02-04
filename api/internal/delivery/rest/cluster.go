@@ -80,3 +80,15 @@ func (h *Handler) PostgresUptime(ctx context.Context, request openapi.PostgresUp
 
 	return openapi.PostgresUptime200JSONResponse(uptime), nil
 }
+
+func (h *Handler) PostmasterSettings(ctx context.Context, request openapi.PostmasterSettingsRequestObject) (openapi.PostmasterSettingsResponseObject, error) {
+
+	settings, err := h.cluster.PostmasterSettings(ctx)
+	if err != nil {
+		return openapi.PostmasterSettings400JSONResponse{
+			Message: err.Error(),
+		}, nil
+	}
+
+	return openapi.PostmasterSettings200JSONResponse(settings), nil
+}

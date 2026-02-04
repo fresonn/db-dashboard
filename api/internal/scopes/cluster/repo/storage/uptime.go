@@ -1,4 +1,4 @@
-package repo
+package storage
 
 import (
 	"dashboard/api/internal/scopes/cluster/entities"

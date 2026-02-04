@@ -17,7 +17,9 @@ WHERE context = $1 AND name IN (
     'data_directory',
     'shared_buffers',
     'wal_buffers',
-    'max_connections'
+    'max_connections',
+    'hba_file',
+    'wal_level'
 )`
 
 func (s *Storage) PostmasterSettings(ctx context.Context) ([]entities.Setting, error) {

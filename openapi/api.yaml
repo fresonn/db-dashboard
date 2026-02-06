@@ -155,7 +155,45 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetPostgresPostmasterSettings"
+                allOf:
+                  - $ref: "#/components/schemas/GetPostgresPostmasterSettings"
+                example:
+                  configFile:
+                    name: config_file
+                    value: /Library/PostgreSQL/16/data/postgresql.conf
+                    unit: ""
+                    description: Sets the server's main configuration file
+                  dataDirectory:
+                    name: data_directory
+                    value: /Library/PostgreSQL/16/data
+                    unit: ""
+                    description: Sets the server's data directory.
+                  sharedBuffers:
+                    name: shared_buffers
+                    value: 256 MB
+                    unit: 8kB
+                    description: Sets the number of shared memory buffers used by the server.
+                  walBuffers:
+                    name: wal_buffers
+                    value: 8 MB
+                    unit: 8kB
+                    description: Sets the number of disk-page buffers in shared memory for WAL.
+                  maxConnections:
+                    name: max_connections
+                    value: "100"
+                    unit: ""
+                    description: Sets the maximum number of concurrent connections.
+                  hbaFile:
+                    name: hba_file
+                    value: /Library/PostgreSQL/16/data/pg_hba.conf
+                    unit: ""
+                    description: Sets the server's "hba" configuration file.
+                  walLevel:
+                    name: wal_level
+                    value: replica
+                    unit: ""
+                    description: Sets the level of information written to the WAL.
+
         "400":
           description: Attempt failed
           content:
@@ -203,14 +241,14 @@ components:
       x-go-type-name: clusterEntities.Setting
       required:
         - name
-        - setting
+        - value
         - unit
         - description
       properties:
         name:
           type: string
           example: shared_buffers
-        setting:
+        value:
           type: string
           example: "32768"
         unit:
@@ -301,8 +339,26 @@ components:
       x-go-type-name: clusterEntities.PostmasterSettings
       type: object
       description: Represents some settings from pg_settings in the "postmaster" context.
+      required:
+        - configFile
+        - dataDirectory
+        - sharedBuffers
+        - walBuffers
+        - maxConnections
+        - hbaFile
+        - walLevel
       properties:
-        settings:
-          type: array
-          items:
-            $ref: "#/components/schemas/PostgresSetting"
+        configFile:
+          $ref: "#/components/schemas/PostgresSetting"
+        dataDirectory:
+          $ref: "#/components/schemas/PostgresSetting"
+        sharedBuffers:
+          $ref: "#/components/schemas/PostgresSetting"
+        walBuffers:
+          $ref: "#/components/schemas/PostgresSetting"
+        maxConnections:
+          $ref: "#/components/schemas/PostgresSetting"
+        hbaFile:
+          $ref: "#/components/schemas/PostgresSetting"
+        walLevel:
+          $ref: "#/components/schemas/PostgresSetting"

@@ -3,26 +3,20 @@ package storage
 import (
 	"context"
 	"dashboard/api/internal/scopes/cluster/entities"
+
+	"github.com/jmoiron/sqlx"
 )
 
-const PG_SETTINGS_QUERY = `
+const POSTMASTER_SETTINGS_QUERY = `
 SELECT
     name,
     setting,
     unit,
     short_desc
 FROM pg_settings
-WHERE context = $1 AND name IN (
-    'config_file',
-    'data_directory',
-    'shared_buffers',
-    'wal_buffers',
-    'max_connections',
-    'hba_file',
-    'wal_level'
-)`
+WHERE context = 'postmaster' AND name IN (?);`
 
-func (s *Storage) PostmasterSettings(ctx context.Context) ([]entities.Setting, error) {
+func (s *Storage) PostmasterSettings(ctx context.Context, params []string) ([]entities.Setting, error) {
 
 	db, err := s.pgManager.SQLX()
 	if err != nil {
@@ -31,7 +25,14 @@ func (s *Storage) PostmasterSettings(ctx context.Context) ([]entities.Setting, e
 
 	var dtos []Setting
 
-	err = db.Select(&dtos, PG_SETTINGS_QUERY, "postmaster")
+	query, args, err := sqlx.In(POSTMASTER_SETTINGS_QUERY, params)
+	if err != nil {
+		return nil, err
+	}
+
+	query = db.Rebind(query)
+
+	err = db.Select(&dtos, query, args...)
 	if err != nil {
 		return nil, err
 	}

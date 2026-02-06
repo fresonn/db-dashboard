@@ -15,7 +15,7 @@ type Setting struct {
 func toSettingEntity(dto Setting) entities.Setting {
 	return entities.Setting{
 		Name:        dto.Name,
-		Setting:     dto.Setting,
+		Value:       dto.Setting,
 		Unit:        dto.Unit.String(),
 		Description: dto.ShortDesc,
 	}

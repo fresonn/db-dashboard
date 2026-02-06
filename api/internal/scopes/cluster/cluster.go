@@ -23,7 +23,7 @@ type Cluster struct {
 type ClusterStorage interface {
 	Version() (string, error)
 	Uptime() (entities.PostgresUptime, error)
-	PostmasterSettings(ctx context.Context) ([]entities.Setting, error)
+	PostmasterSettings(ctx context.Context, params []string) ([]entities.Setting, error)
 }
 
 type Cache interface {

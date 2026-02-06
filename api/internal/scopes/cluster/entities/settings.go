@@ -1,12 +1,18 @@
 package entities
 
 type PostmasterSettings struct {
-	Settings []Setting `json:"settings"`
+	ConfigFile     Setting `json:"configFile"`
+	DataDirectory  Setting `json:"dataDirectory"`
+	SharedBuffers  Setting `json:"sharedBuffers"`
+	WalBuffers     Setting `json:"walBuffers"`
+	MaxConnections Setting `json:"maxConnections"`
+	HbaFile        Setting `json:"hbaFile"`
+	WalLevel       Setting `json:"walLevel"`
 }
 
 type Setting struct {
 	Name        string `json:"name"`
-	Setting     string `json:"setting"`
+	Value       string `json:"value"`
 	Unit        string `json:"unit"`
 	Description string `json:"description"`
 }

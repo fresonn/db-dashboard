@@ -38,9 +38,5 @@ func PrettyByteSize(bytes int64) string {
 		return fmt.Sprintf("%d Byte", bytes)
 	}
 
-	if value == float64(int64(value)) {
-		return fmt.Sprintf("%d %s", int64(value), unit)
-	}
-
 	return fmt.Sprintf("%.1f %s", value, unit)
 }

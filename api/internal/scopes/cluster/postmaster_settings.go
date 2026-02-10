@@ -9,13 +9,14 @@ import (
 )
 
 const (
-	ParamConfigFile     = "config_file"
-	ParamDataDirectory  = "data_directory"
-	ParamSharedBuffers  = "shared_buffers"
-	ParamWalBuffers     = "wal_buffers"
-	ParamMaxConnections = "max_connections"
-	ParamHbaFile        = "hba_file"
-	ParamWalLevel       = "wal_level"
+	ParamConfigFile           = "config_file"
+	ParamDataDirectory        = "data_directory"
+	ParamSharedBuffers        = "shared_buffers"
+	ParamWalBuffers           = "wal_buffers"
+	ParamMaxConnections       = "max_connections"
+	ParamHbaFile              = "hba_file"
+	ParamWalLevel             = "wal_level"
+	ParamAutovacuumMaxWorkers = "autovacuum_max_workers"
 )
 
 var postmasterParams = []string{
@@ -26,6 +27,7 @@ var postmasterParams = []string{
 	ParamMaxConnections,
 	ParamHbaFile,
 	ParamWalLevel,
+	ParamAutovacuumMaxWorkers,
 }
 
 // More about pg_settings and its context values
@@ -55,13 +57,14 @@ func (c *Cluster) PostmasterSettings(ctx context.Context) (entities.PostmasterSe
 	}
 
 	return entities.PostmasterSettings{
-		ConfigFile:     settingsMap[ParamConfigFile],
-		DataDirectory:  settingsMap[ParamDataDirectory],
-		SharedBuffers:  sharedBuffers,
-		WalBuffers:     walBuffers,
-		MaxConnections: settingsMap[ParamMaxConnections],
-		HbaFile:        settingsMap[ParamHbaFile],
-		WalLevel:       settingsMap[ParamWalLevel],
+		ConfigFile:           settingsMap[ParamConfigFile],
+		DataDirectory:        settingsMap[ParamDataDirectory],
+		SharedBuffers:        sharedBuffers,
+		WalBuffers:           walBuffers,
+		MaxConnections:       settingsMap[ParamMaxConnections],
+		HbaFile:              settingsMap[ParamHbaFile],
+		WalLevel:             settingsMap[ParamWalLevel],
+		AutovacuumMaxWorkers: settingsMap[ParamAutovacuumMaxWorkers],
 	}, nil
 }
 

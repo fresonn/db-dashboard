@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "description": "Represents some columns from \"pg_catalog.pg_settings\"",
+  "x-go-type": "clusterEntities.Setting",
+  "x-go-type-import": {
+    "path": "dashboard/api/internal/scopes/cluster/entities",
+    "name": "Setting"
+  },
+  "x-go-type-name": "clusterEntities.Setting",
+  "required": ["name", "value", "unit", "description"],
+  "properties": {
+    "name": { "type": "string", "example": "shared_buffers" },
+    "value": { "type": "string", "example": "32768" },
+    "unit": { "type": "string", "example": "8kB" },
+    "description": { "type": "string", "example": "Sets the number of..." }
+  },
+  "x-readme-ref-name": "PostgresSetting"
+}

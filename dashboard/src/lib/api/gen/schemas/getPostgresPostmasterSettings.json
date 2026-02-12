@@ -1,0 +1,167 @@
+{
+  "x-go-type": "clusterEntities.PostmasterSettings",
+  "x-go-type-import": {
+    "path": "dashboard/api/internal/scopes/cluster/entities",
+    "name": "PostmasterSettings"
+  },
+  "x-go-type-name": "clusterEntities.PostmasterSettings",
+  "type": "object",
+  "description": "Represents some settings from pg_settings in the \"postmaster\" context.",
+  "required": [
+    "configFile",
+    "dataDirectory",
+    "sharedBuffers",
+    "walBuffers",
+    "maxConnections",
+    "hbaFile",
+    "walLevel",
+    "autovacuumMaxWorkers"
+  ],
+  "properties": {
+    "configFile": {
+      "type": "object",
+      "description": "Represents some columns from \"pg_catalog.pg_settings\"",
+      "x-go-type": "clusterEntities.Setting",
+      "x-go-type-import": {
+        "path": "dashboard/api/internal/scopes/cluster/entities",
+        "name": "Setting"
+      },
+      "x-go-type-name": "clusterEntities.Setting",
+      "required": ["name", "value", "unit", "description"],
+      "properties": {
+        "name": { "type": "string", "example": "shared_buffers" },
+        "value": { "type": "string", "example": "32768" },
+        "unit": { "type": "string", "example": "8kB" },
+        "description": { "type": "string", "example": "Sets the number of..." }
+      },
+      "x-readme-ref-name": "PostgresSetting"
+    },
+    "dataDirectory": {
+      "type": "object",
+      "description": "Represents some columns from \"pg_catalog.pg_settings\"",
+      "x-go-type": "clusterEntities.Setting",
+      "x-go-type-import": {
+        "path": "dashboard/api/internal/scopes/cluster/entities",
+        "name": "Setting"
+      },
+      "x-go-type-name": "clusterEntities.Setting",
+      "required": ["name", "value", "unit", "description"],
+      "properties": {
+        "name": { "type": "string", "example": "shared_buffers" },
+        "value": { "type": "string", "example": "32768" },
+        "unit": { "type": "string", "example": "8kB" },
+        "description": { "type": "string", "example": "Sets the number of..." }
+      },
+      "x-readme-ref-name": "PostgresSetting"
+    },
+    "sharedBuffers": {
+      "type": "object",
+      "description": "Represents some columns from \"pg_catalog.pg_settings\"",
+      "x-go-type": "clusterEntities.Setting",
+      "x-go-type-import": {
+        "path": "dashboard/api/internal/scopes/cluster/entities",
+        "name": "Setting"
+      },
+      "x-go-type-name": "clusterEntities.Setting",
+      "required": ["name", "value", "unit", "description"],
+      "properties": {
+        "name": { "type": "string", "example": "shared_buffers" },
+        "value": { "type": "string", "example": "32768" },
+        "unit": { "type": "string", "example": "8kB" },
+        "description": { "type": "string", "example": "Sets the number of..." }
+      },
+      "x-readme-ref-name": "PostgresSetting"
+    },
+    "walBuffers": {
+      "type": "object",
+      "description": "Represents some columns from \"pg_catalog.pg_settings\"",
+      "x-go-type": "clusterEntities.Setting",
+      "x-go-type-import": {
+        "path": "dashboard/api/internal/scopes/cluster/entities",
+        "name": "Setting"
+      },
+      "x-go-type-name": "clusterEntities.Setting",
+      "required": ["name", "value", "unit", "description"],
+      "properties": {
+        "name": { "type": "string", "example": "shared_buffers" },
+        "value": { "type": "string", "example": "32768" },
+        "unit": { "type": "string", "example": "8kB" },
+        "description": { "type": "string", "example": "Sets the number of..." }
+      },
+      "x-readme-ref-name": "PostgresSetting"
+    },
+    "maxConnections": {
+      "type": "object",
+      "description": "Represents some columns from \"pg_catalog.pg_settings\"",
+      "x-go-type": "clusterEntities.Setting",
+      "x-go-type-import": {
+        "path": "dashboard/api/internal/scopes/cluster/entities",
+        "name": "Setting"
+      },
+      "x-go-type-name": "clusterEntities.Setting",
+      "required": ["name", "value", "unit", "description"],
+      "properties": {
+        "name": { "type": "string", "example": "shared_buffers" },
+        "value": { "type": "string", "example": "32768" },
+        "unit": { "type": "string", "example": "8kB" },
+        "description": { "type": "string", "example": "Sets the number of..." }
+      },
+      "x-readme-ref-name": "PostgresSetting"
+    },
+    "hbaFile": {
+      "type": "object",
+      "description": "Represents some columns from \"pg_catalog.pg_settings\"",
+      "x-go-type": "clusterEntities.Setting",
+      "x-go-type-import": {
+        "path": "dashboard/api/internal/scopes/cluster/entities",
+        "name": "Setting"
+      },
+      "x-go-type-name": "clusterEntities.Setting",
+      "required": ["name", "value", "unit", "description"],
+      "properties": {
+        "name": { "type": "string", "example": "shared_buffers" },
+        "value": { "type": "string", "example": "32768" },
+        "unit": { "type": "string", "example": "8kB" },
+        "description": { "type": "string", "example": "Sets the number of..." }
+      },
+      "x-readme-ref-name": "PostgresSetting"
+    },
+    "walLevel": {
+      "type": "object",
+      "description": "Represents some columns from \"pg_catalog.pg_settings\"",
+      "x-go-type": "clusterEntities.Setting",
+      "x-go-type-import": {
+        "path": "dashboard/api/internal/scopes/cluster/entities",
+        "name": "Setting"
+      },
+      "x-go-type-name": "clusterEntities.Setting",
+      "required": ["name", "value", "unit", "description"],
+      "properties": {
+        "name": { "type": "string", "example": "shared_buffers" },
+        "value": { "type": "string", "example": "32768" },
+        "unit": { "type": "string", "example": "8kB" },
+        "description": { "type": "string", "example": "Sets the number of..." }
+      },
+      "x-readme-ref-name": "PostgresSetting"
+    },
+    "autovacuumMaxWorkers": {
+      "type": "object",
+      "description": "Represents some columns from \"pg_catalog.pg_settings\"",
+      "x-go-type": "clusterEntities.Setting",
+      "x-go-type-import": {
+        "path": "dashboard/api/internal/scopes/cluster/entities",
+        "name": "Setting"
+      },
+      "x-go-type-name": "clusterEntities.Setting",
+      "required": ["name", "value", "unit", "description"],
+      "properties": {
+        "name": { "type": "string", "example": "shared_buffers" },
+        "value": { "type": "string", "example": "32768" },
+        "unit": { "type": "string", "example": "8kB" },
+        "description": { "type": "string", "example": "Sets the number of..." }
+      },
+      "x-readme-ref-name": "PostgresSetting"
+    }
+  },
+  "x-readme-ref-name": "GetPostgresPostmasterSettings"
+}

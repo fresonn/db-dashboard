@@ -6,7 +6,7 @@ import { TimeTicker } from '@/components/ui/time-ticker'
 export function UptimeWidgetSkeleton() {
   return (
     <ContentLoader
-      className="h-full pt-2"
+      className="h-full"
       backgroundColor="var(--skeleton-bg)"
       foregroundColor="var(--skeleton-fg)"
       width="100%"
@@ -24,7 +24,7 @@ export function UptimeWidget() {
   })
 
   return (
-    <div className="animate-in fade-in slide-in-from-top-8 pt-2 duration-300">
+    <div>
       <Typography variant="code">
         <TimeTicker startedAtIso={data.startedAt} />
       </Typography>

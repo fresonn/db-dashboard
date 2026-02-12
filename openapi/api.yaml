@@ -193,7 +193,11 @@ paths:
                     value: replica
                     unit: ""
                     description: Sets the level of information written to the WAL.
-
+                  autovacuumMaxWorkers:
+                    name: autovacuum_max_workers
+                    value: "4"
+                    unit: ""
+                    description: Sets the maximum number of simultaneously running autovacuum worker processes.
         "400":
           description: Attempt failed
           content:
@@ -347,6 +351,7 @@ components:
         - maxConnections
         - hbaFile
         - walLevel
+        - autovacuumMaxWorkers
       properties:
         configFile:
           $ref: "#/components/schemas/PostgresSetting"
@@ -361,4 +366,6 @@ components:
         hbaFile:
           $ref: "#/components/schemas/PostgresSetting"
         walLevel:
+          $ref: "#/components/schemas/PostgresSetting"
+        autovacuumMaxWorkers:
           $ref: "#/components/schemas/PostgresSetting"

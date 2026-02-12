@@ -1,3 +1,4 @@
+import { cva } from 'cva'
 import { TriangleAlert } from 'lucide-react'
 import { Suspense, type ReactNode } from 'react'
 import { ErrorBoundary } from '@/components/error-boundary'
@@ -14,26 +15,39 @@ export function WidgetErrorFallback() {
   )
 }
 
+const widgetContainer = cva('p-4', {
+  variants: {
+    withBackground: {
+      true: 'dark:bg-section-box rounded-lg border bg-gray-100',
+      false: ''
+    }
+  }
+})
+
 export function Widget({
   title,
   children,
   skeleton,
-  className
+  className,
+  withBackground = true
 }: {
   title: string
   children: ReactNode
   skeleton: ReactNode
   className?: string
+  withBackground?: boolean
 }) {
   return (
-    <div className={`dark:bg-section-box rounded-xl border bg-gray-100 p-4 ${className}`}>
+    <div className={widgetContainer({ withBackground, className })}>
       <div className="flex h-full flex-col">
-        <Typography variant="h4" className="dark:text-theme-color">
+        <Typography variant="h4" className="dark:text-theme-color mb-2">
           {title}
         </Typography>
         <div className="min-h-0 flex-1">
           <ErrorBoundary fallback={<WidgetErrorFallback />}>
-            <Suspense fallback={skeleton}>{children}</Suspense>
+            <Suspense fallback={skeleton}>
+              <div className="animate-in fade-in slide-in-from-top-8 duration-300">{children}</div>
+            </Suspense>
           </ErrorBoundary>
         </div>
       </div>

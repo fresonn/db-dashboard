@@ -3,9 +3,9 @@
   "required": ["postgres_connection"],
   "properties": {
     "postgres_connection": {
-      "example": "connected",
-      "description": "Represents connection state between dashboard and postgres",
       "type": "string",
+      "description": "Represents connection state between dashboard and postgres",
+      "example": "connected",
       "enum": ["connecting", "connected", "disconnected", "error"],
       "x-enum-varnames": [
         "PgConnectionStatusConnecting,",

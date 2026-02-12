@@ -6,15 +6,19 @@ export type { PostgresUptimeQueryKey } from './hooks/usePostgresUptime.ts'
 export type { PostgresUptimeSuspenseQueryKey } from './hooks/usePostgresUptimeSuspense.ts'
 export type { PostgresVersionQueryKey } from './hooks/usePostgresVersion.ts'
 export type { PostgresVersionSuspenseQueryKey } from './hooks/usePostgresVersionSuspense.ts'
+export type { PostmasterSettingsQueryKey } from './hooks/usePostmasterSettings.ts'
+export type { PostmasterSettingsSuspenseQueryKey } from './hooks/usePostmasterSettingsSuspense.ts'
 export type {
   ErrorBase,
   RequestValidationError,
   ConnectionStatusEnumKey,
   ConnectionStatus,
+  PostgresSetting,
   GetStatusResponse,
   ClusterConnectData,
   GetPostgresVersionResponse,
   GetPostgresUptimeResponse,
+  GetPostgresPostmasterSettings,
   GetStatus200,
   GetStatus400,
   GetStatusQueryResponse,
@@ -38,13 +42,18 @@ export type {
   PostgresUptime200,
   PostgresUptime400,
   PostgresUptimeQueryResponse,
-  PostgresUptimeQuery
+  PostgresUptimeQuery,
+  PostmasterSettings200,
+  PostmasterSettings400,
+  PostmasterSettingsQueryResponse,
+  PostmasterSettingsQuery
 } from './models.ts'
 export { clusterConnect } from './clients/clusterConnect.ts'
 export { clusterDisconnect } from './clients/clusterDisconnect.ts'
 export { getStatus } from './clients/getStatus.ts'
 export { postgresUptime } from './clients/postgresUptime.ts'
 export { postgresVersion } from './clients/postgresVersion.ts'
+export { postmasterSettings } from './clients/postmasterSettings.ts'
 export { clusterConnectMutationKey } from './hooks/useClusterConnect.ts'
 export { clusterConnectMutationOptions } from './hooks/useClusterConnect.ts'
 export { useClusterConnect } from './hooks/useClusterConnect.ts'
@@ -69,4 +78,10 @@ export { usePostgresVersion } from './hooks/usePostgresVersion.ts'
 export { postgresVersionSuspenseQueryKey } from './hooks/usePostgresVersionSuspense.ts'
 export { postgresVersionSuspenseQueryOptions } from './hooks/usePostgresVersionSuspense.ts'
 export { usePostgresVersionSuspense } from './hooks/usePostgresVersionSuspense.ts'
+export { postmasterSettingsQueryKey } from './hooks/usePostmasterSettings.ts'
+export { postmasterSettingsQueryOptions } from './hooks/usePostmasterSettings.ts'
+export { usePostmasterSettings } from './hooks/usePostmasterSettings.ts'
+export { postmasterSettingsSuspenseQueryKey } from './hooks/usePostmasterSettingsSuspense.ts'
+export { postmasterSettingsSuspenseQueryOptions } from './hooks/usePostmasterSettingsSuspense.ts'
+export { usePostmasterSettingsSuspense } from './hooks/usePostmasterSettingsSuspense.ts'
 export { connectionStatus } from './models.ts'

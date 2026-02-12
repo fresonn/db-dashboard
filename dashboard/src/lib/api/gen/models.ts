@@ -30,13 +30,36 @@ export const connectionStatus = {
 export type ConnectionStatusEnumKey = (typeof connectionStatus)[keyof typeof connectionStatus]
 
 /**
- * @description PostgreSQL connection state
+ * @description Represents connection state between dashboard and postgres
+ * @example connected
  */
 export type ConnectionStatus = ConnectionStatusEnumKey
 
+/**
+ * @description Represents some columns from \"pg_catalog.pg_settings\"
+ */
+export type PostgresSetting = {
+  /**
+   * @type string
+   */
+  name: string
+  /**
+   * @type string
+   */
+  value: string
+  /**
+   * @type string
+   */
+  unit: string
+  /**
+   * @type string
+   */
+  description: string
+}
+
 export type GetStatusResponse = {
   /**
-   * @description PostgreSQL connection state
+   * @description Represents connection state between dashboard and postgres
    * @type string
    */
   postgres_connection: ConnectionStatus
@@ -92,6 +115,52 @@ export type GetPostgresUptimeResponse = {
    * @type string
    */
   startedAt: string
+}
+
+/**
+ * @description Represents some settings from pg_settings in the \"postmaster\" context.
+ */
+export type GetPostgresPostmasterSettings = {
+  /**
+   * @description Represents some columns from \"pg_catalog.pg_settings\"
+   * @type object
+   */
+  configFile: PostgresSetting
+  /**
+   * @description Represents some columns from \"pg_catalog.pg_settings\"
+   * @type object
+   */
+  dataDirectory: PostgresSetting
+  /**
+   * @description Represents some columns from \"pg_catalog.pg_settings\"
+   * @type object
+   */
+  sharedBuffers: PostgresSetting
+  /**
+   * @description Represents some columns from \"pg_catalog.pg_settings\"
+   * @type object
+   */
+  walBuffers: PostgresSetting
+  /**
+   * @description Represents some columns from \"pg_catalog.pg_settings\"
+   * @type object
+   */
+  maxConnections: PostgresSetting
+  /**
+   * @description Represents some columns from \"pg_catalog.pg_settings\"
+   * @type object
+   */
+  hbaFile: PostgresSetting
+  /**
+   * @description Represents some columns from \"pg_catalog.pg_settings\"
+   * @type object
+   */
+  walLevel: PostgresSetting
+  /**
+   * @description Represents some columns from \"pg_catalog.pg_settings\"
+   * @type object
+   */
+  autovacuumMaxWorkers: PostgresSetting
 }
 
 /**
@@ -198,4 +267,22 @@ export type PostgresUptimeQueryResponse = PostgresUptime200
 export type PostgresUptimeQuery = {
   Response: PostgresUptime200
   Errors: PostgresUptime400
+}
+
+/**
+ * @description Successful operation
+ * @example [object Object]
+ */
+export type PostmasterSettings200 = GetPostgresPostmasterSettings
+
+/**
+ * @description Attempt failed
+ */
+export type PostmasterSettings400 = ErrorBase
+
+export type PostmasterSettingsQueryResponse = PostmasterSettings200
+
+export type PostmasterSettingsQuery = {
+  Response: PostmasterSettings200
+  Errors: PostmasterSettings400
 }

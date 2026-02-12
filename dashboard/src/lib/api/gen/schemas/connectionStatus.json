@@ -1,5 +1,7 @@
 {
   "type": "string",
+  "description": "Represents connection state between dashboard and postgres",
+  "example": "connected",
   "enum": ["connecting", "connected", "disconnected", "error"],
   "x-enum-varnames": [
     "PgConnectionStatusConnecting,",
@@ -7,6 +9,5 @@
     "PgConnectionStatusDisconnected,",
     "PgConnectionStatusError,"
   ],
-  "description": "PostgreSQL connection state",
   "x-readme-ref-name": "ConnectionStatus"
 }

@@ -12,6 +12,7 @@ import (
 	clusterEntities "dashboard/api/internal/scopes/cluster/entities"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/oapi-codegen/runtime"
 	strictnethttp "github.com/oapi-codegen/runtime/strictmiddleware/nethttp"
 )
 
@@ -23,11 +24,26 @@ const (
 	PgConnectionStatusError        ConnectionStatus = "error"
 )
 
+// Defines values for DatabasesDetailsParamsSort.
+const (
+	Connection DatabasesDetailsParamsSort = "connection"
+	Size       DatabasesDetailsParamsSort = "size"
+)
+
+// Defines values for DatabasesDetailsParamsOrder.
+const (
+	Asc  DatabasesDetailsParamsOrder = "asc"
+	Desc DatabasesDetailsParamsOrder = "desc"
+)
+
 // ClusterConnectData defines model for ClusterConnectData.
 type ClusterConnectData = clusterEntities.AuthData
 
 // ConnectionStatus Represents connection state between dashboard and postgres
 type ConnectionStatus string
+
+// Database Represents database entity from Postgres system catalog
+type Database = clusterEntities.DatabaseDetails
 
 // ErrorBase Error part that should be present in all errors
 type ErrorBase struct {
@@ -58,6 +74,21 @@ type RequestValidationError struct {
 	Reason  string `json:"reason"`
 }
 
+// DatabasesDetailsParams defines parameters for DatabasesDetails.
+type DatabasesDetailsParams struct {
+	// Sort Field to sort by
+	Sort *DatabasesDetailsParamsSort `form:"sort,omitempty" json:"sort,omitempty" validate:"omitempty,oneof=size connection"`
+
+	// Order Sort direction
+	Order *DatabasesDetailsParamsOrder `form:"order,omitempty" json:"order,omitempty" validate:"omitempty,oneof=asc desc"`
+}
+
+// DatabasesDetailsParamsSort defines parameters for DatabasesDetails.
+type DatabasesDetailsParamsSort string
+
+// DatabasesDetailsParamsOrder defines parameters for DatabasesDetails.
+type DatabasesDetailsParamsOrder string
+
 // ClusterConnectJSONRequestBody defines body for ClusterConnect for application/json ContentType.
 type ClusterConnectJSONRequestBody = ClusterConnectData
 
@@ -66,6 +97,9 @@ type ServerInterface interface {
 	// Connect to Postgres cluster
 	// (POST /cluster/connect)
 	ClusterConnect(w http.ResponseWriter, r *http.Request)
+	// Get cluster databases
+	// (GET /cluster/databases)
+	DatabasesDetails(w http.ResponseWriter, r *http.Request, params DatabasesDetailsParams)
 	// Disconnect from Postgres cluster
 	// (POST /cluster/disconnect)
 	ClusterDisconnect(w http.ResponseWriter, r *http.Request)
@@ -90,6 +124,12 @@ type Unimplemented struct{}
 // Connect to Postgres cluster
 // (POST /cluster/connect)
 func (_ Unimplemented) ClusterConnect(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get cluster databases
+// (GET /cluster/databases)
+func (_ Unimplemented) DatabasesDetails(w http.ResponseWriter, r *http.Request, params DatabasesDetailsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -137,6 +177,41 @@ func (siw *ServerInterfaceWrapper) ClusterConnect(w http.ResponseWriter, r *http
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.ClusterConnect(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// DatabasesDetails operation middleware
+func (siw *ServerInterfaceWrapper) DatabasesDetails(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params DatabasesDetailsParams
+
+	// ------------- Optional query parameter "sort" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sort", r.URL.Query(), &params.Sort)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "sort", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "order" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "order", r.URL.Query(), &params.Order)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "order", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DatabasesDetails(w, r, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -333,6 +408,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Post(options.BaseURL+"/cluster/connect", wrapper.ClusterConnect)
 	})
 	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/cluster/databases", wrapper.DatabasesDetails)
+	})
+	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/cluster/disconnect", wrapper.ClusterDisconnect)
 	})
 	r.Group(func(r chi.Router) {
@@ -396,6 +474,41 @@ func (response ClusterConnectdefaultJSONResponse) VisitClusterConnectResponse(w 
 	w.WriteHeader(response.StatusCode)
 
 	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type DatabasesDetailsRequestObject struct {
+	Params DatabasesDetailsParams
+}
+
+type DatabasesDetailsResponseObject interface {
+	VisitDatabasesDetailsResponse(w http.ResponseWriter) error
+}
+
+type DatabasesDetails200JSONResponse []Database
+
+func (response DatabasesDetails200JSONResponse) VisitDatabasesDetailsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DatabasesDetails400JSONResponse ErrorBase
+
+func (response DatabasesDetails400JSONResponse) VisitDatabasesDetailsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DatabasesDetails422JSONResponse RequestValidationError
+
+func (response DatabasesDetails422JSONResponse) VisitDatabasesDetailsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+
+	return json.NewEncoder(w).Encode(response)
 }
 
 type ClusterDisconnectRequestObject struct {
@@ -540,6 +653,9 @@ type StrictServerInterface interface {
 	// Connect to Postgres cluster
 	// (POST /cluster/connect)
 	ClusterConnect(ctx context.Context, request ClusterConnectRequestObject) (ClusterConnectResponseObject, error)
+	// Get cluster databases
+	// (GET /cluster/databases)
+	DatabasesDetails(ctx context.Context, request DatabasesDetailsRequestObject) (DatabasesDetailsResponseObject, error)
 	// Disconnect from Postgres cluster
 	// (POST /cluster/disconnect)
 	ClusterDisconnect(ctx context.Context, request ClusterDisconnectRequestObject) (ClusterDisconnectResponseObject, error)
@@ -610,6 +726,32 @@ func (sh *strictHandler) ClusterConnect(w http.ResponseWriter, r *http.Request) 
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(ClusterConnectResponseObject); ok {
 		if err := validResponse.VisitClusterConnectResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// DatabasesDetails operation middleware
+func (sh *strictHandler) DatabasesDetails(w http.ResponseWriter, r *http.Request, params DatabasesDetailsParams) {
+	var request DatabasesDetailsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DatabasesDetails(ctx, request.(DatabasesDetailsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DatabasesDetails")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DatabasesDetailsResponseObject); ok {
+		if err := validResponse.VisitDatabasesDetailsResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

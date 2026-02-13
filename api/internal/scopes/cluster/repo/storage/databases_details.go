@@ -2,12 +2,15 @@ package storage
 
 import (
 	"context"
+	"dashboard/api/internal/scopes/cluster/entities"
+	"dashboard/api/internal/utils"
 	"fmt"
 )
 
 const DATABASES_DETAILS_QUERY = `
 WITH databases_cte AS (
   SELECT
+  	oid,
     datname AS name,
     datdba AS owner_id,
     encoding AS encoding_id,
@@ -28,6 +31,7 @@ connections AS (
   GROUP BY datname
 )
 SELECT
+  d.oid,
   d.name,
   pg_get_userbyid(d.owner_id) AS owner,
   pg_encoding_to_char(d.encoding_id) AS encoding,
@@ -37,31 +41,65 @@ SELECT
   d.allow_connections,
   d.connection_limit,
   d.size_bytes,
-  pg_size_pretty(d.size_bytes) AS size_pretty,
   COALESCE(c.active_connections, 0) AS active_connections
 FROM databases_cte d
-LEFT JOIN connections c ON c.name = d.name
-ORDER BY d.size_bytes DESC;
-`
+LEFT JOIN connections c ON c.name = d.name`
 
-func (s *Storage) DatabasesDetails(ctx context.Context) error {
+func (s *Storage) DatabasesDetails(ctx context.Context, filter entities.DatabasesFilter) ([]entities.DatabaseDetails, error) {
 
 	db, err := s.pgManager.SQLX()
 	if err != nil {
-		return err
+		return nil, err
 	}
+
+	query := generateDatabasesDetailsQuery(DATABASES_DETAILS_QUERY, filter)
+
+	fmt.Println(query)
 
 	var dtos []DatabaseDetails
 
-	err = db.Select(&dtos, DATABASES_DETAILS_QUERY)
+	err = db.SelectContext(ctx, &dtos, query)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	for _, v := range dtos {
-		fmt.Printf("%+v\n", v)
+	databases := make([]entities.DatabaseDetails, 0, len(dtos))
+
+	for _, d := range dtos {
+		e := toDatabaseDetailsEntity(d)
+		// app function looks better here
+		e.SizePretty = utils.PrettyByteSize(d.SizeBytes)
+
+		databases = append(databases, e)
 	}
 
-	return nil
+	return databases, nil
+}
 
+func generateDatabasesDetailsQuery(query string, filter entities.DatabasesFilter) string {
+	if filter.Sort == "" {
+		return query
+	}
+
+	orderBy := ""
+	switch filter.Sort {
+	case "connection":
+		orderBy = "COALESCE(c.active_connections, 0)"
+		// orderBy = "c.active_connections"
+	case "size":
+		orderBy = "d.size_bytes"
+	default:
+		orderBy = "d.size_bytes"
+	}
+
+	sortMode := "DESC"
+	switch filter.Order {
+	case "asc":
+		sortMode = "ASC"
+	case "desc":
+		sortMode = "DESC"
+	}
+
+	query += fmt.Sprintf(" ORDER BY %s %s", orderBy, sortMode)
+	return query
 }

@@ -3,6 +3,7 @@ package storage
 import (
 	"dashboard/api/internal/postgres"
 	"dashboard/api/internal/scopes/cluster/entities"
+	"dashboard/api/internal/utils"
 )
 
 type Setting struct {
@@ -12,7 +13,17 @@ type Setting struct {
 	ShortDesc string        `db:"short_desc"`
 }
 
+func toSettingEntity(dto Setting) entities.Setting {
+	return entities.Setting{
+		Name:        dto.Name,
+		Value:       dto.Setting,
+		Unit:        dto.Unit.String(),
+		Description: dto.ShortDesc,
+	}
+}
+
 type DatabaseDetails struct {
+	OID  int    `db:"oid"`
 	Name string `db:"name"`
 	// If the OID is invalid or the role has been deleted, the function "pg_get_userbyid(owner_id)", will return NULL
 	Owner postgres.Text `db:"owner"`
@@ -24,15 +35,22 @@ type DatabaseDetails struct {
 	AllowConnections  bool          `db:"allow_connections"`
 	ConnectionLimit   int           `db:"connection_limit"`
 	SizeBytes         int64         `db:"size_bytes"`
-	SizePretty        string        `db:"size_pretty"`
 	ActiveConnections int           `db:"active_connections"`
 }
 
-func toSettingEntity(dto Setting) entities.Setting {
-	return entities.Setting{
-		Name:        dto.Name,
-		Value:       dto.Setting,
-		Unit:        dto.Unit.String(),
-		Description: dto.ShortDesc,
+func toDatabaseDetailsEntity(dto DatabaseDetails) entities.DatabaseDetails {
+	return entities.DatabaseDetails{
+		ID:               utils.IntToString(dto.OID),
+		Name:             dto.Name,
+		Owner:            dto.Owner.String(),
+		Encoding:         dto.Encoding.String(),
+		Collate:          dto.Collate,
+		Ctype:            dto.Ctype,
+		IsTemplate:       dto.IsTemplate,
+		AllowConnections: dto.AllowConnections,
+		ConnectionLimit:  dto.ConnectionLimit,
+		SizeBytes:        dto.SizeBytes,
+		// SizePretty - skip
+		ActiveConnections: dto.ActiveConnections,
 	}
 }

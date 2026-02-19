@@ -1,5 +1,6 @@
+import React from 'react'
 import { Button } from '@/components/ui/button'
-import { LogOut } from 'lucide-react'
+import { Unplug } from 'lucide-react'
 import { useClusterDisconnect } from '@/lib/api/gen'
 import { toast } from 'sonner'
 import { capitalize } from '@/lib/utils'
@@ -7,11 +8,13 @@ import { useNavigate } from '@tanstack/react-router'
 import { SidebarMenuButton } from '../ui/shadcn/sidebar'
 import {
   AlertDialog,
+  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
+  AlertDialogMedia,
   AlertDialogTitle,
   AlertDialogTrigger
 } from '@/components/ui/shadcn/alert-dialog'
@@ -19,7 +22,7 @@ import {
 export function DisconnectDialog() {
   const navigate = useNavigate()
 
-  const { isPending, mutate } = useClusterDisconnect({
+  const { isPending, mutateAsync } = useClusterDisconnect({
     mutation: {
       onError: (error) => {
         toast.error('Disconnect failed', {
@@ -36,28 +39,40 @@ export function DisconnectDialog() {
     }
   })
 
+  const handleDisconnect: React.MouseEventHandler<HTMLButtonElement> = async (e) => {
+    e.preventDefault()
+    await mutateAsync()
+  }
+
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <SidebarMenuButton asChild className="cursor-pointer" tooltip="Disconnect">
           <div className="text-red-500">
-            <LogOut strokeWidth={3} />
+            <Unplug className="size-3" />
             Disconnect
           </div>
         </SidebarMenuButton>
       </AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent size="sm">
         <AlertDialogHeader>
+          <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20">
+            <Unplug className="size-7" />
+          </AlertDialogMedia>
           <AlertDialogTitle>Disconnect from cluster?</AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to disconnect? You will need to connect again to access dashboard.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <Button loading={isPending} variant="destructive" onClick={() => mutate()}>
-            Disconnect
-          </Button>
+          <AlertDialogCancel asChild>
+            <Button variant="outline">Cancel</Button>
+          </AlertDialogCancel>
+          <AlertDialogAction asChild>
+            <Button loading={isPending} variant="destructive" onClick={handleDisconnect}>
+              Disconnect
+            </Button>
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

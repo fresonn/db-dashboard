@@ -4,6 +4,7 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { BooleanCheckState } from '@/components/ui/boolean-check-state'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/shadcn/tooltip'
 import { Typography } from '@/components/ui/typography'
+import { PgLimitBadge } from '@/components/ui/pg-limit-badge'
 
 const columnHelper = createColumnHelper<Database>()
 
@@ -40,10 +41,7 @@ export const columns = [
   }),
   columnHelper.accessor('connectionLimit', {
     header: 'Connection Limit',
-    // -1 — unlimited
-    // 0 — connections is not allowed
-    // >0 — max connections
-    cell: (props) => props.getValue()
+    cell: (props) => <PgLimitBadge state={props.getValue()} />
   }),
   columnHelper.accessor('encoding', {
     header: 'Encoding',

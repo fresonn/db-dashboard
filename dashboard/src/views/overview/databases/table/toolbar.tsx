@@ -30,7 +30,7 @@ export function TableToolbar<TData>({ table }: TableToolbarProps<TData>) {
         )}
       </div>
       <Typography variant="small" className="font-medium">
-        Amount: {totalRows}
+        Total databases: {totalRows}
       </Typography>
     </div>
   )

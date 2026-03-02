@@ -5,32 +5,41 @@ import {
   getFacetedRowModel,
   getFacetedUniqueValues,
   getFilteredRowModel,
-  getFacetedMinMaxValues
+  getFacetedMinMaxValues,
+  type SortingState,
+  type OnChangeFn
 } from '@tanstack/react-table'
 import { columns } from './columns'
 import { TableToolbar } from './toolbar'
-
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow
 } from '@/components/ui/shadcn/table'
-import { useDatabasesDetailed } from '@/lib/api/gen/hooks'
 import { toast } from 'sonner'
 
-export function DatabasesTable() {
-  const { data } = useDatabasesDetailed()
+import type { Database } from './types'
 
+export type DatabasesTableProps = {
+  data: Database[]
+  sorting: SortingState
+  onSortingChange: OnChangeFn<SortingState>
+}
+
+export function DatabasesTable({ data, sorting, onSortingChange }: DatabasesTableProps) {
   const table = useReactTable({
     columns,
-    data: data ?? [],
+    data,
+    manualSorting: true,
+    state: {
+      sorting
+    },
+    onSortingChange,
     getCoreRowModel: getCoreRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
-    // onColumnFiltersChange: handleColumnFiltersChange,
     getFacetedUniqueValues: getFacetedUniqueValues(),
     getFilteredRowModel: getFilteredRowModel(),
     getFacetedMinMaxValues: getFacetedMinMaxValues()

@@ -5,6 +5,7 @@ import { BooleanCheckState } from '@/components/ui/boolean-check-state'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/shadcn/tooltip'
 import { Typography } from '@/components/ui/typography'
 import { PgLimitBadge } from '@/components/ui/pg-limit-badge'
+import { SortableHeader } from '@/components/ui/table/sortable-header'
 
 const columnHelper = createColumnHelper<Database>()
 
@@ -17,14 +18,15 @@ export const columns = [
     header: 'Owner',
     cell: (props) => props.getValue()
   }),
-  columnHelper.accessor('sizePretty', {
-    header: 'Size',
-    cell: (props) => {
-      const db = props.row.original
+  columnHelper.accessor('sizeBytes', {
+    enableSorting: true,
+    header: ({ column }) => <SortableHeader column={column} title="Size" />,
+    cell: ({ row }) => {
+      const db = row.original
 
       return (
         <Tooltip>
-          <TooltipTrigger>{props.getValue()}</TooltipTrigger>
+          <TooltipTrigger>{db.sizePretty}</TooltipTrigger>
           <TooltipContent side="bottom">
             <Typography>
               <Typography as="span" className="font-medium">

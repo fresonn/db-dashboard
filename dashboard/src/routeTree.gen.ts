@@ -13,6 +13,7 @@ import { Route as ConnectRouteImport } from './routes/connect'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedUiRouteImport } from './routes/_authenticated/ui'
+import { Route as AuthenticatedAppsRouteImport } from './routes/_authenticated/apps'
 
 const ConnectRoute = ConnectRouteImport.update({
   id: '/connect',
@@ -33,14 +34,21 @@ const AuthenticatedUiRoute = AuthenticatedUiRouteImport.update({
   path: '/ui',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAppsRoute = AuthenticatedAppsRouteImport.update({
+  id: '/apps',
+  path: '/apps',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/connect': typeof ConnectRoute
+  '/apps': typeof AuthenticatedAppsRoute
   '/ui': typeof AuthenticatedUiRoute
   '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesByTo {
   '/connect': typeof ConnectRoute
+  '/apps': typeof AuthenticatedAppsRoute
   '/ui': typeof AuthenticatedUiRoute
   '/': typeof AuthenticatedIndexRoute
 }
@@ -48,18 +56,20 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/connect': typeof ConnectRoute
+  '/_authenticated/apps': typeof AuthenticatedAppsRoute
   '/_authenticated/ui': typeof AuthenticatedUiRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/connect' | '/ui' | '/'
+  fullPaths: '/connect' | '/apps' | '/ui' | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/connect' | '/ui' | '/'
+  to: '/connect' | '/apps' | '/ui' | '/'
   id:
     | '__root__'
     | '/_authenticated'
     | '/connect'
+    | '/_authenticated/apps'
     | '/_authenticated/ui'
     | '/_authenticated/'
   fileRoutesById: FileRoutesById
@@ -99,15 +109,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUiRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/apps': {
+      id: '/_authenticated/apps'
+      path: '/apps'
+      fullPath: '/apps'
+      preLoaderRoute: typeof AuthenticatedAppsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAppsRoute: typeof AuthenticatedAppsRoute
   AuthenticatedUiRoute: typeof AuthenticatedUiRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAppsRoute: AuthenticatedAppsRoute,
   AuthenticatedUiRoute: AuthenticatedUiRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }

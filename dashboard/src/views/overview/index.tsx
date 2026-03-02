@@ -6,7 +6,7 @@ import type { ReactNode } from 'react'
 import { UptimeWidget, UptimeWidgetSkeleton } from './widgets/uptime'
 import { ClusterSettings, ClusterSettingsSkeleton } from './widgets/cluster-settings'
 import { SidebarTrigger } from '@/components/ui/shadcn/sidebar'
-import { DatabasesTable } from './databases/table'
+import { AvailableDatabases } from './databases'
 
 export function DashboardGrid({ children }: { children: ReactNode }) {
   return (
@@ -43,7 +43,6 @@ export function ClusterOverview() {
           >
             <UptimeWidget />
           </Widget>
-          {/* <div className="animate-in fade-in in-from-top col-span-6 row-span-3 duration-300 dark:bg-neutral-800"></div> */}
           <Widget
             title="Common cluster settings"
             className="col-span-6 row-span-12"
@@ -52,7 +51,7 @@ export function ClusterOverview() {
             <ClusterSettings />
           </Widget>
         </DashboardGrid>
-        <DatabasesTable />
+        <AvailableDatabases />
       </div>
     </div>
   )

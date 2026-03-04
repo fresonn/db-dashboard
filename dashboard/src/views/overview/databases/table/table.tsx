@@ -1,3 +1,4 @@
+import { Typography } from '@/components/ui/typography'
 import {
   getCoreRowModel,
   useReactTable,
@@ -54,13 +55,13 @@ export function DatabasesTable({ data, sorting, onSortingChange }: DatabasesTabl
   return (
     <div>
       <TableToolbar table={table} />
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
+      <div className="border">
+        <Table wrapperClassName="h-[450px]">
+          <TableHeader className="sticky top-0 bg-neutral-900">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className="text-foreground">
                     {header.isPlaceholder
                       ? null
                       : flexRender(header.column.columnDef.header, header.getContext())}
@@ -90,9 +91,9 @@ export function DatabasesTable({ data, sorting, onSortingChange }: DatabasesTabl
                 </TableRow>
               ))
             ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No data
+              <TableRow className="absolute inset-0 flex items-center justify-center hover:bg-transparent">
+                <TableCell>
+                  <Typography variant="h3">No databases found</Typography>
                 </TableCell>
               </TableRow>
             )}

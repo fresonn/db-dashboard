@@ -44,14 +44,21 @@ export function ClusterOverview() {
             <UptimeWidget />
           </Widget>
           <Widget
-            title="Common cluster settings"
+            title="Common settings"
             className="col-span-6 row-span-12"
             skeleton={<ClusterSettingsSkeleton />}
           >
             <ClusterSettings />
           </Widget>
         </DashboardGrid>
-        <AvailableDatabases />
+        <div className="w-full pt-10">
+          <Typography variant="h2" className="text-theme-color">
+            Available databases
+          </Typography>
+          <div className="pt-4">
+            <AvailableDatabases />
+          </div>
+        </div>
       </div>
     </div>
   )

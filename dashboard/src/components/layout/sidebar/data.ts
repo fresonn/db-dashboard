@@ -1,4 +1,5 @@
 import {
+  MonitorCog,
   Construction,
   LayoutDashboard,
   Monitor,
@@ -52,8 +53,13 @@ export const sidebarData: SidebarData = {
       title: 'General',
       items: [
         {
-          title: 'Dashboard',
+          title: 'Cluster Overview',
           url: '/',
+          icon: MonitorCog
+        },
+        {
+          title: 'Dashboard',
+          url: '/dashboard',
           icon: LayoutDashboard
         },
         {
@@ -74,7 +80,7 @@ export const sidebarData: SidebarData = {
         },
         {
           title: 'Users',
-          url: '/users',
+          url: '/connect',
           icon: Users
         },
         {

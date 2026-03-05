@@ -329,7 +329,7 @@ components:
         - connectionLimit
         - sizeBytes
         - sizePretty
-        - activeConnections
+        - totalConnections
       properties:
         id:
           type: string
@@ -365,7 +365,7 @@ components:
         sizePretty:
           type: string
           example: "6.4 MB"
-        activeConnections:
+        totalConnections:
           type: integer
           example: 3
     GetStatusResponse:

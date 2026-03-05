@@ -25,10 +25,8 @@ WITH databases_cte AS (
 connections AS (
   SELECT
     datname AS name,
-    count(*) AS active_connections
-  FROM pg_stat_activity
-  WHERE state = 'active'
-  GROUP BY datname
+    count(*) AS total_connections
+  FROM pg_stat_activity GROUP BY datname
 )
 SELECT
   d.oid,
@@ -41,7 +39,7 @@ SELECT
   d.allow_connections,
   d.connection_limit,
   d.size_bytes,
-  COALESCE(c.active_connections, 0) AS active_connections
+  COALESCE(c.total_connections, 0) AS total_connections
 FROM databases_cte d
 LEFT JOIN connections c ON c.name = d.name`
 
@@ -54,8 +52,6 @@ func (s *Storage) DatabasesDetails(ctx context.Context, filter entities.Database
 
 	query := generateDatabasesDetailsQuery(DATABASES_DETAILS_QUERY, filter)
 
-	fmt.Println(query)
-
 	var dtos []DatabaseDetails
 
 	err = db.SelectContext(ctx, &dtos, query)
@@ -66,11 +62,10 @@ func (s *Storage) DatabasesDetails(ctx context.Context, filter entities.Database
 	databases := make([]entities.DatabaseDetails, 0, len(dtos))
 
 	for _, d := range dtos {
-		e := toDatabaseDetailsEntity(d)
-		// app function looks better here
-		e.SizePretty = utils.PrettyByteSize(d.SizeBytes)
+		entity := toDatabaseDetailsEntity(d)
+		entity.SizePretty = utils.PrettyByteSize(d.SizeBytes)
 
-		databases = append(databases, e)
+		databases = append(databases, entity)
 	}
 
 	return databases, nil
@@ -84,8 +79,7 @@ func generateDatabasesDetailsQuery(query string, filter entities.DatabasesFilter
 	orderBy := ""
 	switch filter.Sort {
 	case "connection":
-		orderBy = "COALESCE(c.active_connections, 0)"
-		// orderBy = "c.active_connections"
+		orderBy = "COALESCE(c.total_connections, 0)"
 	case "size":
 		orderBy = "d.size_bytes"
 	default:

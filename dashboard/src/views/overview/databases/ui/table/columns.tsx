@@ -63,8 +63,15 @@ export const columns = [
     header: 'Collate',
     cell: (props) => props.getValue()
   }),
-  columnHelper.accessor('activeConnections', {
-    header: 'Active Connections',
+  columnHelper.accessor('totalConnections', {
+    enableSorting: true,
+    header: (ctx) => (
+      <SortableHeader
+        title="Total Connections"
+        column={ctx.column}
+        isFetching={(ctx as any).isFetching ?? false}
+      />
+    ),
     cell: (props) => props.getValue()
   }),
   columnHelper.accessor('isTemplate', {

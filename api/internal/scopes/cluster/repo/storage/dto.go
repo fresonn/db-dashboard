@@ -28,14 +28,14 @@ type DatabaseDetails struct {
 	// If the OID is invalid or the role has been deleted, the function "pg_get_userbyid(owner_id)", will return NULL
 	Owner postgres.Text `db:"owner"`
 	// Encoding NULL, if the base is damaged, theoretically
-	Encoding          postgres.Text `db:"encoding"`
-	Collate           string        `db:"collate"`
-	Ctype             string        `db:"ctype"`
-	IsTemplate        bool          `db:"is_template"`
-	AllowConnections  bool          `db:"allow_connections"`
-	ConnectionLimit   int           `db:"connection_limit"`
-	SizeBytes         int64         `db:"size_bytes"`
-	ActiveConnections int           `db:"active_connections"`
+	Encoding         postgres.Text `db:"encoding"`
+	Collate          string        `db:"collate"`
+	Ctype            string        `db:"ctype"`
+	IsTemplate       bool          `db:"is_template"`
+	AllowConnections bool          `db:"allow_connections"`
+	ConnectionLimit  int           `db:"connection_limit"`
+	SizeBytes        int64         `db:"size_bytes"`
+	TotalConnections int           `db:"total_connections"`
 }
 
 func toDatabaseDetailsEntity(dto DatabaseDetails) entities.DatabaseDetails {
@@ -51,6 +51,6 @@ func toDatabaseDetailsEntity(dto DatabaseDetails) entities.DatabaseDetails {
 		ConnectionLimit:  dto.ConnectionLimit,
 		SizeBytes:        dto.SizeBytes,
 		// SizePretty - skip
-		ActiveConnections: dto.ActiveConnections,
+		TotalConnections: dto.TotalConnections,
 	}
 }

@@ -109,7 +109,7 @@ export type Database = {
   /**
    * @type integer
    */
-  activeConnections: number
+  totalConnections: number
 }
 
 export type GetStatusResponse = {

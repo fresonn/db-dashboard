@@ -19,7 +19,7 @@
     "connectionLimit",
     "sizeBytes",
     "sizePretty",
-    "activeConnections"
+    "totalConnections"
   ],
   "properties": {
     "id": {
@@ -37,7 +37,7 @@
     "connectionLimit": { "type": "integer", "example": -1 },
     "sizeBytes": { "type": "integer", "example": 7746019 },
     "sizePretty": { "type": "string", "example": "6.4 MB" },
-    "activeConnections": { "type": "integer", "example": 3 }
+    "totalConnections": { "type": "integer", "example": 3 }
   },
   "x-readme-ref-name": "Database"
 }

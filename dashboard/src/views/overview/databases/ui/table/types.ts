@@ -5,7 +5,7 @@ export type Database = {
   sizePretty: string
   isTemplate: boolean
   allowConnections: boolean
-  activeConnections: number
+  totalConnections: number
   encoding: string
   collate: string
   ctype: string

@@ -3,7 +3,7 @@ import { databasesDetailedQueryParamsOrderEnum } from '@/lib/api/gen'
 
 const sortFieldMap: Record<string, 'size' | 'connection'> = {
   sizeBytes: 'size',
-  connectionCount: 'connection'
+  totalConnections: 'connection'
 }
 
 export function useQueryParams(sorting: { id: string; desc: boolean }[]) {

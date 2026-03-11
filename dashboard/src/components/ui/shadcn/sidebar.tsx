@@ -51,6 +51,16 @@ function useSidebar() {
   return context
 }
 
+export function getSidebarState() {
+  if (typeof document === 'undefined') return false
+
+  const cookie = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith(SIDEBAR_COOKIE_NAME + '='))
+
+  return cookie?.split('=')[1] === 'true'
+}
+
 const SidebarProvider = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<'div'> & {

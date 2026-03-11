@@ -6,7 +6,7 @@ import { Typography } from '@/components/ui/typography'
 
 export function WidgetErrorFallback() {
   return (
-    <div className="flex h-full flex-col items-center justify-center text-red-700 dark:text-yellow-400">
+    <div className="flex h-full flex-col items-center justify-center text-yellow-400">
       <div>
         <TriangleAlert className="size-8" strokeWidth={1.5} />
       </div>
@@ -18,7 +18,7 @@ export function WidgetErrorFallback() {
 const widgetContainer = cva('rounded-lg border p-3', {
   variants: {
     withBackground: {
-      true: 'dark:bg-section-box bg-gray-100',
+      true: 'bg-section-box',
       false: ''
     }
   }
@@ -40,7 +40,7 @@ export function Widget({
   return (
     <div className={widgetContainer({ withBackground, className })}>
       <div className="flex h-full flex-col">
-        <Typography variant="h4" className="dark:text-theme-color mb-2">
+        <Typography variant="h4" className="text-theme-color mb-2">
           {title}
         </Typography>
         <div className="min-h-0 flex-1">

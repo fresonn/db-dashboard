@@ -1,4 +1,3 @@
-import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { Typography } from '@/components/ui/typography'
 import { VersionWidget, VersionWidgetSkeleton } from './widgets/version'
 import { Widget } from './common'
@@ -23,7 +22,6 @@ export function ClusterOverview() {
         Overview
         <SidebarTrigger variant="outline" className="scale-125 sm:scale-100" />
       </Typography>
-      <ThemeToggle />
 
       <div className="mt-2">
         <DashboardGrid>

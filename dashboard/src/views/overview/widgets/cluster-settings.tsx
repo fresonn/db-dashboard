@@ -90,7 +90,7 @@ export function PropertyRow({
             </MaybeTooltip>
           </div>
           {withCopy && (
-            <div className="ml-2.5 dark:text-green-400">
+            <div className="ml-2.5 text-green-400">
               <CopyToClipboard what={setting.value} />
             </div>
           )}

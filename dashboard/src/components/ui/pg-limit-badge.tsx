@@ -11,7 +11,7 @@ export function PgLimitBadge({ state }: { state: number }) {
     case -1:
       return (
         <div className="flex items-center">
-          <InfinityIcon strokeWidth={2} className="dark:text-theme-color mr-1 text-green-500" />
+          <InfinityIcon strokeWidth={2} className="text-theme-color mr-1" />
           <Typography as="span" variant="small">
             Unlimited
           </Typography>
@@ -20,7 +20,7 @@ export function PgLimitBadge({ state }: { state: number }) {
     case 0:
       return (
         <div className="flex items-center">
-          <CircleOff size={19} className="mr-1 text-red-500 dark:text-red-400" />
+          <CircleOff size={19} className="mr-1 text-red-400" />
           <Typography as="span" variant="small">
             Not allowed
           </Typography>

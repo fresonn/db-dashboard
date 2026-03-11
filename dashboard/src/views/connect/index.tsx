@@ -1,9 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/shadcn/popover'
-import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { Typography } from '@/components/ui/typography'
-import { useTheme } from '@/hooks/use-theme'
 import { useClusterConnect } from '@/lib/api/gen'
 import { valibotResolver } from '@hookform/resolvers/valibot'
 import { Database, EthernetPort, Info, KeyRound, Server, UserRound } from 'lucide-react'
@@ -25,7 +23,6 @@ import { PostgresLogo } from '@/components/ui/pg-logo'
 
 export function ConnectView() {
   const navigate = useNavigate()
-  const [theme] = useTheme()
 
   const { isPending, mutate } = useClusterConnect({
     mutation: {
@@ -63,14 +60,11 @@ export function ConnectView() {
   }
 
   return (
-    <div className="grid h-screen grid-cols-[2fr_1fr]">
+    <div className="bg-section-box grid h-screen grid-cols-[2fr_1fr]">
       <form onSubmit={handleSubmit(onSubmit)} className="relative flex items-center justify-center">
-        <div className="absolute top-8 right-10">
-          <ThemeToggle />
-        </div>
         <div className="w-full max-w-[700px] px-12 py-10">
           <div className="flex items-center justify-center">
-            <PostgresLogo className="mr-2 size-16" variant={theme} />
+            <PostgresLogo className="mr-2 size-16" />
             <Typography variant="h1" as="h2">
               Simple Dashboard
             </Typography>

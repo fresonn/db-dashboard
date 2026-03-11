@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { AlarmClockCheck, Database } from 'lucide-react'
@@ -20,16 +19,13 @@ function RouteComponent() {
     <div className="p-2">
       <h3>Connect to postgres</h3>
 
-      <div>
-        <ThemeToggle />
-      </div>
-
       <Button>Click me!</Button>
       <Button variant="destructive">Click me!</Button>
-      <Button variant="outline">Click me!</Button>
-      <Button variant="secondary">Click me!</Button>
-      <Button variant="ghost">Click me!</Button>
+      <Button variant="outline">Outline</Button>
+      <Button variant="secondary">Secondary</Button>
+      <Button variant="ghost">Ghost</Button>
       <Button variant="link">Click me!</Button>
+      <Button variant="light">Light</Button>
       <div className="my-10">
         <Button loading={loading} onClick={hanleClick}>
           <Database />
@@ -38,6 +34,10 @@ function RouteComponent() {
         <Button loading={loading} onClick={hanleClick} variant="secondary">
           <AlarmClockCheck />
           Loading
+        </Button>
+        <Button loading={loading} variant="light">
+          <Database />
+          Light
         </Button>
 
         <div className="max-w-42">

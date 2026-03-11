@@ -1,5 +1,4 @@
 import { cva } from 'cva'
-import { useTheme } from '@/hooks/use-theme'
 import { Typography } from '@/components/ui/typography'
 import { useSidebar } from '@/components/ui/shadcn/sidebar'
 import { PostgresLogo } from '@/components/ui/pg-logo'
@@ -22,26 +21,22 @@ const logo = cva('shrink-0 transition-all duration-200', {
   }
 })
 
-const title = cva(
-  'pl-1 whitespace-nowrap transition-opacity duration-200 select-none dark:text-gray-200',
-  {
-    variants: {
-      open: {
-        true: 'opacity-100',
-        false: 'pointer-events-none opacity-0'
-      }
+const title = cva('pl-1 whitespace-nowrap transition-opacity duration-200 select-none', {
+  variants: {
+    open: {
+      true: 'opacity-100',
+      false: 'pointer-events-none opacity-0'
     }
   }
-)
+})
 
 export function Header() {
   const { open } = useSidebar()
-  const [theme] = useTheme()
 
   return (
     <div className={head({ open })}>
       <div className={logo({ open })}>
-        <PostgresLogo className="h-full w-full" variant={theme} />
+        <PostgresLogo className="size-full" />
       </div>
 
       <Typography className={title({ open })} variant="h4" as="h4">

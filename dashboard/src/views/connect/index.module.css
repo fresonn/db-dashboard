@@ -2,7 +2,7 @@
   height: 100%;
   width: 100%;
 
-  background-color: #fff;
+  background-color: #282727;
   opacity: 1;
   background-image:
     linear-gradient(30deg, #000000 12%, transparent 12.5%, transparent 87%, #000000 87.5%, #000000),
@@ -53,8 +53,4 @@
   margin-right: 8px;
   width: 64px;
   height: 64px;
-}
-
-:global(.dark) .view {
-  background-color: #222222;
 }

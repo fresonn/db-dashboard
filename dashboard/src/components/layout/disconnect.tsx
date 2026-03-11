@@ -56,7 +56,7 @@ export function DisconnectDialog() {
       </AlertDialogTrigger>
       <AlertDialogContent size="sm">
         <AlertDialogHeader>
-          <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20">
+          <AlertDialogMedia className="text-destructive bg-destructive/20">
             <Unplug className="size-7" />
           </AlertDialogMedia>
           <AlertDialogTitle>Disconnect from cluster?</AlertDialogTitle>

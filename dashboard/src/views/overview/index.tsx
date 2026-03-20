@@ -1,3 +1,4 @@
+import { Header } from '@/components/layout/header/header'
 import { Typography } from '@/components/ui/typography'
 import { VersionWidget, VersionWidgetSkeleton } from './widgets/version'
 import { Widget } from './common'
@@ -5,7 +6,7 @@ import type { ReactNode } from 'react'
 import { UptimeWidget, UptimeWidgetSkeleton } from './widgets/uptime'
 import { ClusterSettings, ClusterSettingsSkeleton } from './widgets/cluster-settings'
 import { AvailableDatabases } from './databases'
-import { Header } from '@/components/layout/header/header'
+import { RolesWidget } from './roles'
 
 export function DashboardGrid({ children }: { children: ReactNode }) {
   return (
@@ -46,11 +47,11 @@ export function ClusterOverview() {
               <ClusterSettings />
             </Widget>
             <Widget
-              title="Users and roles"
+              title="Roles & Permissions"
               className="col-span-6 row-span-8"
               skeleton={<div>skeleton</div>}
             >
-              users
+              <RolesWidget />
             </Widget>
           </DashboardGrid>
           <div className="w-full pt-10">

@@ -226,6 +226,44 @@ export type GetPostgresPostmasterSettings = {
   autovacuumMaxWorkers: PostgresSetting
 }
 
+export const roleAccessLevelEnum = {
+  admin: 'admin',
+  elevated: 'elevated',
+  standard: 'standard',
+  limited: 'limited'
+} as const
+
+export type RoleAccessLevelEnumKey = (typeof roleAccessLevelEnum)[keyof typeof roleAccessLevelEnum]
+
+export type RoleAccessLevel = RoleAccessLevelEnumKey
+
+export type RoleView = {
+  /**
+   * @type string
+   */
+  id: string
+  /**
+   * @type string
+   */
+  name: string
+  /**
+   * @type array
+   */
+  memberOf: string[]
+  /**
+   * @type array
+   */
+  flags: string[]
+  /**
+   * @type string
+   */
+  accessLevel: RoleAccessLevel
+  /**
+   * @type array
+   */
+  capabilities: string[]
+}
+
 /**
  * @description Server current status
  */
@@ -400,4 +438,21 @@ export type DatabasesDetailedQuery = {
   Response: DatabasesDetailed200
   QueryParams: DatabasesDetailedQueryParams
   Errors: DatabasesDetailed400 | DatabasesDetailed422
+}
+
+/**
+ * @description Successful operation
+ */
+export type Roles200 = RoleView[]
+
+/**
+ * @description Attempt failed
+ */
+export type Roles400 = ErrorBase
+
+export type RolesQueryResponse = Roles200
+
+export type RolesQuery = {
+  Response: Roles200
+  Errors: Roles400
 }

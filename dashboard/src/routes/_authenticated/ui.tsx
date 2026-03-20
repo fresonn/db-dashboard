@@ -4,10 +4,19 @@ import { Button } from '@/components/ui/button'
 import { AlarmClockCheck, Database } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Header } from '@/components/layout/header/header'
+import { RoleFlag } from '@/views/overview/roles/ui/flag'
 
 export const Route = createFileRoute('/_authenticated/ui')({
   component: RouteComponent
 })
+
+export const roleFlag = {
+  superuser: 'superuser',
+  login: 'login',
+  createRole: 'create_role',
+  createDb: 'create_db',
+  replication: 'replication'
+} as const
 
 function RouteComponent() {
   const [loading, setLoading] = useState(false)
@@ -46,6 +55,14 @@ function RouteComponent() {
           <Input disabled placeholder="Port" type="number" />
         </div>
       </div>
+
+      <div className="mb-10">
+        <h1>Role flags</h1>
+        {Object.values(roleFlag).map((flag) => (
+          <RoleFlag key={flag} flag={flag} />
+        ))}
+      </div>
+
       <div>
         <p className="font-code">
           Lorem, ipsum dolor sit amet consectetur adipisicing elit. Vero consequuntur voluptatibus

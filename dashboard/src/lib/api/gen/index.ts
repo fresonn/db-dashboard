@@ -10,6 +10,8 @@ export type { PostgresVersionQueryKey } from './hooks/usePostgresVersion.ts'
 export type { PostgresVersionSuspenseQueryKey } from './hooks/usePostgresVersionSuspense.ts'
 export type { PostmasterSettingsQueryKey } from './hooks/usePostmasterSettings.ts'
 export type { PostmasterSettingsSuspenseQueryKey } from './hooks/usePostmasterSettingsSuspense.ts'
+export type { RolesQueryKey } from './hooks/useRoles.ts'
+export type { RolesSuspenseQueryKey } from './hooks/useRolesSuspense.ts'
 export type {
   ErrorBase,
   RequestValidationError,
@@ -22,6 +24,9 @@ export type {
   GetPostgresVersionResponse,
   GetPostgresUptimeResponse,
   GetPostgresPostmasterSettings,
+  RoleAccessLevelEnumKey,
+  RoleAccessLevel,
+  RoleView,
   GetStatus200,
   GetStatus400,
   GetStatusQueryResponse,
@@ -57,7 +62,11 @@ export type {
   DatabasesDetailed400,
   DatabasesDetailed422,
   DatabasesDetailedQueryResponse,
-  DatabasesDetailedQuery
+  DatabasesDetailedQuery,
+  Roles200,
+  Roles400,
+  RolesQueryResponse,
+  RolesQuery
 } from './models.ts'
 export { clusterConnect } from './clients/clusterConnect.ts'
 export { clusterDisconnect } from './clients/clusterDisconnect.ts'
@@ -66,6 +75,7 @@ export { getStatus } from './clients/getStatus.ts'
 export { postgresUptime } from './clients/postgresUptime.ts'
 export { postgresVersion } from './clients/postgresVersion.ts'
 export { postmasterSettings } from './clients/postmasterSettings.ts'
+export { roles } from './clients/roles.ts'
 export { clusterConnectMutationKey } from './hooks/useClusterConnect.ts'
 export { clusterConnectMutationOptions } from './hooks/useClusterConnect.ts'
 export { useClusterConnect } from './hooks/useClusterConnect.ts'
@@ -102,6 +112,13 @@ export { usePostmasterSettings } from './hooks/usePostmasterSettings.ts'
 export { postmasterSettingsSuspenseQueryKey } from './hooks/usePostmasterSettingsSuspense.ts'
 export { postmasterSettingsSuspenseQueryOptions } from './hooks/usePostmasterSettingsSuspense.ts'
 export { usePostmasterSettingsSuspense } from './hooks/usePostmasterSettingsSuspense.ts'
+export { rolesQueryKey } from './hooks/useRoles.ts'
+export { rolesQueryOptions } from './hooks/useRoles.ts'
+export { useRoles } from './hooks/useRoles.ts'
+export { rolesSuspenseQueryKey } from './hooks/useRolesSuspense.ts'
+export { rolesSuspenseQueryOptions } from './hooks/useRolesSuspense.ts'
+export { useRolesSuspense } from './hooks/useRolesSuspense.ts'
 export { connectionStatus } from './models.ts'
+export { roleAccessLevelEnum } from './models.ts'
 export { databasesDetailedQueryParamsSortEnum } from './models.ts'
 export { databasesDetailedQueryParamsOrderEnum } from './models.ts'

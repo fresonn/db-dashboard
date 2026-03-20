@@ -3,6 +3,7 @@ package cluster
 import (
 	"context"
 	"dashboard/api/internal/scopes/cluster/entities"
+	"dashboard/api/internal/utils"
 	"errors"
 )
 
@@ -29,45 +30,40 @@ func (c *Cluster) Roles(ctx context.Context) ([]entities.RoleView, error) {
 
 func computeAccessLevel(role entities.Role) entities.RoleView {
 	rv := entities.RoleView{
+		ID:       utils.IntToString(role.ID),
 		Name:     role.Name,
 		MemberOf: role.MemberOf,
 	}
 
-	flags := []string{}
+	var flags []entities.RoleFlag
+
 	if role.IsSuper {
-		flags = append(flags, "superuser")
+		flags = append(flags, entities.RoleFlagSuperuser)
 	}
 	if role.CanLogin {
-		flags = append(flags, "canLogin")
+		flags = append(flags, entities.RoleFlagLogin)
 	}
 	if role.CanCreateRole {
-		flags = append(flags, "createRole")
+		flags = append(flags, entities.RoleFlagCreateRole)
 	}
 	if role.CanCreateDB {
-		flags = append(flags, "createDb")
+		flags = append(flags, entities.RoleFlagCreateDB)
 	}
 	if role.Replication {
-		flags = append(flags, "replication")
+		flags = append(flags, entities.RoleFlagReplication)
 	}
 
 	rv.Flags = flags
 
-	reasons := []string{}
 	access := entities.RoleAccessLevelLimited
 
 	if role.IsSuper {
 		access = entities.RoleAccessLevelAdmin
-		reasons = append(reasons, "Superuser")
 	} else {
-		dangerousRoles := map[string]string{
-			"pg_execute_server_program": "Can execute server programs",
-			"pg_write_server_files":     "Can write server files",
-			"pg_read_server_files":      "Can read server files",
-		}
+
 		for _, r := range role.MemberOf {
-			if reason, ok := dangerousRoles[r]; ok {
+			if _, ok := entities.RoleDescriptions[r]; ok {
 				access = entities.RoleAccessLevelAdmin
-				reasons = append(reasons, reason)
 			}
 		}
 
@@ -75,12 +71,10 @@ func computeAccessLevel(role entities.Role) entities.RoleView {
 		if access != entities.RoleAccessLevelAdmin {
 			if role.CanCreateRole {
 				access = entities.RoleAccessLevelElevated
-				reasons = append(reasons, "Can create roles")
 			}
 			for _, r := range role.MemberOf {
 				if r == "pg_write_all_data" {
 					access = entities.RoleAccessLevelElevated
-					reasons = append(reasons, "Can modify all data")
 				}
 			}
 		}
@@ -89,18 +83,48 @@ func computeAccessLevel(role entities.Role) entities.RoleView {
 		if access != entities.RoleAccessLevelAdmin && access != entities.RoleAccessLevelElevated {
 			if role.CanCreateDB {
 				access = entities.RoleAccessLevelStandard
-				reasons = append(reasons, "Can create DBs")
 			}
 			for _, r := range role.MemberOf {
 				if r == "pg_read_all_data" || r == "pg_monitor" {
 					access = entities.RoleAccessLevelStandard
-					reasons = append(reasons, "Extended read or monitoring access")
 				}
 			}
 		}
 	}
 
 	rv.AccessLevel = access
-	rv.Reasons = reasons
+	rv.Capabilities = buildCapabilitiesDescriptions(role)
 	return rv
+}
+
+func buildCapabilitiesDescriptions(role entities.Role) []string {
+	var descriptions []string
+
+	// Flags
+	if role.IsSuper {
+		descriptions = append(descriptions, entities.RoleDescriptions["superuser"])
+	}
+	if role.Replication {
+		descriptions = append(descriptions, entities.RoleDescriptions["replication"])
+	}
+	if role.CanCreateDB {
+		descriptions = append(descriptions, entities.RoleDescriptions["createdb"])
+	}
+	if role.CanCreateDB {
+		descriptions = append(descriptions, entities.RoleDescriptions["createrole"])
+	}
+	if role.CanLogin {
+		descriptions = append(descriptions, entities.RoleDescriptions["rolcanlogin"])
+	}
+
+	// Membership
+	for _, r := range role.MemberOf {
+		if desc, ok := entities.RoleDescriptions[r]; ok {
+			descriptions = append(descriptions, desc)
+		} else {
+			descriptions = append(descriptions, r)
+		}
+	}
+
+	return descriptions
 }

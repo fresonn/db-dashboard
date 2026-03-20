@@ -522,19 +522,22 @@ components:
     RoleView:
       type: object
       required:
+        - id
         - name
-        - access_level
-        - member_of
+        - accessLevel
+        - memberOf
         - flags
-        - reasons
+        - capabilities
       x-go-type: entities.RoleView
       x-go-type-import:
         path: dashboard/api/internal/scopes/cluster/entities
         name: clusterEntities
       properties:
+        id:
+          type: string
         name:
           type: string
-        member_of:
+        memberOf:
           type: array
           items:
             type: string
@@ -542,9 +545,9 @@ components:
           type: array
           items:
             type: string
-        access_level:
+        accessLevel:
           $ref: "#/components/schemas/RoleAccessLevel"
-        reasons:
+        capabilities:
           type: array
           items:
             type: string

@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"dashboard/api/internal/scopes/cluster/entities"
 	clusterEntities "dashboard/api/internal/scopes/cluster/entities"
 
 	"github.com/go-chi/chi/v5"
@@ -76,6 +77,12 @@ type RequestValidationError struct {
 	Reason  string `json:"reason"`
 }
 
+// RoleAccessLevel defines model for RoleAccessLevel.
+type RoleAccessLevel = clusterEntities.RoleAccessLevel
+
+// RoleView defines model for RoleView.
+type RoleView = entities.RoleView
+
 // DatabasesDetailedParams defines parameters for DatabasesDetailed.
 type DatabasesDetailedParams struct {
 	// Sort Field to sort by
@@ -108,6 +115,9 @@ type ServerInterface interface {
 	// Get global cluster settings
 	// (GET /cluster/postmaster-settings)
 	PostmasterSettings(w http.ResponseWriter, r *http.Request)
+	// Get available roles
+	// (GET /cluster/roles)
+	Roles(w http.ResponseWriter, r *http.Request)
 	// Get server current status
 	// (GET /cluster/status)
 	GetStatus(w http.ResponseWriter, r *http.Request)
@@ -144,6 +154,12 @@ func (_ Unimplemented) ClusterDisconnect(w http.ResponseWriter, r *http.Request)
 // Get global cluster settings
 // (GET /cluster/postmaster-settings)
 func (_ Unimplemented) PostmasterSettings(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get available roles
+// (GET /cluster/roles)
+func (_ Unimplemented) Roles(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -242,6 +258,20 @@ func (siw *ServerInterfaceWrapper) PostmasterSettings(w http.ResponseWriter, r *
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.PostmasterSettings(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// Roles operation middleware
+func (siw *ServerInterfaceWrapper) Roles(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.Roles(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -419,6 +449,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Get(options.BaseURL+"/cluster/postmaster-settings", wrapper.PostmasterSettings)
 	})
 	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/cluster/roles", wrapper.Roles)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/cluster/status", wrapper.GetStatus)
 	})
 	r.Group(func(r chi.Router) {
@@ -575,6 +608,31 @@ func (response PostmasterSettings400JSONResponse) VisitPostmasterSettingsRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
+type RolesRequestObject struct {
+}
+
+type RolesResponseObject interface {
+	VisitRolesResponse(w http.ResponseWriter) error
+}
+
+type Roles200JSONResponse []RoleView
+
+func (response Roles200JSONResponse) VisitRolesResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type Roles400JSONResponse ErrorBase
+
+func (response Roles400JSONResponse) VisitRolesResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type GetStatusRequestObject struct {
 }
 
@@ -664,6 +722,9 @@ type StrictServerInterface interface {
 	// Get global cluster settings
 	// (GET /cluster/postmaster-settings)
 	PostmasterSettings(ctx context.Context, request PostmasterSettingsRequestObject) (PostmasterSettingsResponseObject, error)
+	// Get available roles
+	// (GET /cluster/roles)
+	Roles(ctx context.Context, request RolesRequestObject) (RolesResponseObject, error)
 	// Get server current status
 	// (GET /cluster/status)
 	GetStatus(ctx context.Context, request GetStatusRequestObject) (GetStatusResponseObject, error)
@@ -802,6 +863,30 @@ func (sh *strictHandler) PostmasterSettings(w http.ResponseWriter, r *http.Reque
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(PostmasterSettingsResponseObject); ok {
 		if err := validResponse.VisitPostmasterSettingsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// Roles operation middleware
+func (sh *strictHandler) Roles(w http.ResponseWriter, r *http.Request) {
+	var request RolesRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.Roles(ctx, request.(RolesRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "Roles")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(RolesResponseObject); ok {
+		if err := validResponse.VisitRolesResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

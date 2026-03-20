@@ -254,6 +254,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RequestValidationError"
+  /cluster/roles:
+    get:
+      tags:
+        - cluster
+      summary: Get available roles
+      description: Returns a list of all available roles with their details
+      operationId: Roles
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RoleView"
+        "400":
+          description: Attempt failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorBase"
 components:
   schemas:
     ErrorBase:
@@ -486,3 +508,43 @@ components:
           $ref: "#/components/schemas/PostgresSetting"
         autovacuumMaxWorkers:
           $ref: "#/components/schemas/PostgresSetting"
+    RoleAccessLevel:
+      type: string
+      enum:
+        - admin
+        - elevated
+        - standard
+        - limited
+      x-go-type: clusterEntities.RoleAccessLevel
+      x-go-type-import:
+        path: dashboard/api/internal/scopes/cluster/entities
+        name: clusterEntities
+    RoleView:
+      type: object
+      required:
+        - name
+        - access_level
+        - member_of
+        - flags
+        - reasons
+      x-go-type: entities.RoleView
+      x-go-type-import:
+        path: dashboard/api/internal/scopes/cluster/entities
+        name: clusterEntities
+      properties:
+        name:
+          type: string
+        member_of:
+          type: array
+          items:
+            type: string
+        flags:
+          type: array
+          items:
+            type: string
+        access_level:
+          $ref: "#/components/schemas/RoleAccessLevel"
+        reasons:
+          type: array
+          items:
+            type: string

@@ -226,6 +226,72 @@ export type GetPostgresPostmasterSettings = {
   autovacuumMaxWorkers: PostgresSetting
 }
 
+export const roleAccessLevelEnum = {
+  admin: 'admin',
+  elevated: 'elevated',
+  standard: 'standard',
+  limited: 'limited'
+} as const
+
+export type RoleAccessLevelEnumKey = (typeof roleAccessLevelEnum)[keyof typeof roleAccessLevelEnum]
+
+/**
+ * @description Admin > Elevated > Standard > Limited
+ */
+export type RoleAccessLevel = RoleAccessLevelEnumKey
+
+export const roleAttributesEnum = {
+  superuser: 'superuser',
+  login: 'login',
+  createRole: 'createRole',
+  createDatabase: 'createDatabase',
+  replication: 'replication'
+} as const
+
+export type RoleAttributesEnumKey = (typeof roleAttributesEnum)[keyof typeof roleAttributesEnum]
+
+/**
+ * @description https://www.postgresql.org/docs/current/role-attributes.html#ROLE-ATTRIBUTES
+ */
+export type RoleAttributes = RoleAttributesEnumKey
+
+export type RoleView = {
+  /**
+   * @type string
+   */
+  id: string
+  /**
+   * @type string
+   */
+  name: string
+  /**
+   * @type boolean
+   */
+  isGroup: boolean
+  /**
+   * @type array
+   */
+  membership: {
+    /**
+     * @type string
+     */
+    name: string
+    /**
+     * @type string
+     */
+    description: string
+  }[]
+  /**
+   * @type array
+   */
+  attributes: RoleAttributes[]
+  /**
+   * @description Admin > Elevated > Standard > Limited
+   * @type string
+   */
+  accessLevel: RoleAccessLevel
+}
+
 /**
  * @description Server current status
  */
@@ -400,4 +466,21 @@ export type DatabasesDetailedQuery = {
   Response: DatabasesDetailed200
   QueryParams: DatabasesDetailedQueryParams
   Errors: DatabasesDetailed400 | DatabasesDetailed422
+}
+
+/**
+ * @description Successful operation
+ */
+export type Roles200 = RoleView[]
+
+/**
+ * @description Attempt failed
+ */
+export type Roles400 = ErrorBase
+
+export type RolesQueryResponse = Roles200
+
+export type RolesQuery = {
+  Response: Roles200
+  Errors: Roles400
 }

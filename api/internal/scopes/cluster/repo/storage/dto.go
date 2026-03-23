@@ -4,6 +4,8 @@ import (
 	"dashboard/api/internal/postgres"
 	"dashboard/api/internal/scopes/cluster/entities"
 	"dashboard/api/internal/utils"
+
+	"github.com/lib/pq"
 )
 
 type Setting struct {
@@ -52,5 +54,30 @@ func toDatabaseDetailsEntity(dto DatabaseDetails) entities.DatabaseDetails {
 		SizeBytes:        dto.SizeBytes,
 		// SizePretty - skip
 		TotalConnections: dto.TotalConnections,
+	}
+}
+
+type RoleDetails struct {
+	OID           int            `db:"oid"`
+	RoleName      string         `db:"rolname"`
+	CanLogin      bool           `db:"rolcanlogin"`
+	RoleSuper     bool           `db:"rolsuper"`
+	CanCreateRole bool           `db:"rolcreaterole"`
+	CanCreateDB   bool           `db:"rolcreatedb"`
+	Replication   bool           `db:"rolreplication"`
+	MemberOf      pq.StringArray `db:"member_of"`
+}
+
+func toRoleEntity(dto RoleDetails) entities.Role {
+
+	return entities.Role{
+		ID:            dto.OID,
+		Name:          dto.RoleName,
+		CanLogin:      dto.CanLogin,
+		IsSuper:       dto.RoleSuper,
+		CanCreateRole: dto.CanCreateRole,
+		CanCreateDB:   dto.CanCreateDB,
+		Replication:   dto.Replication,
+		MemberOf:      []string(dto.MemberOf),
 	}
 }

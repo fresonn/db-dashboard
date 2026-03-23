@@ -4,10 +4,20 @@ import { Button } from '@/components/ui/button'
 import { AlarmClockCheck, Database } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Header } from '@/components/layout/header/header'
+import { RoleAttributeFlag } from '@/views/overview/roles/ui/attribute-flag'
+import { roleAttributesEnum } from '@/lib/api/gen'
 
 export const Route = createFileRoute('/_authenticated/ui')({
   component: RouteComponent
 })
+
+export const roleFlag = {
+  superuser: 'superuser',
+  login: 'login',
+  createRole: 'create_role',
+  createDb: 'create_db',
+  replication: 'replication'
+} as const
 
 function RouteComponent() {
   const [loading, setLoading] = useState(false)
@@ -46,6 +56,14 @@ function RouteComponent() {
           <Input disabled placeholder="Port" type="number" />
         </div>
       </div>
+
+      <div className="mb-10">
+        <h1>Role attrs</h1>
+        {Object.values(roleAttributesEnum).map((attr) => (
+          <RoleAttributeFlag key={attr} attribute={attr} />
+        ))}
+      </div>
+
       <div>
         <p className="font-code">
           Lorem, ipsum dolor sit amet consectetur adipisicing elit. Vero consequuntur voluptatibus

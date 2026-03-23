@@ -25,6 +25,7 @@ type ClusterStorage interface {
 	Uptime() (entities.PostgresUptime, error)
 	PostmasterSettings(ctx context.Context, params []string) ([]entities.Setting, error)
 	DatabasesDetails(ctx context.Context, filters entities.DatabasesFilter) ([]entities.DatabaseDetails, error)
+	Roles(ctx context.Context) ([]entities.Role, error)
 }
 
 type Cache interface {

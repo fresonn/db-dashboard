@@ -17,7 +17,6 @@ import {
   UserCog,
   UserX,
   Users,
-  MessagesSquare,
   ShieldCheck,
   AudioWaveform,
   Command,
@@ -73,13 +72,7 @@ export const sidebarData: SidebarData = {
           icon: Package
         },
         {
-          title: 'Chats',
-          url: '/chats',
-          badge: '3',
-          icon: MessagesSquare
-        },
-        {
-          title: 'Users',
+          title: 'Roles',
           url: '/connect',
           icon: Users
         },

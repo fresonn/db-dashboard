@@ -77,7 +77,7 @@ type RequestValidationError struct {
 	Reason  string `json:"reason"`
 }
 
-// RoleAccessLevel defines model for RoleAccessLevel.
+// RoleAccessLevel Admin > Elevated > Standard > Limited
 type RoleAccessLevel = clusterEntities.RoleAccessLevel
 
 // RoleView defines model for RoleView.

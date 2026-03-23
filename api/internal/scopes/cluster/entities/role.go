@@ -1,5 +1,7 @@
 package entities
 
+import "slices"
+
 type RoleAccessLevel string
 
 const (
@@ -30,13 +32,18 @@ type Role struct {
 	MemberOf      []string `json:"memberOf"`
 }
 
+type RoleMembership struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
 type RoleView struct {
-	ID           string          `json:"id"`
-	Name         string          `json:"name"`
-	MemberOf     []string        `json:"memberOf"`
-	Flags        []RoleFlag      `json:"flags"`
-	Capabilities []string        `json:"capabilities"`
-	AccessLevel  RoleAccessLevel `json:"accessLevel"`
+	ID          string           `json:"id"`
+	Name        string           `json:"name"`
+	IsGroupRole bool             `json:"isGroup"`
+	Membership  []RoleMembership `json:"membership"`
+	Flags       []RoleFlag       `json:"flags"`
+	AccessLevel RoleAccessLevel  `json:"accessLevel"`
 }
 
 var RoleDescriptions = map[string]string{
@@ -61,11 +68,40 @@ var RoleDescriptions = map[string]string{
 
 	// Replication
 	"pg_create_subscription": "Can create logical replication subscriptions",
+}
 
-	// Flags
-	"superuser":   "Full access to cluster",
-	"replication": "Can manage replication",
-	"createdb":    "Can create databases",
-	"createrole":  "Can create roles",
-	"rolcanlogin": "Can log in",
+type AccessRule struct {
+	Level RoleAccessLevel
+	Check func(role Role) bool
+}
+
+var AccessRules = []AccessRule{
+	// Admin
+	{
+		Level: RoleAccessLevelAdmin,
+		Check: func(role Role) bool {
+			return role.IsSuper ||
+				slices.Contains(role.MemberOf, "pg_execute_server_program") ||
+				slices.Contains(role.MemberOf, "pg_write_server_files") ||
+				slices.Contains(role.MemberOf, "pg_read_server_files")
+		},
+	},
+
+	// Elevated
+	{
+		Level: RoleAccessLevelElevated,
+		Check: func(role Role) bool {
+			return role.CanCreateRole || slices.Contains(role.MemberOf, "pg_write_all_data")
+		},
+	},
+
+	// Standard
+	{
+		Level: RoleAccessLevelStandard,
+		Check: func(role Role) bool {
+			return role.CanCreateDB ||
+				slices.Contains(role.MemberOf, "pg_read_all_data") ||
+				slices.Contains(role.MemberOf, "pg_monitor")
+		},
+	},
 }

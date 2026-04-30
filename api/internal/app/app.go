@@ -6,9 +6,13 @@ import (
 	"dashboard/api/internal/config"
 	"dashboard/api/internal/delivery/rest"
 	"dashboard/api/internal/postgres"
-	"dashboard/api/internal/scopes/cluster"
-	clusterCache "dashboard/api/internal/scopes/cluster/repo/cache"
-	repo "dashboard/api/internal/scopes/cluster/repo/storage"
+	"dashboard/api/internal/service/cluster"
+	clusterCache "dashboard/api/internal/service/cluster/repo/cache"
+	clusterRepo "dashboard/api/internal/service/cluster/repo/storage"
+	"dashboard/api/internal/service/database"
+	databaseRepo "dashboard/api/internal/service/database/repo/storage"
+	"dashboard/api/internal/service/roles"
+	rolesRepo "dashboard/api/internal/service/roles/repo/storage"
 	"dashboard/api/internal/utils"
 	"errors"
 	"fmt"
@@ -35,16 +39,33 @@ func New(cfg config.AppConfig, logger *slog.Logger) *App {
 
 	pgManager := postgres.New(cfg, logger)
 
-	clusterStorage := repo.New(cfg, logger, pgManager)
-
+	clusterStorage := clusterRepo.New(cfg, logger, pgManager)
 	clusterCache := clusterCache.New(&cfg, logger)
 
-	clusterScope := cluster.New(cluster.Options{
+	clusterService := cluster.New(cluster.Options{
 		Config:          cfg,
 		Logger:          logger,
 		PostgresManager: pgManager,
 		Storage:         clusterStorage,
 		Cache:           clusterCache,
+	})
+
+	rolesStorage := rolesRepo.New(cfg, logger, pgManager)
+
+	rolesService := roles.New(roles.Options{
+		Config:          cfg,
+		Logger:          logger,
+		PostgresManager: pgManager,
+		Storage:         rolesStorage,
+	})
+
+	databaseStorage := databaseRepo.New(cfg, logger, pgManager)
+
+	databaseService := database.New(database.Options{
+		Config:          cfg,
+		Logger:          logger,
+		PostgresManager: pgManager,
+		Storage:         databaseStorage,
 	})
 
 	r := chi.NewRouter()
@@ -55,7 +76,7 @@ func New(cfg config.AppConfig, logger *slog.Logger) *App {
 		AllowCredentials: true,
 	}))
 
-	restHandler := rest.New(clusterScope)
+	restHandler := rest.New(clusterService, rolesService, databaseService)
 
 	strictHandler := openapi.NewStrictHandler(restHandler, nil)
 

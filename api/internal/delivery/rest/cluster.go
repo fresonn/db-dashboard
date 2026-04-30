@@ -3,7 +3,7 @@ package rest
 import (
 	"context"
 	"dashboard/api/gen/openapi"
-	"dashboard/api/internal/scopes/cluster/entities"
+	"dashboard/api/internal/model/cluster"
 	"errors"
 
 	"github.com/go-playground/validator/v10"
@@ -24,7 +24,7 @@ func (h *Handler) GetStatus(ctx context.Context, request openapi.GetStatusReques
 
 func (h *Handler) ClusterConnect(ctx context.Context, request openapi.ClusterConnectRequestObject) (openapi.ClusterConnectResponseObject, error) {
 
-	status, err := h.cluster.Connect(ctx, entities.AuthData(*request.Body))
+	status, err := h.cluster.Connect(ctx, cluster.AuthData(*request.Body))
 	if err != nil {
 
 		var ve validator.ValidationErrors
@@ -95,47 +95,4 @@ func (h *Handler) PostmasterSettings(ctx context.Context, request openapi.Postma
 	}
 
 	return openapi.PostmasterSettings200JSONResponse(settings), nil
-}
-
-func (h *Handler) DatabasesDetailed(ctx context.Context, request openapi.DatabasesDetailedRequestObject) (openapi.DatabasesDetailedResponseObject, error) {
-
-	params := request.Params
-
-	if err := validator.New(validator.WithRequiredStructEnabled()).Struct(&params); err != nil {
-		return openapi.DatabasesDetailed422JSONResponse{
-			Message: "Request validation failed",
-			Reason:  err.Error(),
-		}, nil
-	}
-
-	var filter entities.DatabasesFilter
-
-	if params.Sort != nil {
-		filter.Sort = string(*params.Sort)
-	}
-
-	if params.Order != nil {
-		filter.Order = string(*params.Order)
-	}
-
-	databases, err := h.cluster.DatabasesDetailed(ctx, filter)
-	if err != nil {
-		return openapi.DatabasesDetailed400JSONResponse{
-			Message: err.Error(),
-		}, nil
-	}
-
-	return openapi.DatabasesDetailed200JSONResponse(databases), nil
-}
-
-func (h *Handler) Roles(ctx context.Context, request openapi.RolesRequestObject) (openapi.RolesResponseObject, error) {
-
-	roles, err := h.cluster.Roles(ctx)
-	if err != nil {
-		return openapi.Roles400JSONResponse{
-			Message: err.Error(),
-		}, nil
-	}
-
-	return openapi.Roles200JSONResponse(roles), nil
 }

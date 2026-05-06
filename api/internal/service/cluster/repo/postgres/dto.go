@@ -5,14 +5,14 @@ import (
 	"dashboard/api/internal/model/cluster"
 )
 
-type Setting struct {
+type setting struct {
 	Name      string        `db:"name"`
 	Setting   string        `db:"setting"`
 	Unit      postgres.Text `db:"unit"`
 	ShortDesc string        `db:"short_desc"`
 }
 
-func toSettingEntity(dto Setting) cluster.Setting {
+func toSettingEntity(dto setting) cluster.Setting {
 	return cluster.Setting{
 		Name:        dto.Name,
 		Value:       dto.Setting,

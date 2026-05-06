@@ -9,7 +9,7 @@ import (
 )
 
 type ClusterUseCase interface {
-	Connect(ctx context.Context, authData cluster.AuthData) (cluster.Status, error)
+	Connect(ctx context.Context, conn cluster.NewConnection) (cluster.Status, error)
 	PostgresStatus(ctx context.Context) cluster.Status
 	Uptime(ctx context.Context) (cluster.PostgresUptime, error)
 	Version(ctx context.Context) (cluster.PostgresVersion, error)

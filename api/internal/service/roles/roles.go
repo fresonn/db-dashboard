@@ -12,8 +12,8 @@ func (s *Service) Roles(ctx context.Context) ([]roleModels.RoleView, error) {
 
 	roles, err := s.pg.Roles(ctx)
 	if err != nil {
-		s.logger.ErrorContext(ctx, "get roles", "error", err)
-		return nil, errors.New("failed to get cluster roles")
+		s.logger.ErrorContext(ctx, "roles fetch failed", "error", err)
+		return nil, errors.New("failed to get postgres roles")
 	}
 
 	views := make([]roleModels.RoleView, 0, len(roles))
@@ -22,7 +22,7 @@ func (s *Service) Roles(ctx context.Context) ([]roleModels.RoleView, error) {
 		views = append(views, computeRoleView(role))
 	}
 
-	s.logger.DebugContext(ctx, "got cluster roles", "count", len(roles))
+	s.logger.DebugContext(ctx, "postgres roles fetched", "count", len(roles))
 
 	return views, nil
 }

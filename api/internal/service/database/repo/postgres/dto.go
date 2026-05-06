@@ -6,7 +6,7 @@ import (
 	"dashboard/api/internal/model/database"
 )
 
-type DatabaseDetails struct {
+type databaseDetails struct {
 	OID  int    `db:"oid"`
 	Name string `db:"name"`
 	// If the OID is invalid or the role has been deleted, the function "pg_get_userbyid(owner_id)", will return NULL
@@ -22,7 +22,7 @@ type DatabaseDetails struct {
 	TotalConnections int           `db:"total_connections"`
 }
 
-func toDatabaseDetailsEntity(dto DatabaseDetails) database.DatabaseDetails {
+func toDatabaseDetailsEntity(dto databaseDetails) database.DatabaseDetails {
 	return database.DatabaseDetails{
 		ID:               helper.IntToString(dto.OID),
 		Name:             dto.Name,
@@ -39,7 +39,7 @@ func toDatabaseDetailsEntity(dto DatabaseDetails) database.DatabaseDetails {
 	}
 }
 
-type DatabaseByOID struct {
+type databaseByOID struct {
 	OID  int    `db:"oid"`
 	Name string `db:"name"`
 	// If the OID is invalid or the role has been deleted, the function "pg_get_userbyid(owner_id)", will return NULL
@@ -54,7 +54,7 @@ type DatabaseByOID struct {
 	Description      postgres.Text `db:"description"`
 }
 
-func toDatabase(dto DatabaseByOID) database.Database {
+func toDatabase(dto databaseByOID) database.Database {
 	return database.Database{
 		ID:               helper.IntToString(dto.OID),
 		Name:             dto.Name,

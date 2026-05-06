@@ -28,9 +28,9 @@ func (h *Handler) Database(ctx context.Context, req openapi.DatabaseRequestObjec
 	return openapi.Database200JSONResponse(db), nil
 }
 
-func (h *Handler) DatabasesDetailed(ctx context.Context, request openapi.DatabasesDetailedRequestObject) (openapi.DatabasesDetailedResponseObject, error) {
+func (h *Handler) DatabasesDetailed(ctx context.Context, req openapi.DatabasesDetailedRequestObject) (openapi.DatabasesDetailedResponseObject, error) {
 
-	params := request.Params
+	params := req.Params
 
 	if err := validator.New(validator.WithRequiredStructEnabled()).Struct(&params); err != nil {
 		return openapi.DatabasesDetailed422JSONResponse{

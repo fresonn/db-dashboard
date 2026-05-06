@@ -9,16 +9,16 @@ import (
 
 func (s *Service) Version(ctx context.Context) (cluster.PostgresVersion, error) {
 
-	s.logger.DebugContext(ctx, "try to get postgres version")
-
 	if pgVersion, ok := s.cache.PgVersion(ctx); ok {
-		s.logger.DebugContext(ctx, "got postgres version", "version", pgVersion.Version)
+		s.logger.DebugContext(ctx, "postgres version cache hit", "version", pgVersion.Version)
 		return pgVersion, nil
 	}
 
+	s.logger.DebugContext(ctx, "postgres version cache miss")
+
 	rawVersion, err := s.pg.Version()
 	if err != nil {
-		s.logger.ErrorContext(ctx, "get postgres version", "error", err)
+		s.logger.ErrorContext(ctx, "postgres version fetch failed", "error", err)
 		return cluster.PostgresVersion{}, err
 	}
 
@@ -49,7 +49,7 @@ func (s *Service) Version(ctx context.Context) (cluster.PostgresVersion, error) 
 
 	s.cache.SetPgVersion(ctx, pgVersion)
 
-	s.logger.DebugContext(ctx, "got postgres version", "version", pgVersion.Version)
+	s.logger.DebugContext(ctx, "postgres version fetched", "version", pgVersion.Version)
 
 	return pgVersion, nil
 }

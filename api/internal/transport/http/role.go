@@ -5,7 +5,7 @@ import (
 	"dashboard/api/gen/openapi"
 )
 
-func (h *Handler) Roles(ctx context.Context, request openapi.RolesRequestObject) (openapi.RolesResponseObject, error) {
+func (h *Handler) Roles(ctx context.Context, req openapi.RolesRequestObject) (openapi.RolesResponseObject, error) {
 
 	roles, err := h.roles.Roles(ctx)
 	if err != nil {

@@ -37,7 +37,7 @@ func (s *Service) PostmasterSettings(ctx context.Context) (cluster.PostmasterSet
 
 	settings, err := s.pg.PostmasterSettings(ctx, postmasterParams)
 	if err != nil {
-		s.logger.ErrorContext(ctx, "get cluster settings", "error", err)
+		s.logger.ErrorContext(ctx, "cluster settings fetch failed", "error", err)
 		return cluster.PostmasterSettings{}, err
 	}
 

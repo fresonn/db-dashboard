@@ -8,45 +8,47 @@ import (
 	"errors"
 )
 
-// todo: cluster.AuthData -> cluster.NewConnection
-func (s *Service) Connect(ctx context.Context, authData cluster.AuthData) (cluster.Status, error) {
-
-	s.logger.Info("try to establish postgres connection")
-
-	authData.PrettyLog()
+func (s *Service) Connect(ctx context.Context, newConn cluster.NewConnection) (cluster.Status, error) {
 
 	if ok := s.pgManager.IsConnected(); ok {
 		s.logger.WarnContext(ctx, "connection already established")
 		return cluster.Status{}, errors.New("connection already established")
 	}
 
-	err := s.validate.Struct(&authData)
+	err := s.validate.Struct(&newConn)
 	if err != nil {
-		s.logger.ErrorContext(ctx, "connection validation", "error", err)
+		s.logger.ErrorContext(ctx, "connection validation failed", "error", err)
 		return cluster.Status{}, err
 	}
 
 	conn := config.Connection{
-		Host:     authData.Host,
-		Port:     authData.Port,
-		User:     authData.User,
-		Password: authData.Password,
-		SSLMode:  authData.SSLMode,
+		Host:     newConn.Host,
+		Port:     newConn.Port,
+		User:     newConn.User,
+		Password: newConn.Password,
+		SSLMode:  newConn.SSLMode,
 	}
 
-	if authData.Database != nil {
-		conn.Database = *authData.Database
+	if newConn.Database != nil {
+		conn.Database = *newConn.Database
 	} else {
 		conn.Database = "postgres"
 	}
 
 	err = s.pgManager.UpdateConnection(ctx, conn)
 	if err != nil {
-		s.logger.Error("set connection", "error", err)
+		s.logger.Error("failed to update postgres connection", "error", err)
 		return cluster.Status{}, err
 	}
 
-	s.logger.Info("postgres connection established")
+	s.logger.Info("postgres connection established",
+		"host", conn.Host,
+		"port", conn.Port,
+		"user", conn.User,
+		"password", "***",
+		"database", conn.Database,
+		"sslmode", conn.SSLMode,
+	)
 
 	return cluster.Status{
 		ConnectionStatus: s.pgManager.Status(),

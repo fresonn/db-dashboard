@@ -10,6 +10,8 @@ tags:
     description: Everything related to Postgres cluster level settings and objects
   - name: database
     description: Everything related to Postgres database level settings and objects
+  - name: role
+    description: Everything related to Postgres role level settings and objects
 paths:
   /cluster/status:
     get:
@@ -209,58 +211,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorBase"
-  /cluster/databases-detailed:
-    get:
-      tags:
-        - cluster
-      summary: Get cluster databases
-      description: Returns a list of all available databases with their details
-      operationId: DatabasesDetailed
-      parameters:
-        - name: sort
-          description: Field to sort by
-          in: query
-          required: false
-          schema:
-            type: string
-            enum: [ size, connection ]
-          x-oapi-codegen-extra-tags:
-            validate: "omitempty,oneof=size connection"
-        - name: order
-          description: Sort direction
-          in: query
-          required: false
-          schema:
-            type: string
-            enum: [ asc, desc ]
-          x-oapi-codegen-extra-tags:
-            validate: "omitempty,oneof=asc desc"
-          # default: desc
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/DatabaseDetails"
-        "400":
-          description: Attempt failed
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorBase"
-        "422":
-          description: Some query params are invalid
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RequestValidationError"
   /cluster/roles:
     get:
       tags:
-        - cluster
+        - role
       summary: Get available roles
       description: Returns a list of all available roles with their details
       operationId: Roles
@@ -312,6 +266,54 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorBase"
+  /databases-detailed:
+    get:
+      tags:
+        - database
+      summary: Get all databases
+      description: Returns a list of all available databases with their details
+      operationId: DatabasesDetailed
+      parameters:
+        - name: sort
+          description: Field to sort by
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ size, connection ]
+          x-oapi-codegen-extra-tags:
+            validate: "omitempty,oneof=size connection"
+        - name: order
+          description: Sort direction
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ asc, desc ]
+          x-oapi-codegen-extra-tags:
+            validate: "omitempty,oneof=asc desc"
+          # default: desc
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DatabaseDetails"
+        "400":
+          description: Attempt failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorBase"
+        "422":
+          description: Some query params are invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RequestValidationError"
 components:
   schemas:
     ErrorBase:
@@ -499,11 +501,11 @@ components:
           type: string
           example: postgres
     ClusterConnectData:
-      x-go-type: clusterEntities.AuthData
+      x-go-type: clusterEntities.NewConnection
       x-go-type-import:
         path: dashboard/api/internal/model/cluster
         name: clusterEntities
-      x-go-type-name: clusterEntities.AuthData
+      x-go-type-name: clusterEntities.NewConnection
       type: object
       required:
         - host

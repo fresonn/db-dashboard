@@ -6,7 +6,7 @@ import (
 	"github.com/lib/pq"
 )
 
-type RoleDetails struct {
+type roleDetails struct {
 	OID           int            `db:"oid"`
 	RoleName      string         `db:"rolname"`
 	CanLogin      bool           `db:"rolcanlogin"`
@@ -17,7 +17,7 @@ type RoleDetails struct {
 	MemberOf      pq.StringArray `db:"member_of"`
 }
 
-func toRoleEntity(dto RoleDetails) role.Role {
+func toRoleEntity(dto roleDetails) role.Role {
 
 	return role.Role{
 		ID:            dto.OID,

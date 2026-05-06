@@ -7,8 +7,6 @@ import (
 
 func (s *Service) Disconnect(ctx context.Context) error {
 
-	s.logger.Info("try to disconnect postgres")
-
 	isConnected := s.pgManager.IsConnected()
 
 	if !isConnected {
@@ -18,13 +16,13 @@ func (s *Service) Disconnect(ctx context.Context) error {
 
 	err := s.pgManager.Disconnect()
 	if err != nil {
-		s.logger.Error("disconnect from postgres", "error", err)
+		s.logger.Error("postgres failed to disconnect", "error", err)
 		return err
 	}
 
 	s.cache.Clear(ctx)
 
-	s.logger.Info("postgres disconnected")
+	s.logger.Info("successfully disconnected")
 
 	return nil
 }

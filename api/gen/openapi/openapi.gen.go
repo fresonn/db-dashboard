@@ -39,7 +39,7 @@ const (
 )
 
 // ClusterConnectData defines model for ClusterConnectData.
-type ClusterConnectData = clusterEntities.AuthData
+type ClusterConnectData = clusterEntities.NewConnection
 
 // ConnectionStatus Represents connection state between dashboard and postgres
 type ConnectionStatus string
@@ -113,9 +113,6 @@ type ServerInterface interface {
 	// Connect to Postgres cluster
 	// (POST /cluster/connect)
 	ClusterConnect(w http.ResponseWriter, r *http.Request)
-	// Get cluster databases
-	// (GET /cluster/databases-detailed)
-	DatabasesDetailed(w http.ResponseWriter, r *http.Request, params DatabasesDetailedParams)
 	// Disconnect from Postgres cluster
 	// (POST /cluster/disconnect)
 	ClusterDisconnect(w http.ResponseWriter, r *http.Request)
@@ -137,6 +134,9 @@ type ServerInterface interface {
 	// Find database by identifier
 	// (GET /database/{databaseId})
 	Database(w http.ResponseWriter, r *http.Request, databaseId int)
+	// Get all databases
+	// (GET /databases-detailed)
+	DatabasesDetailed(w http.ResponseWriter, r *http.Request, params DatabasesDetailedParams)
 }
 
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
@@ -146,12 +146,6 @@ type Unimplemented struct{}
 // Connect to Postgres cluster
 // (POST /cluster/connect)
 func (_ Unimplemented) ClusterConnect(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// Get cluster databases
-// (GET /cluster/databases-detailed)
-func (_ Unimplemented) DatabasesDetailed(w http.ResponseWriter, r *http.Request, params DatabasesDetailedParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -197,6 +191,12 @@ func (_ Unimplemented) Database(w http.ResponseWriter, r *http.Request, database
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// Get all databases
+// (GET /databases-detailed)
+func (_ Unimplemented) DatabasesDetailed(w http.ResponseWriter, r *http.Request, params DatabasesDetailedParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
 // ServerInterfaceWrapper converts contexts to parameters.
 type ServerInterfaceWrapper struct {
 	Handler            ServerInterface
@@ -211,41 +211,6 @@ func (siw *ServerInterfaceWrapper) ClusterConnect(w http.ResponseWriter, r *http
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.ClusterConnect(w, r)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r)
-}
-
-// DatabasesDetailed operation middleware
-func (siw *ServerInterfaceWrapper) DatabasesDetailed(w http.ResponseWriter, r *http.Request) {
-
-	var err error
-
-	// Parameter object where we will unmarshal all parameters from the context
-	var params DatabasesDetailedParams
-
-	// ------------- Optional query parameter "sort" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "sort", r.URL.Query(), &params.Sort)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "sort", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "order" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "order", r.URL.Query(), &params.Order)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "order", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.DatabasesDetailed(w, r, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -355,6 +320,41 @@ func (siw *ServerInterfaceWrapper) Database(w http.ResponseWriter, r *http.Reque
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.Database(w, r, databaseId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// DatabasesDetailed operation middleware
+func (siw *ServerInterfaceWrapper) DatabasesDetailed(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params DatabasesDetailedParams
+
+	// ------------- Optional query parameter "sort" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sort", r.URL.Query(), &params.Sort)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "sort", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "order" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "order", r.URL.Query(), &params.Order)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "order", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DatabasesDetailed(w, r, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -481,9 +481,6 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Post(options.BaseURL+"/cluster/connect", wrapper.ClusterConnect)
 	})
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/cluster/databases-detailed", wrapper.DatabasesDetailed)
-	})
-	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/cluster/disconnect", wrapper.ClusterDisconnect)
 	})
 	r.Group(func(r chi.Router) {
@@ -503,6 +500,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/database/{databaseId}", wrapper.Database)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/databases-detailed", wrapper.DatabasesDetailed)
 	})
 
 	return r
@@ -553,41 +553,6 @@ func (response ClusterConnectdefaultJSONResponse) VisitClusterConnectResponse(w 
 	w.WriteHeader(response.StatusCode)
 
 	return json.NewEncoder(w).Encode(response.Body)
-}
-
-type DatabasesDetailedRequestObject struct {
-	Params DatabasesDetailedParams
-}
-
-type DatabasesDetailedResponseObject interface {
-	VisitDatabasesDetailedResponse(w http.ResponseWriter) error
-}
-
-type DatabasesDetailed200JSONResponse []DatabaseDetails
-
-func (response DatabasesDetailed200JSONResponse) VisitDatabasesDetailedResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type DatabasesDetailed400JSONResponse ErrorBase
-
-func (response DatabasesDetailed400JSONResponse) VisitDatabasesDetailedResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(400)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type DatabasesDetailed422JSONResponse RequestValidationError
-
-func (response DatabasesDetailed422JSONResponse) VisitDatabasesDetailedResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(422)
-
-	return json.NewEncoder(w).Encode(response)
 }
 
 type ClusterDisconnectRequestObject struct {
@@ -787,14 +752,46 @@ func (response Database404JSONResponse) VisitDatabaseResponse(w http.ResponseWri
 	return json.NewEncoder(w).Encode(response)
 }
 
+type DatabasesDetailedRequestObject struct {
+	Params DatabasesDetailedParams
+}
+
+type DatabasesDetailedResponseObject interface {
+	VisitDatabasesDetailedResponse(w http.ResponseWriter) error
+}
+
+type DatabasesDetailed200JSONResponse []DatabaseDetails
+
+func (response DatabasesDetailed200JSONResponse) VisitDatabasesDetailedResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DatabasesDetailed400JSONResponse ErrorBase
+
+func (response DatabasesDetailed400JSONResponse) VisitDatabasesDetailedResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DatabasesDetailed422JSONResponse RequestValidationError
+
+func (response DatabasesDetailed422JSONResponse) VisitDatabasesDetailedResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
 	// Connect to Postgres cluster
 	// (POST /cluster/connect)
 	ClusterConnect(ctx context.Context, request ClusterConnectRequestObject) (ClusterConnectResponseObject, error)
-	// Get cluster databases
-	// (GET /cluster/databases-detailed)
-	DatabasesDetailed(ctx context.Context, request DatabasesDetailedRequestObject) (DatabasesDetailedResponseObject, error)
 	// Disconnect from Postgres cluster
 	// (POST /cluster/disconnect)
 	ClusterDisconnect(ctx context.Context, request ClusterDisconnectRequestObject) (ClusterDisconnectResponseObject, error)
@@ -816,6 +813,9 @@ type StrictServerInterface interface {
 	// Find database by identifier
 	// (GET /database/{databaseId})
 	Database(ctx context.Context, request DatabaseRequestObject) (DatabaseResponseObject, error)
+	// Get all databases
+	// (GET /databases-detailed)
+	DatabasesDetailed(ctx context.Context, request DatabasesDetailedRequestObject) (DatabasesDetailedResponseObject, error)
 }
 
 type StrictHandlerFunc = strictnethttp.StrictHTTPHandlerFunc
@@ -871,32 +871,6 @@ func (sh *strictHandler) ClusterConnect(w http.ResponseWriter, r *http.Request) 
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(ClusterConnectResponseObject); ok {
 		if err := validResponse.VisitClusterConnectResponse(w); err != nil {
-			sh.options.ResponseErrorHandlerFunc(w, r, err)
-		}
-	} else if response != nil {
-		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// DatabasesDetailed operation middleware
-func (sh *strictHandler) DatabasesDetailed(w http.ResponseWriter, r *http.Request, params DatabasesDetailedParams) {
-	var request DatabasesDetailedRequestObject
-
-	request.Params = params
-
-	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
-		return sh.ssi.DatabasesDetailed(ctx, request.(DatabasesDetailedRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "DatabasesDetailed")
-	}
-
-	response, err := handler(r.Context(), w, r, request)
-
-	if err != nil {
-		sh.options.ResponseErrorHandlerFunc(w, r, err)
-	} else if validResponse, ok := response.(DatabasesDetailedResponseObject); ok {
-		if err := validResponse.VisitDatabasesDetailedResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
@@ -1067,6 +1041,32 @@ func (sh *strictHandler) Database(w http.ResponseWriter, r *http.Request, databa
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(DatabaseResponseObject); ok {
 		if err := validResponse.VisitDatabaseResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// DatabasesDetailed operation middleware
+func (sh *strictHandler) DatabasesDetailed(w http.ResponseWriter, r *http.Request, params DatabasesDetailedParams) {
+	var request DatabasesDetailedRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DatabasesDetailed(ctx, request.(DatabasesDetailedRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DatabasesDetailed")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DatabasesDetailedResponseObject); ok {
+		if err := validResponse.VisitDatabasesDetailedResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

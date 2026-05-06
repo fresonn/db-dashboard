@@ -9,7 +9,7 @@ func (s *Service) PostgresStatus(ctx context.Context) cluster.Status {
 
 	status := s.pgManager.Status()
 
-	s.logger.DebugContext(ctx, "get postgres status", "status", status)
+	s.logger.DebugContext(ctx, "postgres status fetched", "status", status)
 
 	var currentUser, currentDatabase *string
 

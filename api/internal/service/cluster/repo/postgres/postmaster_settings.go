@@ -23,7 +23,7 @@ func (s *Storage) PostmasterSettings(ctx context.Context, params []string) ([]cl
 		return nil, err
 	}
 
-	var dtos []Setting
+	var dtos []setting
 
 	query, args, err := sqlx.In(POSTMASTER_SETTINGS_QUERY, params)
 	if err != nil {

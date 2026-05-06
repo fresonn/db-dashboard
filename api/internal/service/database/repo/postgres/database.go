@@ -33,7 +33,7 @@ func (s *Storage) Database(ctx context.Context, oid int) (database.Database, err
 		return database.Database{}, err
 	}
 
-	var dto DatabaseByOID
+	var dto databaseByOID
 
 	err = db.Get(&dto, DATABASE_BY_OID, oid)
 	if err != nil {

@@ -9,7 +9,7 @@ func (s *Service) DatabasesDetailed(ctx context.Context, filter database.Databas
 
 	databases, err := s.pg.DatabasesDetails(ctx, filter)
 	if err != nil {
-		s.logger.ErrorContext(ctx, "available databases", "error", err)
+		s.logger.ErrorContext(ctx, "databases detailed fetch failed", "error", err)
 		return nil, err
 	}
 

@@ -51,7 +51,7 @@ func (s *Storage) DatabasesDetails(ctx context.Context, filter database.Database
 
 	query := generateDatabasesDetailsQuery(DATABASES_DETAILS_QUERY, filter)
 
-	var dtos []DatabaseDetails
+	var dtos []databaseDetails
 
 	err = db.SelectContext(ctx, &dtos, query)
 	if err != nil {

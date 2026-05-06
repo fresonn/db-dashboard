@@ -37,7 +37,7 @@ func (s *Storage) Roles(ctx context.Context) ([]role.Role, error) {
 		return nil, err
 	}
 
-	var dtos []RoleDetails
+	var dtos []roleDetails
 
 	err = db.SelectContext(ctx, &dtos, ROLES_DETAILS_QUERY)
 	if err != nil {

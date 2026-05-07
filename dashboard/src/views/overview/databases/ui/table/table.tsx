@@ -1,4 +1,8 @@
+import { useNavigate } from '@tanstack/react-router'
 import { Typography } from '@/components/ui/typography'
+import { TableToolbar } from './toolbar'
+import { columns } from './columns'
+import type { Database } from './types'
 import {
   getCoreRowModel,
   useReactTable,
@@ -10,8 +14,6 @@ import {
   type SortingState,
   type OnChangeFn
 } from '@tanstack/react-table'
-import { columns } from './columns'
-import { TableToolbar } from './toolbar'
 import {
   Table,
   TableBody,
@@ -20,9 +22,6 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/shadcn/table'
-import { toast } from 'sonner'
-
-import type { Database } from './types'
 
 export type DatabasesTableProps = {
   data: Database[]
@@ -52,9 +51,14 @@ export function DatabasesTable({
     getFacetedMinMaxValues: getFacetedMinMaxValues()
   })
 
-  const handleDatabaseClick = (dbName: string) => {
-    toast.success(`Redirect to /database/${dbName}`, {
-      duration: 1500
+  const navigate = useNavigate()
+
+  const handleDatabaseClick = (databaseId: string) => {
+    navigate({
+      to: '/database/$databaseId',
+      params: {
+        databaseId
+      }
     })
   }
 
@@ -88,7 +92,7 @@ export function DatabasesTable({
                   className="cursor-pointer"
                   onClick={() => {
                     if (row.getValue('allowConnections')) {
-                      handleDatabaseClick(row.getValue('name'))
+                      handleDatabaseClick(row.original.id)
                     }
                   }}
                 >

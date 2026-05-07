@@ -15,6 +15,10 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedUiRouteImport } from './routes/_authenticated/ui'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAppsRouteImport } from './routes/_authenticated/apps'
+import { Route as AuthenticatedDatabaseDatabaseIdRouteImport } from './routes/_authenticated/database/$databaseId'
+import { Route as AuthenticatedDatabaseDatabaseIdIndexRouteImport } from './routes/_authenticated/database/$databaseId.index'
+import { Route as AuthenticatedDatabaseDatabaseIdTablesRouteImport } from './routes/_authenticated/database/$databaseId.tables'
+import { Route as AuthenticatedDatabaseDatabaseIdIndexesRouteImport } from './routes/_authenticated/database/$databaseId.indexes'
 
 const ConnectRoute = ConnectRouteImport.update({
   id: '/connect',
@@ -45,6 +49,30 @@ const AuthenticatedAppsRoute = AuthenticatedAppsRouteImport.update({
   path: '/apps',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDatabaseDatabaseIdRoute =
+  AuthenticatedDatabaseDatabaseIdRouteImport.update({
+    id: '/database/$databaseId',
+    path: '/database/$databaseId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDatabaseDatabaseIdIndexRoute =
+  AuthenticatedDatabaseDatabaseIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDatabaseDatabaseIdRoute,
+  } as any)
+const AuthenticatedDatabaseDatabaseIdTablesRoute =
+  AuthenticatedDatabaseDatabaseIdTablesRouteImport.update({
+    id: '/tables',
+    path: '/tables',
+    getParentRoute: () => AuthenticatedDatabaseDatabaseIdRoute,
+  } as any)
+const AuthenticatedDatabaseDatabaseIdIndexesRoute =
+  AuthenticatedDatabaseDatabaseIdIndexesRouteImport.update({
+    id: '/indexes',
+    path: '/indexes',
+    getParentRoute: () => AuthenticatedDatabaseDatabaseIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/connect': typeof ConnectRoute
@@ -52,6 +80,10 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/ui': typeof AuthenticatedUiRoute
   '/': typeof AuthenticatedIndexRoute
+  '/database/$databaseId': typeof AuthenticatedDatabaseDatabaseIdRouteWithChildren
+  '/database/$databaseId/indexes': typeof AuthenticatedDatabaseDatabaseIdIndexesRoute
+  '/database/$databaseId/tables': typeof AuthenticatedDatabaseDatabaseIdTablesRoute
+  '/database/$databaseId/': typeof AuthenticatedDatabaseDatabaseIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/connect': typeof ConnectRoute
@@ -59,6 +91,9 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/ui': typeof AuthenticatedUiRoute
   '/': typeof AuthenticatedIndexRoute
+  '/database/$databaseId/indexes': typeof AuthenticatedDatabaseDatabaseIdIndexesRoute
+  '/database/$databaseId/tables': typeof AuthenticatedDatabaseDatabaseIdTablesRoute
+  '/database/$databaseId': typeof AuthenticatedDatabaseDatabaseIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -68,12 +103,33 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/ui': typeof AuthenticatedUiRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/database/$databaseId': typeof AuthenticatedDatabaseDatabaseIdRouteWithChildren
+  '/_authenticated/database/$databaseId/indexes': typeof AuthenticatedDatabaseDatabaseIdIndexesRoute
+  '/_authenticated/database/$databaseId/tables': typeof AuthenticatedDatabaseDatabaseIdTablesRoute
+  '/_authenticated/database/$databaseId/': typeof AuthenticatedDatabaseDatabaseIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/connect' | '/apps' | '/dashboard' | '/ui' | '/'
+  fullPaths:
+    | '/connect'
+    | '/apps'
+    | '/dashboard'
+    | '/ui'
+    | '/'
+    | '/database/$databaseId'
+    | '/database/$databaseId/indexes'
+    | '/database/$databaseId/tables'
+    | '/database/$databaseId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/connect' | '/apps' | '/dashboard' | '/ui' | '/'
+  to:
+    | '/connect'
+    | '/apps'
+    | '/dashboard'
+    | '/ui'
+    | '/'
+    | '/database/$databaseId/indexes'
+    | '/database/$databaseId/tables'
+    | '/database/$databaseId'
   id:
     | '__root__'
     | '/_authenticated'
@@ -82,6 +138,10 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/ui'
     | '/_authenticated/'
+    | '/_authenticated/database/$databaseId'
+    | '/_authenticated/database/$databaseId/indexes'
+    | '/_authenticated/database/$databaseId/tables'
+    | '/_authenticated/database/$databaseId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -133,14 +193,64 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/database/$databaseId': {
+      id: '/_authenticated/database/$databaseId'
+      path: '/database/$databaseId'
+      fullPath: '/database/$databaseId'
+      preLoaderRoute: typeof AuthenticatedDatabaseDatabaseIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/database/$databaseId/': {
+      id: '/_authenticated/database/$databaseId/'
+      path: '/'
+      fullPath: '/database/$databaseId/'
+      preLoaderRoute: typeof AuthenticatedDatabaseDatabaseIdIndexRouteImport
+      parentRoute: typeof AuthenticatedDatabaseDatabaseIdRoute
+    }
+    '/_authenticated/database/$databaseId/tables': {
+      id: '/_authenticated/database/$databaseId/tables'
+      path: '/tables'
+      fullPath: '/database/$databaseId/tables'
+      preLoaderRoute: typeof AuthenticatedDatabaseDatabaseIdTablesRouteImport
+      parentRoute: typeof AuthenticatedDatabaseDatabaseIdRoute
+    }
+    '/_authenticated/database/$databaseId/indexes': {
+      id: '/_authenticated/database/$databaseId/indexes'
+      path: '/indexes'
+      fullPath: '/database/$databaseId/indexes'
+      preLoaderRoute: typeof AuthenticatedDatabaseDatabaseIdIndexesRouteImport
+      parentRoute: typeof AuthenticatedDatabaseDatabaseIdRoute
+    }
   }
 }
+
+interface AuthenticatedDatabaseDatabaseIdRouteChildren {
+  AuthenticatedDatabaseDatabaseIdIndexesRoute: typeof AuthenticatedDatabaseDatabaseIdIndexesRoute
+  AuthenticatedDatabaseDatabaseIdTablesRoute: typeof AuthenticatedDatabaseDatabaseIdTablesRoute
+  AuthenticatedDatabaseDatabaseIdIndexRoute: typeof AuthenticatedDatabaseDatabaseIdIndexRoute
+}
+
+const AuthenticatedDatabaseDatabaseIdRouteChildren: AuthenticatedDatabaseDatabaseIdRouteChildren =
+  {
+    AuthenticatedDatabaseDatabaseIdIndexesRoute:
+      AuthenticatedDatabaseDatabaseIdIndexesRoute,
+    AuthenticatedDatabaseDatabaseIdTablesRoute:
+      AuthenticatedDatabaseDatabaseIdTablesRoute,
+    AuthenticatedDatabaseDatabaseIdIndexRoute:
+      AuthenticatedDatabaseDatabaseIdIndexRoute,
+  }
+
+const AuthenticatedDatabaseDatabaseIdRouteWithChildren =
+  AuthenticatedDatabaseDatabaseIdRoute._addFileChildren(
+    AuthenticatedDatabaseDatabaseIdRouteChildren,
+  )
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppsRoute: typeof AuthenticatedAppsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedUiRoute: typeof AuthenticatedUiRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedDatabaseDatabaseIdRoute: typeof AuthenticatedDatabaseDatabaseIdRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -148,6 +258,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedUiRoute: AuthenticatedUiRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedDatabaseDatabaseIdRoute:
+    AuthenticatedDatabaseDatabaseIdRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =

@@ -13,14 +13,14 @@ import type {
 import type { RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
 
 function getDatabasesDetailedUrl() {
-  const res = { method: 'GET', url: `/cluster/databases-detailed` as const }
+  const res = { method: 'GET', url: `/databases-detailed` as const }
   return res
 }
 
 /**
  * @description Returns a list of all available databases with their details
- * @summary Get cluster databases
- * {@link /cluster/databases-detailed}
+ * @summary Get all databases
+ * {@link /databases-detailed}
  */
 export async function databasesDetailed(
   params?: DatabasesDetailedQueryParams,

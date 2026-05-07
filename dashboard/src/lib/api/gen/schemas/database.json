@@ -1,25 +1,24 @@
 {
   "type": "object",
-  "description": "Represents database entity from Postgres system catalog",
-  "x-go-type": "clusterEntities.DatabaseDetails",
+  "description": "Represents database entity",
+  "x-go-type": "databaseEntities.Database",
   "x-go-type-import": {
-    "path": "dashboard/api/internal/scopes/cluster/entities",
-    "name": "DatabaseDetails"
+    "path": "dashboard/api/internal/model/database",
+    "name": "databaseEntities"
   },
-  "x-go-type-name": "clusterEntities.DatabaseDetails",
+  "x-go-type-name": "databaseEntities.Database",
   "required": [
     "id",
     "name",
     "owner",
     "encoding",
-    "collate",
-    "ctype",
-    "isTemplate",
-    "allowConnections",
     "connectionLimit",
+    "allowConnections",
+    "isTemplate",
+    "tablespace",
     "sizeBytes",
     "sizePretty",
-    "totalConnections"
+    "description"
   ],
   "properties": {
     "id": {
@@ -30,14 +29,13 @@
     "name": { "type": "string", "example": "postgres" },
     "owner": { "type": "string", "example": "postgres" },
     "encoding": { "type": "string", "example": "UTF8" },
-    "collate": { "type": "string", "example": "en_US.UTF-8" },
-    "ctype": { "type": "string", "example": "en_US.UTF-8" },
-    "isTemplate": { "type": "boolean", "example": false },
-    "allowConnections": { "type": "boolean", "example": true },
     "connectionLimit": { "type": "integer", "example": -1 },
-    "sizeBytes": { "type": "integer", "example": 7746019 },
-    "sizePretty": { "type": "string", "example": "6.4 MB" },
-    "totalConnections": { "type": "integer", "example": 3 }
+    "allowConnections": { "type": "boolean", "example": true },
+    "isTemplate": { "type": "boolean", "example": false },
+    "tablespace": { "type": "string", "example": "pg_default" },
+    "sizeBytes": { "type": "integer", "example": 10138083 },
+    "sizePretty": { "type": "string", "example": "9.7 MB" },
+    "description": { "type": "string", "example": "Description text if it exists" }
   },
   "x-readme-ref-name": "Database"
 }

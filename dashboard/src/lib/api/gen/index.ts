@@ -1,7 +1,9 @@
 export type { ClusterConnectMutationKey } from './hooks/useClusterConnect.ts'
 export type { ClusterDisconnectMutationKey } from './hooks/useClusterDisconnect.ts'
+export type { DatabaseQueryKey } from './hooks/useDatabase.ts'
 export type { DatabasesDetailedQueryKey } from './hooks/useDatabasesDetailed.ts'
 export type { DatabasesDetailedSuspenseQueryKey } from './hooks/useDatabasesDetailedSuspense.ts'
+export type { DatabaseSuspenseQueryKey } from './hooks/useDatabaseSuspense.ts'
 export type { GetStatusQueryKey } from './hooks/useGetStatus.ts'
 export type { GetStatusSuspenseQueryKey } from './hooks/useGetStatusSuspense.ts'
 export type { PostgresUptimeQueryKey } from './hooks/usePostgresUptime.ts'
@@ -19,6 +21,7 @@ export type {
   ConnectionStatus,
   PostgresSetting,
   Database,
+  DatabaseDetails,
   GetStatusResponse,
   ClusterConnectData,
   GetPostgresVersionResponse,
@@ -57,6 +60,16 @@ export type {
   PostmasterSettings400,
   PostmasterSettingsQueryResponse,
   PostmasterSettingsQuery,
+  Roles200,
+  Roles400,
+  RolesQueryResponse,
+  RolesQuery,
+  DatabasePathParams,
+  Database200,
+  Database400,
+  Database404,
+  DatabaseQueryResponse,
+  DatabaseQuery,
   DatabasesDetailedQueryParamsSortEnumKey,
   DatabasesDetailedQueryParamsOrderEnumKey,
   DatabasesDetailedQueryParams,
@@ -64,14 +77,11 @@ export type {
   DatabasesDetailed400,
   DatabasesDetailed422,
   DatabasesDetailedQueryResponse,
-  DatabasesDetailedQuery,
-  Roles200,
-  Roles400,
-  RolesQueryResponse,
-  RolesQuery
+  DatabasesDetailedQuery
 } from './models.ts'
 export { clusterConnect } from './clients/clusterConnect.ts'
 export { clusterDisconnect } from './clients/clusterDisconnect.ts'
+export { database } from './clients/database.ts'
 export { databasesDetailed } from './clients/databasesDetailed.ts'
 export { getStatus } from './clients/getStatus.ts'
 export { postgresUptime } from './clients/postgresUptime.ts'
@@ -84,12 +94,18 @@ export { useClusterConnect } from './hooks/useClusterConnect.ts'
 export { clusterDisconnectMutationKey } from './hooks/useClusterDisconnect.ts'
 export { clusterDisconnectMutationOptions } from './hooks/useClusterDisconnect.ts'
 export { useClusterDisconnect } from './hooks/useClusterDisconnect.ts'
+export { databaseQueryKey } from './hooks/useDatabase.ts'
+export { databaseQueryOptions } from './hooks/useDatabase.ts'
+export { useDatabase } from './hooks/useDatabase.ts'
 export { databasesDetailedQueryKey } from './hooks/useDatabasesDetailed.ts'
 export { databasesDetailedQueryOptions } from './hooks/useDatabasesDetailed.ts'
 export { useDatabasesDetailed } from './hooks/useDatabasesDetailed.ts'
 export { databasesDetailedSuspenseQueryKey } from './hooks/useDatabasesDetailedSuspense.ts'
 export { databasesDetailedSuspenseQueryOptions } from './hooks/useDatabasesDetailedSuspense.ts'
 export { useDatabasesDetailedSuspense } from './hooks/useDatabasesDetailedSuspense.ts'
+export { databaseSuspenseQueryKey } from './hooks/useDatabaseSuspense.ts'
+export { databaseSuspenseQueryOptions } from './hooks/useDatabaseSuspense.ts'
+export { useDatabaseSuspense } from './hooks/useDatabaseSuspense.ts'
 export { getStatusQueryKey } from './hooks/useGetStatus.ts'
 export { getStatusQueryOptions } from './hooks/useGetStatus.ts'
 export { useGetStatus } from './hooks/useGetStatus.ts'

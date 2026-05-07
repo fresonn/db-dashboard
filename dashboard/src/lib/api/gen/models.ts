@@ -58,9 +58,60 @@ export type PostgresSetting = {
 }
 
 /**
- * @description Represents database entity from Postgres system catalog
+ * @description Represents database entity
  */
 export type Database = {
+  /**
+   * @description This is essentially a Postgres OID.
+   * @type string
+   */
+  id: string
+  /**
+   * @type string
+   */
+  name: string
+  /**
+   * @type string
+   */
+  owner: string
+  /**
+   * @type string
+   */
+  encoding: string
+  /**
+   * @type integer
+   */
+  connectionLimit: number
+  /**
+   * @type boolean
+   */
+  allowConnections: boolean
+  /**
+   * @type boolean
+   */
+  isTemplate: boolean
+  /**
+   * @type string
+   */
+  tablespace: string
+  /**
+   * @type integer
+   */
+  sizeBytes: number
+  /**
+   * @type string
+   */
+  sizePretty: string
+  /**
+   * @type string
+   */
+  description: string
+}
+
+/**
+ * @description Represents database entity from Postgres system catalog
+ */
+export type DatabaseDetails = {
   /**
    * @description This is essentially a Postgres OID.
    * @type string
@@ -416,6 +467,54 @@ export type PostmasterSettingsQuery = {
   Errors: PostmasterSettings400
 }
 
+/**
+ * @description Successful operation
+ */
+export type Roles200 = RoleView[]
+
+/**
+ * @description Attempt failed
+ */
+export type Roles400 = ErrorBase
+
+export type RolesQueryResponse = Roles200
+
+export type RolesQuery = {
+  Response: Roles200
+  Errors: Roles400
+}
+
+export type DatabasePathParams = {
+  /**
+   * @description ID of database to return
+   * @type integer
+   */
+  databaseId: number
+}
+
+/**
+ * @description Successful operation
+ */
+export type Database200 = Database
+
+/**
+ * @description Attempt to get database failed
+ */
+export type Database400 = ErrorBase
+
+/**
+ * @description Database not found
+ */
+export type Database404 = ErrorBase
+
+export type DatabaseQueryResponse = Database200
+
+export type DatabaseQuery = {
+  Response: Database200
+  PathParams: DatabasePathParams
+  Errors: Database400 | Database404
+}
+
 export const databasesDetailedQueryParamsSortEnum = {
   size: 'size',
   connection: 'connection'
@@ -448,7 +547,7 @@ export type DatabasesDetailedQueryParams = {
 /**
  * @description Successful operation
  */
-export type DatabasesDetailed200 = Database[]
+export type DatabasesDetailed200 = DatabaseDetails[]
 
 /**
  * @description Attempt failed
@@ -466,21 +565,4 @@ export type DatabasesDetailedQuery = {
   Response: DatabasesDetailed200
   QueryParams: DatabasesDetailedQueryParams
   Errors: DatabasesDetailed400 | DatabasesDetailed422
-}
-
-/**
- * @description Successful operation
- */
-export type Roles200 = RoleView[]
-
-/**
- * @description Attempt failed
- */
-export type Roles400 = ErrorBase
-
-export type RolesQueryResponse = Roles200
-
-export type RolesQuery = {
-  Response: Roles200
-  Errors: Roles400
 }

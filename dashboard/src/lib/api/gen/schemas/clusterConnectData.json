@@ -1,10 +1,7 @@
 {
-  "x-go-type": "clusterEntities.AuthData",
-  "x-go-type-import": {
-    "path": "dashboard/api/internal/scopes/cluster/entities",
-    "name": "clusterEntities"
-  },
-  "x-go-type-name": "clusterEntities.AuthData",
+  "x-go-type": "clusterEntities.NewConnection",
+  "x-go-type-import": { "path": "dashboard/api/internal/model/cluster", "name": "clusterEntities" },
+  "x-go-type-name": "clusterEntities.NewConnection",
   "type": "object",
   "required": ["host", "port", "user", "password", "sslmode"],
   "properties": {

@@ -21,7 +21,7 @@ import { databasesDetailed } from '../clients/databasesDetailed.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 export const databasesDetailedQueryKey = (params?: DatabasesDetailedQueryParams) =>
-  [{ url: '/cluster/databases-detailed' }, ...(params ? [params] : [])] as const
+  [{ url: '/databases-detailed' }, ...(params ? [params] : [])] as const
 
 export type DatabasesDetailedQueryKey = ReturnType<typeof databasesDetailedQueryKey>
 
@@ -46,8 +46,8 @@ export function databasesDetailedQueryOptions(
 
 /**
  * @description Returns a list of all available databases with their details
- * @summary Get cluster databases
- * {@link /cluster/databases-detailed}
+ * @summary Get all databases
+ * {@link /databases-detailed}
  */
 export function useDatabasesDetailed<
   TData = DatabasesDetailedQueryResponse,

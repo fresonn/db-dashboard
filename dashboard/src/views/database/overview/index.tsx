@@ -1,10 +1,12 @@
 import { Header } from '@/components/layout/header/header'
+import { type Database } from '@/lib/api/gen'
 
-export function DatabaseOverviewPage({ databaseId }: { databaseId: string }) {
+export function DatabaseOverviewPage({ database }: { database: Database }) {
   return (
     <div>
-      <Header title="Database Overview" />
-      <p>{databaseId}</p>
+      <Header title={`Database — ${database.name}`} />
+
+      <p>{database.id}</p>
     </div>
   )
 }

@@ -57,7 +57,10 @@ const client = async <TResponse = unknown, TData = unknown, TError = unknown>(
   const body = await parseResponseBody(response)
 
   if (!response.ok) {
-    throw body as ResponseErrorConfig<TError>
+    throw {
+      status: response.status,
+      body: body as ResponseErrorConfig<TError>
+    }
   }
 
   return {

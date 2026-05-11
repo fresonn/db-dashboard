@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"dashboard/api/internal/model/database"
+	"errors"
 )
 
 func (s *Service) Database(ctx context.Context, id int) (database.Database, error) {
@@ -16,6 +17,11 @@ func (s *Service) Database(ctx context.Context, id int) (database.Database, erro
 
 	db, err := s.pg.Database(ctx, id)
 	if err != nil {
+		if errors.Is(err, ErrNotFound) {
+			s.logger.Warn("database not found", "id", id)
+			return database.Database{}, err
+		}
+
 		s.logger.ErrorContext(ctx, "database fetch failed", "id", id, "error", err)
 		return database.Database{}, err
 	}

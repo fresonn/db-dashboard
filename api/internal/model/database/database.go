@@ -25,6 +25,7 @@ type Database struct {
 	Name             string `json:"name"`
 	Owner            string `json:"owner"`
 	Encoding         string `json:"encoding"`
+	Ctype            string `json:"ctype"`
 	ConnectionLimit  int    `json:"connectionLimit"`
 	AllowConnections bool   `json:"allowConnections"`
 	IsTemplate       bool   `json:"isTemplate"`

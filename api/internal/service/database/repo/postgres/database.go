@@ -14,6 +14,7 @@ SELECT
   d.datname as name,
   pg_get_userbyid(d.datdba) AS owner,
   pg_encoding_to_char(d.encoding) AS encoding,
+  datctype AS ctype,
   d.datconnlimit as connection_limit,
   d.datallowconn as allow_connections,
   d.datistemplate as is_template,

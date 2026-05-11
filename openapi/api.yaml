@@ -384,6 +384,7 @@ components:
         - name
         - owner
         - encoding
+        - ctype
         - connectionLimit
         - allowConnections
         - isTemplate
@@ -405,6 +406,9 @@ components:
         encoding:
           type: string
           example: UTF8
+        ctype:
+          type: string
+          example: C
         connectionLimit:
           type: integer
           example: -1

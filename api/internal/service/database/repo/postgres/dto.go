@@ -46,6 +46,7 @@ type databaseByOID struct {
 	Owner postgres.Text `db:"owner"`
 	// Encoding NULL, if the base is damaged, theoretically
 	Encoding         postgres.Text `db:"encoding"`
+	Ctype            string        `db:"ctype"`
 	ConnectionLimit  int           `db:"connection_limit"`
 	AllowConnections bool          `db:"allow_connections"`
 	IsTemplate       bool          `db:"is_template"`
@@ -60,6 +61,7 @@ func toDatabase(dto databaseByOID) database.Database {
 		Name:             dto.Name,
 		Owner:            dto.Owner.String(),
 		Encoding:         dto.Encoding.String(),
+		Ctype:            dto.Ctype,
 		ConnectionLimit:  dto.ConnectionLimit,
 		IsTemplate:       dto.IsTemplate,
 		AllowConnections: dto.AllowConnections,

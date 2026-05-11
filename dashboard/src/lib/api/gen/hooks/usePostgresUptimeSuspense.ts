@@ -3,9 +3,8 @@
  * Do not edit manually.
  */
 
-import fetch from '@/lib/api/http-client.ts'
 import type { PostgresUptimeQueryResponse, PostgresUptime400 } from '../models.ts'
-import type { RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
 import type {
   QueryKey,
   QueryClient,
@@ -20,7 +19,7 @@ export const postgresUptimeSuspenseQueryKey = () => [{ url: '/cluster/uptime' }]
 export type PostgresUptimeSuspenseQueryKey = ReturnType<typeof postgresUptimeSuspenseQueryKey>
 
 export function postgresUptimeSuspenseQueryOptions(
-  config: Partial<RequestConfig> & { client?: typeof fetch } = {}
+  config: Partial<RequestConfig> & { client?: Client } = {}
 ) {
   const queryKey = postgresUptimeSuspenseQueryKey()
   return queryOptions<
@@ -31,8 +30,7 @@ export function postgresUptimeSuspenseQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal
-      return postgresUptime(config)
+      return postgresUptime({ ...config, signal: config.signal ?? signal })
     }
   })
 }
@@ -55,18 +53,18 @@ export function usePostgresUptimeSuspense<
         TQueryKey
       >
     > & { client?: QueryClient }
-    client?: Partial<RequestConfig> & { client?: typeof fetch }
+    client?: Partial<RequestConfig> & { client?: Client }
   } = {}
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...queryOptions } = queryConfig
-  const queryKey = queryOptions?.queryKey ?? postgresUptimeSuspenseQueryKey()
+  const { client: queryClient, ...resolvedOptions } = queryConfig
+  const queryKey = resolvedOptions?.queryKey ?? postgresUptimeSuspenseQueryKey()
 
   const query = useSuspenseQuery(
     {
       ...postgresUptimeSuspenseQueryOptions(config),
-      queryKey,
-      ...queryOptions
+      ...resolvedOptions,
+      queryKey
     } as unknown as UseSuspenseQueryOptions,
     queryClient
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<PostgresUptime400>> & {

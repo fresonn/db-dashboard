@@ -79,6 +79,10 @@ export type Database = {
    */
   encoding: string
   /**
+   * @type string
+   */
+  ctype: string
+  /**
    * @type integer
    */
   connectionLimit: number

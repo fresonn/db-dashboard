@@ -3,14 +3,13 @@
  * Do not edit manually.
  */
 
-import fetch from '@/lib/api/http-client.ts'
 import type {
   DatabaseQueryResponse,
   DatabasePathParams,
   Database400,
   Database404
 } from '../models.ts'
-import type { RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
 import type {
   QueryKey,
   QueryClient,
@@ -20,14 +19,15 @@ import type {
 import { database } from '../clients/database.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
-export const databaseSuspenseQueryKey = (databaseId: DatabasePathParams['databaseId']) =>
-  [{ url: '/database/:databaseId', params: { databaseId: databaseId } }] as const
+export const databaseSuspenseQueryKey = (
+  databaseId: DatabasePathParams['databaseId'] | undefined
+) => [{ url: '/database/:databaseId', params: { databaseId: databaseId } }] as const
 
 export type DatabaseSuspenseQueryKey = ReturnType<typeof databaseSuspenseQueryKey>
 
 export function databaseSuspenseQueryOptions(
-  databaseId: DatabasePathParams['databaseId'],
-  config: Partial<RequestConfig> & { client?: typeof fetch } = {}
+  databaseId: DatabasePathParams['databaseId'] | undefined,
+  config: Partial<RequestConfig> & { client?: Client } = {}
 ) {
   const queryKey = databaseSuspenseQueryKey(databaseId)
   return queryOptions<
@@ -39,8 +39,7 @@ export function databaseSuspenseQueryOptions(
     enabled: !!databaseId,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal
-      return database(databaseId, config)
+      return database(databaseId!, { ...config, signal: config.signal ?? signal })
     }
   })
 }
@@ -54,7 +53,7 @@ export function useDatabaseSuspense<
   TData = DatabaseQueryResponse,
   TQueryKey extends QueryKey = DatabaseSuspenseQueryKey
 >(
-  databaseId: DatabasePathParams['databaseId'],
+  databaseId: DatabasePathParams['databaseId'] | undefined,
   options: {
     query?: Partial<
       UseSuspenseQueryOptions<
@@ -64,18 +63,18 @@ export function useDatabaseSuspense<
         TQueryKey
       >
     > & { client?: QueryClient }
-    client?: Partial<RequestConfig> & { client?: typeof fetch }
+    client?: Partial<RequestConfig> & { client?: Client }
   } = {}
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...queryOptions } = queryConfig
-  const queryKey = queryOptions?.queryKey ?? databaseSuspenseQueryKey(databaseId)
+  const { client: queryClient, ...resolvedOptions } = queryConfig
+  const queryKey = resolvedOptions?.queryKey ?? databaseSuspenseQueryKey(databaseId)
 
   const query = useSuspenseQuery(
     {
       ...databaseSuspenseQueryOptions(databaseId, config),
-      queryKey,
-      ...queryOptions
+      ...resolvedOptions,
+      queryKey
     } as unknown as UseSuspenseQueryOptions,
     queryClient
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Database400 | Database404>> & {

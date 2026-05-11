@@ -3,9 +3,8 @@
  * Do not edit manually.
  */
 
-import fetch from '@/lib/api/http-client.ts'
 import type { ClusterDisconnectMutationResponse, ClusterDisconnect400 } from '../models.ts'
-import type { RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { clusterDisconnect } from '../clients/clusterDisconnect.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -14,15 +13,15 @@ export const clusterDisconnectMutationKey = () => [{ url: '/cluster/disconnect' 
 
 export type ClusterDisconnectMutationKey = ReturnType<typeof clusterDisconnectMutationKey>
 
-export function clusterDisconnectMutationOptions(
-  config: Partial<RequestConfig> & { client?: typeof fetch } = {}
+export function clusterDisconnectMutationOptions<TContext = unknown>(
+  config: Partial<RequestConfig> & { client?: Client } = {}
 ) {
   const mutationKey = clusterDisconnectMutationKey()
   return mutationOptions<
     ClusterDisconnectMutationResponse,
     ResponseErrorConfig<ClusterDisconnect400>,
     void,
-    typeof mutationKey
+    TContext
   >({
     mutationKey,
     mutationFn: async () => {
@@ -44,7 +43,7 @@ export function useClusterDisconnect<TContext>(
       void,
       TContext
     > & { client?: QueryClient }
-    client?: Partial<RequestConfig> & { client?: typeof fetch }
+    client?: Partial<RequestConfig> & { client?: Client }
   } = {}
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

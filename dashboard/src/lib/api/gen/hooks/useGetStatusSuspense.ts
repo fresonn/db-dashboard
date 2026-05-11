@@ -3,9 +3,8 @@
  * Do not edit manually.
  */
 
-import fetch from '@/lib/api/http-client.ts'
 import type { GetStatusQueryResponse, GetStatus400 } from '../models.ts'
-import type { RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
 import type {
   QueryKey,
   QueryClient,
@@ -20,7 +19,7 @@ export const getStatusSuspenseQueryKey = () => [{ url: '/cluster/status' }] as c
 export type GetStatusSuspenseQueryKey = ReturnType<typeof getStatusSuspenseQueryKey>
 
 export function getStatusSuspenseQueryOptions(
-  config: Partial<RequestConfig> & { client?: typeof fetch } = {}
+  config: Partial<RequestConfig> & { client?: Client } = {}
 ) {
   const queryKey = getStatusSuspenseQueryKey()
   return queryOptions<
@@ -31,8 +30,7 @@ export function getStatusSuspenseQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal
-      return getStatus(config)
+      return getStatus({ ...config, signal: config.signal ?? signal })
     }
   })
 }
@@ -54,18 +52,18 @@ export function useGetStatusSuspense<
         TQueryKey
       >
     > & { client?: QueryClient }
-    client?: Partial<RequestConfig> & { client?: typeof fetch }
+    client?: Partial<RequestConfig> & { client?: Client }
   } = {}
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...queryOptions } = queryConfig
-  const queryKey = queryOptions?.queryKey ?? getStatusSuspenseQueryKey()
+  const { client: queryClient, ...resolvedOptions } = queryConfig
+  const queryKey = resolvedOptions?.queryKey ?? getStatusSuspenseQueryKey()
 
   const query = useSuspenseQuery(
     {
       ...getStatusSuspenseQueryOptions(config),
-      queryKey,
-      ...queryOptions
+      ...resolvedOptions,
+      queryKey
     } as unknown as UseSuspenseQueryOptions,
     queryClient
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<GetStatus400>> & { queryKey: TQueryKey }

@@ -3,9 +3,8 @@
  * Do not edit manually.
  */
 
-import fetch from '@/lib/api/http-client.ts'
 import type { PostgresVersionQueryResponse, PostgresVersion400 } from '../models.ts'
-import type { RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
 import type {
   QueryKey,
   QueryClient,
@@ -20,7 +19,7 @@ export const postgresVersionSuspenseQueryKey = () => [{ url: '/cluster/version' 
 export type PostgresVersionSuspenseQueryKey = ReturnType<typeof postgresVersionSuspenseQueryKey>
 
 export function postgresVersionSuspenseQueryOptions(
-  config: Partial<RequestConfig> & { client?: typeof fetch } = {}
+  config: Partial<RequestConfig> & { client?: Client } = {}
 ) {
   const queryKey = postgresVersionSuspenseQueryKey()
   return queryOptions<
@@ -31,8 +30,7 @@ export function postgresVersionSuspenseQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal
-      return postgresVersion(config)
+      return postgresVersion({ ...config, signal: config.signal ?? signal })
     }
   })
 }
@@ -55,18 +53,18 @@ export function usePostgresVersionSuspense<
         TQueryKey
       >
     > & { client?: QueryClient }
-    client?: Partial<RequestConfig> & { client?: typeof fetch }
+    client?: Partial<RequestConfig> & { client?: Client }
   } = {}
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...queryOptions } = queryConfig
-  const queryKey = queryOptions?.queryKey ?? postgresVersionSuspenseQueryKey()
+  const { client: queryClient, ...resolvedOptions } = queryConfig
+  const queryKey = resolvedOptions?.queryKey ?? postgresVersionSuspenseQueryKey()
 
   const query = useSuspenseQuery(
     {
       ...postgresVersionSuspenseQueryOptions(config),
-      queryKey,
-      ...queryOptions
+      ...resolvedOptions,
+      queryKey
     } as unknown as UseSuspenseQueryOptions,
     queryClient
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<PostgresVersion400>> & {

@@ -5,7 +5,7 @@
 
 import fetch from '@/lib/api/http-client.ts'
 import type { PostgresUptimeQueryResponse, PostgresUptime400 } from '../models.ts'
-import type { RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
 
 function getPostgresUptimeUrl() {
   const res = { method: 'GET', url: `/cluster/uptime` as const }
@@ -17,9 +17,7 @@ function getPostgresUptimeUrl() {
  * @summary Get Postgres uptime info
  * {@link /cluster/uptime}
  */
-export async function postgresUptime(
-  config: Partial<RequestConfig> & { client?: typeof fetch } = {}
-) {
+export async function postgresUptime(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
   const res = await request<

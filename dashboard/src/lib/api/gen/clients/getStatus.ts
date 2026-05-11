@@ -5,7 +5,7 @@
 
 import fetch from '@/lib/api/http-client.ts'
 import type { GetStatusQueryResponse, GetStatus400 } from '../models.ts'
-import type { RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
 
 function getGetStatusUrl() {
   const res = { method: 'GET', url: `/cluster/status` as const }
@@ -16,7 +16,7 @@ function getGetStatusUrl() {
  * @summary Get server current status
  * {@link /cluster/status}
  */
-export async function getStatus(config: Partial<RequestConfig> & { client?: typeof fetch } = {}) {
+export async function getStatus(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
   const res = await request<GetStatusQueryResponse, ResponseErrorConfig<GetStatus400>, unknown>({

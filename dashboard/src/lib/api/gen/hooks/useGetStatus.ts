@@ -3,9 +3,8 @@
  * Do not edit manually.
  */
 
-import fetch from '@/lib/api/http-client.ts'
 import type { GetStatusQueryResponse, GetStatus400 } from '../models.ts'
-import type { RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
 import type {
   QueryKey,
   QueryClient,
@@ -19,9 +18,7 @@ export const getStatusQueryKey = () => [{ url: '/cluster/status' }] as const
 
 export type GetStatusQueryKey = ReturnType<typeof getStatusQueryKey>
 
-export function getStatusQueryOptions(
-  config: Partial<RequestConfig> & { client?: typeof fetch } = {}
-) {
+export function getStatusQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getStatusQueryKey()
   return queryOptions<
     GetStatusQueryResponse,
@@ -31,8 +28,7 @@ export function getStatusQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal
-      return getStatus(config)
+      return getStatus({ ...config, signal: config.signal ?? signal })
     }
   })
 }
@@ -56,18 +52,18 @@ export function useGetStatus<
         TQueryKey
       >
     > & { client?: QueryClient }
-    client?: Partial<RequestConfig> & { client?: typeof fetch }
+    client?: Partial<RequestConfig> & { client?: Client }
   } = {}
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...queryOptions } = queryConfig
-  const queryKey = queryOptions?.queryKey ?? getStatusQueryKey()
+  const { client: queryClient, ...resolvedOptions } = queryConfig
+  const queryKey = resolvedOptions?.queryKey ?? getStatusQueryKey()
 
   const query = useQuery(
     {
       ...getStatusQueryOptions(config),
-      queryKey,
-      ...queryOptions
+      ...resolvedOptions,
+      queryKey
     } as unknown as QueryObserverOptions,
     queryClient
   ) as UseQueryResult<TData, ResponseErrorConfig<GetStatus400>> & { queryKey: TQueryKey }

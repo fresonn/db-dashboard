@@ -10,7 +10,7 @@ import type {
   DatabasesDetailed400,
   DatabasesDetailed422
 } from '../models.ts'
-import type { RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
 
 function getDatabasesDetailedUrl() {
   const res = { method: 'GET', url: `/databases-detailed` as const }
@@ -24,7 +24,7 @@ function getDatabasesDetailedUrl() {
  */
 export async function databasesDetailed(
   params?: DatabasesDetailedQueryParams,
-  config: Partial<RequestConfig> & { client?: typeof fetch } = {}
+  config: Partial<RequestConfig> & { client?: Client } = {}
 ) {
   const { client: request = fetch, ...requestConfig } = config
 

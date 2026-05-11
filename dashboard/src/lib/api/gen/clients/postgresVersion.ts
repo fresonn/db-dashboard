@@ -5,7 +5,7 @@
 
 import fetch from '@/lib/api/http-client.ts'
 import type { PostgresVersionQueryResponse, PostgresVersion400 } from '../models.ts'
-import type { RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
 
 function getPostgresVersionUrl() {
   const res = { method: 'GET', url: `/cluster/version` as const }
@@ -17,9 +17,7 @@ function getPostgresVersionUrl() {
  * @summary Get detailed Postgres version info
  * {@link /cluster/version}
  */
-export async function postgresVersion(
-  config: Partial<RequestConfig> & { client?: typeof fetch } = {}
-) {
+export async function postgresVersion(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
   const res = await request<

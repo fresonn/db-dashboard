@@ -10,7 +10,7 @@ import type {
   Database400,
   Database404
 } from '../models.ts'
-import type { RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
 
 function getDatabaseUrl(databaseId: DatabasePathParams['databaseId']) {
   const res = { method: 'GET', url: `/database/${databaseId}` as const }
@@ -24,7 +24,7 @@ function getDatabaseUrl(databaseId: DatabasePathParams['databaseId']) {
  */
 export async function database(
   databaseId: DatabasePathParams['databaseId'],
-  config: Partial<RequestConfig> & { client?: typeof fetch } = {}
+  config: Partial<RequestConfig> & { client?: Client } = {}
 ) {
   const { client: request = fetch, ...requestConfig } = config
 

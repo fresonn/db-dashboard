@@ -3,14 +3,13 @@
  * Do not edit manually.
  */
 
-import fetch from '@/lib/api/http-client.ts'
 import type {
   DatabaseQueryResponse,
   DatabasePathParams,
   Database400,
   Database404
 } from '../models.ts'
-import type { RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
 import type {
   QueryKey,
   QueryClient,
@@ -20,14 +19,14 @@ import type {
 import { database } from '../clients/database.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-export const databaseQueryKey = (databaseId: DatabasePathParams['databaseId']) =>
+export const databaseQueryKey = (databaseId: DatabasePathParams['databaseId'] | undefined) =>
   [{ url: '/database/:databaseId', params: { databaseId: databaseId } }] as const
 
 export type DatabaseQueryKey = ReturnType<typeof databaseQueryKey>
 
 export function databaseQueryOptions(
-  databaseId: DatabasePathParams['databaseId'],
-  config: Partial<RequestConfig> & { client?: typeof fetch } = {}
+  databaseId: DatabasePathParams['databaseId'] | undefined,
+  config: Partial<RequestConfig> & { client?: Client } = {}
 ) {
   const queryKey = databaseQueryKey(databaseId)
   return queryOptions<
@@ -39,8 +38,7 @@ export function databaseQueryOptions(
     enabled: !!databaseId,
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal
-      return database(databaseId, config)
+      return database(databaseId!, { ...config, signal: config.signal ?? signal })
     }
   })
 }
@@ -55,7 +53,7 @@ export function useDatabase<
   TQueryData = DatabaseQueryResponse,
   TQueryKey extends QueryKey = DatabaseQueryKey
 >(
-  databaseId: DatabasePathParams['databaseId'],
+  databaseId: DatabasePathParams['databaseId'] | undefined,
   options: {
     query?: Partial<
       QueryObserverOptions<
@@ -66,18 +64,18 @@ export function useDatabase<
         TQueryKey
       >
     > & { client?: QueryClient }
-    client?: Partial<RequestConfig> & { client?: typeof fetch }
+    client?: Partial<RequestConfig> & { client?: Client }
   } = {}
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...queryOptions } = queryConfig
-  const queryKey = queryOptions?.queryKey ?? databaseQueryKey(databaseId)
+  const { client: queryClient, ...resolvedOptions } = queryConfig
+  const queryKey = resolvedOptions?.queryKey ?? databaseQueryKey(databaseId)
 
   const query = useQuery(
     {
       ...databaseQueryOptions(databaseId, config),
-      queryKey,
-      ...queryOptions
+      ...resolvedOptions,
+      queryKey
     } as unknown as QueryObserverOptions,
     queryClient
   ) as UseQueryResult<TData, ResponseErrorConfig<Database400 | Database404>> & {

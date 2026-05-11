@@ -35,6 +35,10 @@ const parseResponseBody = async (response: Response): Promise<unknown> => {
   return response.blob()
 }
 
+export type Client = <TData, _TError = unknown, TVariables = unknown>(
+  config: RequestConfig<TVariables>
+) => Promise<ResponseConfig<TData>>
+
 const client = async <TResponse = unknown, TData = unknown, TError = unknown>(
   config: RequestConfig<TData>
 ): Promise<ResponseConfig<TResponse>> => {

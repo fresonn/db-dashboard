@@ -3,14 +3,13 @@
  * Do not edit manually.
  */
 
-import fetch from '@/lib/api/http-client.ts'
 import type {
   DatabasesDetailedQueryResponse,
   DatabasesDetailedQueryParams,
   DatabasesDetailed400,
   DatabasesDetailed422
 } from '../models.ts'
-import type { RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
 import type {
   QueryKey,
   QueryClient,
@@ -27,7 +26,7 @@ export type DatabasesDetailedQueryKey = ReturnType<typeof databasesDetailedQuery
 
 export function databasesDetailedQueryOptions(
   params?: DatabasesDetailedQueryParams,
-  config: Partial<RequestConfig> & { client?: typeof fetch } = {}
+  config: Partial<RequestConfig> & { client?: Client } = {}
 ) {
   const queryKey = databasesDetailedQueryKey(params)
   return queryOptions<
@@ -38,8 +37,7 @@ export function databasesDetailedQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal
-      return databasesDetailed(params, config)
+      return databasesDetailed(params, { ...config, signal: config.signal ?? signal })
     }
   })
 }
@@ -65,18 +63,18 @@ export function useDatabasesDetailed<
         TQueryKey
       >
     > & { client?: QueryClient }
-    client?: Partial<RequestConfig> & { client?: typeof fetch }
+    client?: Partial<RequestConfig> & { client?: Client }
   } = {}
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...queryOptions } = queryConfig
-  const queryKey = queryOptions?.queryKey ?? databasesDetailedQueryKey(params)
+  const { client: queryClient, ...resolvedOptions } = queryConfig
+  const queryKey = resolvedOptions?.queryKey ?? databasesDetailedQueryKey(params)
 
   const query = useQuery(
     {
       ...databasesDetailedQueryOptions(params, config),
-      queryKey,
-      ...queryOptions
+      ...resolvedOptions,
+      queryKey
     } as unknown as QueryObserverOptions,
     queryClient
   ) as UseQueryResult<TData, ResponseErrorConfig<DatabasesDetailed400 | DatabasesDetailed422>> & {

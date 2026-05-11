@@ -5,7 +5,7 @@
 
 import fetch from '@/lib/api/http-client.ts'
 import type { RolesQueryResponse, Roles400 } from '../models.ts'
-import type { RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
 
 function getRolesUrl() {
   const res = { method: 'GET', url: `/cluster/roles` as const }
@@ -17,7 +17,7 @@ function getRolesUrl() {
  * @summary Get available roles
  * {@link /cluster/roles}
  */
-export async function roles(config: Partial<RequestConfig> & { client?: typeof fetch } = {}) {
+export async function roles(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
   const res = await request<RolesQueryResponse, ResponseErrorConfig<Roles400>, unknown>({

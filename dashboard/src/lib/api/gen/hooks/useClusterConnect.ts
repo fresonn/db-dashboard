@@ -3,14 +3,13 @@
  * Do not edit manually.
  */
 
-import fetch from '@/lib/api/http-client.ts'
 import type {
   ClusterConnectMutationRequest,
   ClusterConnectMutationResponse,
   ClusterConnect400,
   ClusterConnect422
 } from '../models.ts'
-import type { RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { clusterConnect } from '../clients/clusterConnect.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -19,15 +18,15 @@ export const clusterConnectMutationKey = () => [{ url: '/cluster/connect' }] as 
 
 export type ClusterConnectMutationKey = ReturnType<typeof clusterConnectMutationKey>
 
-export function clusterConnectMutationOptions(
-  config: Partial<RequestConfig<ClusterConnectMutationRequest>> & { client?: typeof fetch } = {}
+export function clusterConnectMutationOptions<TContext = unknown>(
+  config: Partial<RequestConfig<ClusterConnectMutationRequest>> & { client?: Client } = {}
 ) {
   const mutationKey = clusterConnectMutationKey()
   return mutationOptions<
     ClusterConnectMutationResponse,
     ResponseErrorConfig<ClusterConnect400 | ClusterConnect422>,
     { data: ClusterConnectMutationRequest },
-    typeof mutationKey
+    TContext
   >({
     mutationKey,
     mutationFn: async ({ data }) => {
@@ -49,7 +48,7 @@ export function useClusterConnect<TContext>(
       { data: ClusterConnectMutationRequest },
       TContext
     > & { client?: QueryClient }
-    client?: Partial<RequestConfig<ClusterConnectMutationRequest>> & { client?: typeof fetch }
+    client?: Partial<RequestConfig<ClusterConnectMutationRequest>> & { client?: Client }
   } = {}
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

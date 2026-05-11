@@ -3,9 +3,8 @@
  * Do not edit manually.
  */
 
-import fetch from '@/lib/api/http-client.ts'
 import type { PostgresUptimeQueryResponse, PostgresUptime400 } from '../models.ts'
-import type { RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
 import type {
   QueryKey,
   QueryClient,
@@ -20,7 +19,7 @@ export const postgresUptimeQueryKey = () => [{ url: '/cluster/uptime' }] as cons
 export type PostgresUptimeQueryKey = ReturnType<typeof postgresUptimeQueryKey>
 
 export function postgresUptimeQueryOptions(
-  config: Partial<RequestConfig> & { client?: typeof fetch } = {}
+  config: Partial<RequestConfig> & { client?: Client } = {}
 ) {
   const queryKey = postgresUptimeQueryKey()
   return queryOptions<
@@ -31,8 +30,7 @@ export function postgresUptimeQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal
-      return postgresUptime(config)
+      return postgresUptime({ ...config, signal: config.signal ?? signal })
     }
   })
 }
@@ -57,18 +55,18 @@ export function usePostgresUptime<
         TQueryKey
       >
     > & { client?: QueryClient }
-    client?: Partial<RequestConfig> & { client?: typeof fetch }
+    client?: Partial<RequestConfig> & { client?: Client }
   } = {}
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...queryOptions } = queryConfig
-  const queryKey = queryOptions?.queryKey ?? postgresUptimeQueryKey()
+  const { client: queryClient, ...resolvedOptions } = queryConfig
+  const queryKey = resolvedOptions?.queryKey ?? postgresUptimeQueryKey()
 
   const query = useQuery(
     {
       ...postgresUptimeQueryOptions(config),
-      queryKey,
-      ...queryOptions
+      ...resolvedOptions,
+      queryKey
     } as unknown as QueryObserverOptions,
     queryClient
   ) as UseQueryResult<TData, ResponseErrorConfig<PostgresUptime400>> & { queryKey: TQueryKey }

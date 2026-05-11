@@ -3,9 +3,8 @@
  * Do not edit manually.
  */
 
-import fetch from '@/lib/api/http-client.ts'
 import type { PostmasterSettingsQueryResponse, PostmasterSettings400 } from '../models.ts'
-import type { RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
 import type {
   QueryKey,
   QueryClient,
@@ -23,7 +22,7 @@ export type PostmasterSettingsSuspenseQueryKey = ReturnType<
 >
 
 export function postmasterSettingsSuspenseQueryOptions(
-  config: Partial<RequestConfig> & { client?: typeof fetch } = {}
+  config: Partial<RequestConfig> & { client?: Client } = {}
 ) {
   const queryKey = postmasterSettingsSuspenseQueryKey()
   return queryOptions<
@@ -34,8 +33,7 @@ export function postmasterSettingsSuspenseQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal
-      return postmasterSettings(config)
+      return postmasterSettings({ ...config, signal: config.signal ?? signal })
     }
   })
 }
@@ -58,18 +56,18 @@ export function usePostmasterSettingsSuspense<
         TQueryKey
       >
     > & { client?: QueryClient }
-    client?: Partial<RequestConfig> & { client?: typeof fetch }
+    client?: Partial<RequestConfig> & { client?: Client }
   } = {}
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...queryOptions } = queryConfig
-  const queryKey = queryOptions?.queryKey ?? postmasterSettingsSuspenseQueryKey()
+  const { client: queryClient, ...resolvedOptions } = queryConfig
+  const queryKey = resolvedOptions?.queryKey ?? postmasterSettingsSuspenseQueryKey()
 
   const query = useSuspenseQuery(
     {
       ...postmasterSettingsSuspenseQueryOptions(config),
-      queryKey,
-      ...queryOptions
+      ...resolvedOptions,
+      queryKey
     } as unknown as UseSuspenseQueryOptions,
     queryClient
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<PostmasterSettings400>> & {

@@ -10,7 +10,7 @@ import type {
   ClusterConnect400,
   ClusterConnect422
 } from '../models.ts'
-import type { RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
 
 function getClusterConnectUrl() {
   const res = { method: 'POST', url: `/cluster/connect` as const }
@@ -24,7 +24,7 @@ function getClusterConnectUrl() {
  */
 export async function clusterConnect(
   data: ClusterConnectMutationRequest,
-  config: Partial<RequestConfig<ClusterConnectMutationRequest>> & { client?: typeof fetch } = {}
+  config: Partial<RequestConfig<ClusterConnectMutationRequest>> & { client?: Client } = {}
 ) {
   const { client: request = fetch, ...requestConfig } = config
 

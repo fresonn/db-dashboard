@@ -3,9 +3,8 @@
  * Do not edit manually.
  */
 
-import fetch from '@/lib/api/http-client.ts'
 import type { RolesQueryResponse, Roles400 } from '../models.ts'
-import type { RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
 import type {
   QueryKey,
   QueryClient,
@@ -20,7 +19,7 @@ export const rolesSuspenseQueryKey = () => [{ url: '/cluster/roles' }] as const
 export type RolesSuspenseQueryKey = ReturnType<typeof rolesSuspenseQueryKey>
 
 export function rolesSuspenseQueryOptions(
-  config: Partial<RequestConfig> & { client?: typeof fetch } = {}
+  config: Partial<RequestConfig> & { client?: Client } = {}
 ) {
   const queryKey = rolesSuspenseQueryKey()
   return queryOptions<
@@ -31,8 +30,7 @@ export function rolesSuspenseQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      config.signal = signal
-      return roles(config)
+      return roles({ ...config, signal: config.signal ?? signal })
     }
   })
 }
@@ -50,18 +48,18 @@ export function useRolesSuspense<
     query?: Partial<
       UseSuspenseQueryOptions<RolesQueryResponse, ResponseErrorConfig<Roles400>, TData, TQueryKey>
     > & { client?: QueryClient }
-    client?: Partial<RequestConfig> & { client?: typeof fetch }
+    client?: Partial<RequestConfig> & { client?: Client }
   } = {}
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...queryOptions } = queryConfig
-  const queryKey = queryOptions?.queryKey ?? rolesSuspenseQueryKey()
+  const { client: queryClient, ...resolvedOptions } = queryConfig
+  const queryKey = resolvedOptions?.queryKey ?? rolesSuspenseQueryKey()
 
   const query = useSuspenseQuery(
     {
       ...rolesSuspenseQueryOptions(config),
-      queryKey,
-      ...queryOptions
+      ...resolvedOptions,
+      queryKey
     } as unknown as UseSuspenseQueryOptions,
     queryClient
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Roles400>> & { queryKey: TQueryKey }

@@ -5,7 +5,7 @@
 
 import fetch from '@/lib/api/http-client.ts'
 import type { PostmasterSettingsQueryResponse, PostmasterSettings400 } from '../models.ts'
-import type { RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@/lib/api/http-client.ts'
 
 function getPostmasterSettingsUrl() {
   const res = { method: 'GET', url: `/cluster/postmaster-settings` as const }
@@ -18,7 +18,7 @@ function getPostmasterSettingsUrl() {
  * {@link /cluster/postmaster-settings}
  */
 export async function postmasterSettings(
-  config: Partial<RequestConfig> & { client?: typeof fetch } = {}
+  config: Partial<RequestConfig> & { client?: Client } = {}
 ) {
   const { client: request = fetch, ...requestConfig } = config
 

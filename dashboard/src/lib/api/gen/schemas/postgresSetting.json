@@ -2,10 +2,7 @@
   "type": "object",
   "description": "Represents some columns from \"pg_catalog.pg_settings\"",
   "x-go-type": "clusterEntities.Setting",
-  "x-go-type-import": {
-    "path": "dashboard/api/internal/scopes/cluster/entities",
-    "name": "Setting"
-  },
+  "x-go-type-import": { "path": "dashboard/api/internal/model/cluster", "name": "Setting" },
   "x-go-type-name": "clusterEntities.Setting",
   "required": ["name", "value", "unit", "description"],
   "properties": {

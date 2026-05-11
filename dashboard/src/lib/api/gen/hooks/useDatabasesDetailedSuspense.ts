@@ -21,7 +21,7 @@ import { databasesDetailed } from '../clients/databasesDetailed.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
 export const databasesDetailedSuspenseQueryKey = (params?: DatabasesDetailedQueryParams) =>
-  [{ url: '/cluster/databases-detailed' }, ...(params ? [params] : [])] as const
+  [{ url: '/databases-detailed' }, ...(params ? [params] : [])] as const
 
 export type DatabasesDetailedSuspenseQueryKey = ReturnType<typeof databasesDetailedSuspenseQueryKey>
 
@@ -46,8 +46,8 @@ export function databasesDetailedSuspenseQueryOptions(
 
 /**
  * @description Returns a list of all available databases with their details
- * @summary Get cluster databases
- * {@link /cluster/databases-detailed}
+ * @summary Get all databases
+ * {@link /databases-detailed}
  */
 export function useDatabasesDetailedSuspense<
   TData = DatabasesDetailedQueryResponse,

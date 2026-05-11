@@ -2,10 +2,8 @@
   "type": "string",
   "description": "Admin > Elevated > Standard > Limited",
   "enum": ["admin", "elevated", "standard", "limited"],
-  "x-go-type": "clusterEntities.RoleAccessLevel",
-  "x-go-type-import": {
-    "path": "dashboard/api/internal/scopes/cluster/entities",
-    "name": "clusterEntities"
-  },
+  "x-go-type": "roleEntities.RoleAccessLevel",
+  "x-go-type-import": { "path": "dashboard/api/internal/model/role", "name": "roleEntities" },
+  "x-go-type-name": "roleEntities.RoleAccessLevel",
   "x-readme-ref-name": "RoleAccessLevel"
 }

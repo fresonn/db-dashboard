@@ -1,9 +1,6 @@
 {
   "x-go-type": "clusterEntities.PostgresVersion",
-  "x-go-type-import": {
-    "path": "dashboard/api/internal/scopes/cluster/entities",
-    "name": "clusterEntities"
-  },
+  "x-go-type-import": { "path": "dashboard/api/internal/model/cluster", "name": "clusterEntities" },
   "x-go-type-name": "clusterEntities.PostgresVersion",
   "type": "object",
   "required": ["version", "compiler", "bitDepth"],

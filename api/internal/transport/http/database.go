@@ -58,3 +58,10 @@ func (h *Handler) DatabasesDetailed(ctx context.Context, req openapi.DatabasesDe
 
 	return openapi.DatabasesDetailed200JSONResponse(databases), nil
 }
+
+func (h *Handler) DatabaseStatsOverview(ctx context.Context, req openapi.DatabaseStatsOverviewRequestObject) (openapi.DatabaseStatsOverviewResponseObject, error) {
+
+	return openapi.DatabaseStatsOverview400JSONResponse{
+		Message: "not implemented",
+	}, nil
+}

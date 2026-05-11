@@ -203,7 +203,8 @@ paths:
                     name: autovacuum_max_workers
                     value: "4"
                     unit: ""
-                    description: Sets the maximum number of simultaneously running autovacuum worker
+                    description:
+                      Sets the maximum number of simultaneously running autovacuum worker
                       processes.
         "400":
           description: Attempt failed
@@ -266,6 +267,39 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorBase"
+  /database/{databaseId}/stats/overview:
+    get:
+      tags:
+        - database
+      summary: Get static stats for database size, tables, indexes
+      description: Returns static stats for database
+      operationId: DatabaseStatsOverview
+      parameters:
+        - name: databaseId
+          in: path
+          description: ID of database to return
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DatabaseStatsOverview"
+        "400":
+          description: Failed attempt to get database stats overview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorBase"
+        "404":
+          description: Database not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorBase"
   /databases-detailed:
     get:
       tags:
@@ -280,7 +314,7 @@ paths:
           required: false
           schema:
             type: string
-            enum: [ size, connection ]
+            enum: [size, connection]
           x-oapi-codegen-extra-tags:
             validate: "omitempty,oneof=size connection"
         - name: order
@@ -289,7 +323,7 @@ paths:
           required: false
           schema:
             type: string
-            enum: [ asc, desc ]
+            enum: [asc, desc]
           x-oapi-codegen-extra-tags:
             validate: "omitempty,oneof=asc desc"
           # default: desc
@@ -339,7 +373,7 @@ components:
       type: string
       description: Represents connection state between dashboard and postgres
       example: connected
-      enum: [ connecting, connected, disconnected, error ]
+      enum: [connecting, connected, disconnected, error]
       x-enum-varnames:
         - PgConnectionStatusConnecting,
         - PgConnectionStatusConnected,
@@ -371,6 +405,42 @@ components:
         description:
           type: string
           example: Sets the number of...
+    DatabaseStatsOverview:
+      type: object
+      description: Represents database stats overview
+      x-go-type: databaseEntities.DatabaseStatsOverview
+      x-go-type-import:
+        path: dashboard/api/internal/model/database
+        name: databaseEntities
+      x-go-type-name: databaseEntities.DatabaseStatsOverview
+      required:
+        - size
+      properties:
+        size:
+          type: object
+          required:
+            - sizeBytes
+            - sizePretty
+            - trend
+          properties:
+            sizeBytes:
+              type: integer
+              example: 10138083
+            sizePretty:
+              type: string
+              example: 9.7 MB
+            trend:
+              type: object
+              required:
+                - value
+                - direction
+              properties:
+                value:
+                  type: string
+                  example: "1.2 MB"
+                direction:
+                  type: string
+                  example: "up"
     Database:
       type: object
       description: Represents database entity

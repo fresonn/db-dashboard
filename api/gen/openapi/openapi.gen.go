@@ -50,6 +50,9 @@ type Database = databaseEntities.Database
 // DatabaseDetails Represents database entity from Postgres system catalog
 type DatabaseDetails = databaseEntities.DatabaseDetails
 
+// DatabaseStatsOverview Represents database stats overview
+type DatabaseStatsOverview = databaseEntities.DatabaseStatsOverview
+
 // ErrorBase Error part that should be present in all errors
 type ErrorBase struct {
 	Message string `json:"message"`
@@ -134,6 +137,9 @@ type ServerInterface interface {
 	// Find database by identifier
 	// (GET /database/{databaseId})
 	Database(w http.ResponseWriter, r *http.Request, databaseId int)
+	// Get static stats for database size, tables, indexes
+	// (GET /database/{databaseId}/stats/overview)
+	DatabaseStatsOverview(w http.ResponseWriter, r *http.Request, databaseId int)
 	// Get all databases
 	// (GET /databases-detailed)
 	DatabasesDetailed(w http.ResponseWriter, r *http.Request, params DatabasesDetailedParams)
@@ -188,6 +194,12 @@ func (_ Unimplemented) PostgresVersion(w http.ResponseWriter, r *http.Request) {
 // Find database by identifier
 // (GET /database/{databaseId})
 func (_ Unimplemented) Database(w http.ResponseWriter, r *http.Request, databaseId int) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get static stats for database size, tables, indexes
+// (GET /database/{databaseId}/stats/overview)
+func (_ Unimplemented) DatabaseStatsOverview(w http.ResponseWriter, r *http.Request, databaseId int) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -320,6 +332,31 @@ func (siw *ServerInterfaceWrapper) Database(w http.ResponseWriter, r *http.Reque
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.Database(w, r, databaseId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// DatabaseStatsOverview operation middleware
+func (siw *ServerInterfaceWrapper) DatabaseStatsOverview(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "databaseId" -------------
+	var databaseId int
+
+	err = runtime.BindStyledParameterWithOptions("simple", "databaseId", chi.URLParam(r, "databaseId"), &databaseId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "databaseId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DatabaseStatsOverview(w, r, databaseId)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -500,6 +537,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/database/{databaseId}", wrapper.Database)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/database/{databaseId}/stats/overview", wrapper.DatabaseStatsOverview)
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/databases-detailed", wrapper.DatabasesDetailed)
@@ -752,6 +792,41 @@ func (response Database404JSONResponse) VisitDatabaseResponse(w http.ResponseWri
 	return json.NewEncoder(w).Encode(response)
 }
 
+type DatabaseStatsOverviewRequestObject struct {
+	DatabaseId int `json:"databaseId"`
+}
+
+type DatabaseStatsOverviewResponseObject interface {
+	VisitDatabaseStatsOverviewResponse(w http.ResponseWriter) error
+}
+
+type DatabaseStatsOverview200JSONResponse DatabaseStatsOverview
+
+func (response DatabaseStatsOverview200JSONResponse) VisitDatabaseStatsOverviewResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DatabaseStatsOverview400JSONResponse ErrorBase
+
+func (response DatabaseStatsOverview400JSONResponse) VisitDatabaseStatsOverviewResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type DatabaseStatsOverview404JSONResponse ErrorBase
+
+func (response DatabaseStatsOverview404JSONResponse) VisitDatabaseStatsOverviewResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type DatabasesDetailedRequestObject struct {
 	Params DatabasesDetailedParams
 }
@@ -813,6 +888,9 @@ type StrictServerInterface interface {
 	// Find database by identifier
 	// (GET /database/{databaseId})
 	Database(ctx context.Context, request DatabaseRequestObject) (DatabaseResponseObject, error)
+	// Get static stats for database size, tables, indexes
+	// (GET /database/{databaseId}/stats/overview)
+	DatabaseStatsOverview(ctx context.Context, request DatabaseStatsOverviewRequestObject) (DatabaseStatsOverviewResponseObject, error)
 	// Get all databases
 	// (GET /databases-detailed)
 	DatabasesDetailed(ctx context.Context, request DatabasesDetailedRequestObject) (DatabasesDetailedResponseObject, error)
@@ -1041,6 +1119,32 @@ func (sh *strictHandler) Database(w http.ResponseWriter, r *http.Request, databa
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(DatabaseResponseObject); ok {
 		if err := validResponse.VisitDatabaseResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// DatabaseStatsOverview operation middleware
+func (sh *strictHandler) DatabaseStatsOverview(w http.ResponseWriter, r *http.Request, databaseId int) {
+	var request DatabaseStatsOverviewRequestObject
+
+	request.DatabaseId = databaseId
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DatabaseStatsOverview(ctx, request.(DatabaseStatsOverviewRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DatabaseStatsOverview")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DatabaseStatsOverviewResponseObject); ok {
+		if err := validResponse.VisitDatabaseStatsOverviewResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

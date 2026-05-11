@@ -30,7 +30,7 @@ export function DatabaseOverviewPage({ databaseId }: { databaseId: string }) {
         name={data?.name}
         owner={data?.owner}
         encoding={data?.encoding}
-        ctype={'C'} // todo: add property
+        ctype={data.ctype}
         tablespace={data?.tablespace}
         isTemplate={data?.isTemplate}
         description={data?.description}

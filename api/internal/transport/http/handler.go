@@ -20,6 +20,7 @@ type ClusterUseCase interface {
 type DatabaseUseCase interface {
 	Database(ctx context.Context, id int) (database.Database, error)
 	DatabasesDetailed(ctx context.Context, filter database.DatabasesFilter) ([]database.DatabaseDetails, error)
+	StatsOverview(ctx context.Context, databaseID int) (database.DatabaseStatsOverview, error)
 }
 
 type RoleUseCase interface {

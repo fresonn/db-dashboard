@@ -61,7 +61,18 @@ func (h *Handler) DatabasesDetailed(ctx context.Context, req openapi.DatabasesDe
 
 func (h *Handler) DatabaseStatsOverview(ctx context.Context, req openapi.DatabaseStatsOverviewRequestObject) (openapi.DatabaseStatsOverviewResponseObject, error) {
 
-	return openapi.DatabaseStatsOverview400JSONResponse{
-		Message: "not implemented",
-	}, nil
+	stats, err := h.database.StatsOverview(ctx, req.DatabaseId)
+	if err != nil {
+		if errors.Is(err, databaseService.ErrNotFound) {
+			return openapi.DatabaseStatsOverview404JSONResponse{
+				Message: err.Error(),
+			}, nil
+		}
+
+		return openapi.DatabaseStatsOverview400JSONResponse{
+			Message: err.Error(),
+		}, nil
+	}
+
+	return openapi.DatabaseStatsOverview200JSONResponse(stats), nil
 }

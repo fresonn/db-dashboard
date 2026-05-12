@@ -14,3 +14,8 @@ type Cache interface {
 	Database(ctx context.Context, id int) (database.Database, bool)
 	SetDatabase(ctx context.Context, id int, db database.Database)
 }
+
+type Storage interface {
+	DatabaseName(id int) (string, error)
+	SetDatabaseName(id int, name string) error
+}

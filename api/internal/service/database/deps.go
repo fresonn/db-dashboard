@@ -8,6 +8,7 @@ import (
 type PostgresRepo interface {
 	Database(ctx context.Context, id int) (database.Database, error)
 	DatabasesDetails(ctx context.Context, filters database.DatabasesFilter) ([]database.DatabaseDetails, error)
+	CurrentDBOverviewStats(ctx context.Context) (database.PostgresDbOverviewStats, error)
 }
 
 type Cache interface {

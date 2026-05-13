@@ -71,3 +71,22 @@ func toDatabase(dto databaseByOID) database.Database {
 		Description:      dto.Description.String(),
 	}
 }
+
+type overviewStats struct {
+	OID     int64  `db:"oid"`
+	Name    string `db:"name"`
+	Size    int64  `db:"size_current"`
+	Tables  int64  `db:"tables_current"`
+	Indexes int64  `db:"indexes_current"`
+}
+
+func toOverviewStats(dto overviewStats) database.PostgresDbOverviewStats {
+
+	return database.PostgresDbOverviewStats{
+		ID:      dto.OID,
+		Name:    dto.Name,
+		Size:    dto.Size,
+		Tables:  dto.Tables,
+		Indexes: dto.Indexes,
+	}
+}

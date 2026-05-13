@@ -8,7 +8,11 @@ const (
 )
 
 type DatabaseStatsOverview struct {
-	Size DatabaseSizeStaticStat `json:"size"`
+	ID      string                    `json:"id"`
+	Name    string                    `json:"name"`
+	Size    DatabaseSizeStaticStat    `json:"size"`
+	Tables  DatabaseTablesStaticStat  `json:"tables"`
+	Indexes DatabaseIndexesStaticStat `json:"indexes"`
 }
 
 type DatabaseSizeStaticStat struct {
@@ -17,7 +21,25 @@ type DatabaseSizeStaticStat struct {
 	Trend      StaticStatTrend `json:"trend"`
 }
 
+type DatabaseTablesStaticStat struct {
+	Total int64           `json:"total"`
+	Trend StaticStatTrend `json:"trend"`
+}
+
+type DatabaseIndexesStaticStat struct {
+	Total int64           `json:"total"`
+	Trend StaticStatTrend `json:"trend"`
+}
+
 type StaticStatTrend struct {
 	Value     string        `json:"value"`
 	Direction StatDirection `json:"direction"`
+}
+
+type PostgresDbOverviewStats struct {
+	ID      int64
+	Name    string
+	Size    int64
+	Tables  int64
+	Indexes int64
 }

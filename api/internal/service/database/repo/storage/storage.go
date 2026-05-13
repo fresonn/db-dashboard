@@ -3,10 +3,31 @@ package storage
 import (
 	"dashboard/api/internal/config"
 	"dashboard/api/internal/infra/logger"
-	"strconv"
 
 	"github.com/dgraph-io/badger/v4"
 )
+
+// db:{id}:stat:overview:{timestamp}
+// db:{id}:metric:size:10s:{timestamp}
+
+// func paddedTimestamp(ts int64) string {
+// 	return fmt.Sprintf("%020d", ts)
+// }
+
+// func MetricKey(
+// 	dbID int64,
+// 	metric string,
+// 	resolution string,
+// 	ts int64,
+// ) []byte {
+// 	return []byte(fmt.Sprintf(
+// 		"db:%d:metric:%s:%s:%s",
+// 		dbID,
+// 		metric,
+// 		resolution,
+// 		paddedTimestamp(ts),
+// 	))
+// }
 
 type Storage struct {
 	config config.AppConfig
@@ -20,37 +41,4 @@ func New(config config.AppConfig, logger logger.Logger, db *badger.DB) *Storage 
 		logger: logger,
 		db:     db,
 	}
-}
-
-func (s Storage) DatabaseName(id int) (string, error) {
-	var result string
-
-	err := s.db.View(func(txn *badger.Txn) error {
-		key := []byte("db:" + strconv.Itoa(id) + ":name")
-
-		item, err := txn.Get(key)
-		if err != nil {
-			return err
-		}
-
-		value, err := item.ValueCopy(nil)
-		if err != nil {
-			return err
-		}
-
-		result = string(value)
-
-		return nil
-	})
-
-	return result, err
-}
-
-func (s Storage) SetDatabaseName(id int, name string) error {
-	return s.db.Update(func(txn *badger.Txn) error {
-		key := []byte("db:" + strconv.Itoa(id) + ":name")
-		value := []byte(name)
-
-		return txn.Set(key, value)
-	})
 }

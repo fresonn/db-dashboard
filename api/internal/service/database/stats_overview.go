@@ -11,24 +11,7 @@ import (
 // Returns simple stats for current connected database, not only by database ID, connection required
 func (s *Service) StatsOverview(ctx context.Context, databaseID int) (database.DatabaseStatsOverview, error) {
 
-	// db, err := s.Database(ctx, databaseID)
-	// if err != nil {
-	// 	return database.DatabaseStatsOverview{}, err
-	// }
-
-	// dbName, err := s.storage.DatabaseName(databaseID)
-	// if err != nil {
-	// 	s.logger.Error("get db name", "error", err)
-
-	// 	// temp, for RND
-	// 	if err.Error() == "Key not found" {
-	// 		s.storage.SetDatabaseName(databaseID, db.Name)
-	// 	}
-	// }
-
-	// fmt.Println("DB name:", dbName)
-
-	pgStats, err := s.pg.CurrentDBOverviewStats(ctx)
+	currentStats, err := s.pg.CurrentDBOverviewStats(ctx)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
 			s.logger.Warn("database stats not found", "id", databaseID)
@@ -43,28 +26,48 @@ func (s *Service) StatsOverview(ctx context.Context, databaseID int) (database.D
 	// 	return database.DatabaseStatsOverview{}, fmt.Errorf("to get stats connect to database=%d first, current=%d", databaseID, pgStats.ID)
 	// }
 
-	fmt.Printf("%+v\n", pgStats)
+	fmt.Printf("current ---- %+v\n", currentStats)
+
+	existingStats, err := s.storage.StatsOverview(databaseID, currentStats)
+	if err != nil {
+
+		if errors.Is(err, ErrStatsOverviewNotFound) {
+			s.logger.Warn("stats overview not found", "id", databaseID)
+		} else {
+
+			s.logger.ErrorContext(ctx, "get existing stats failed", "id", databaseID, "error", err)
+			return database.DatabaseStatsOverview{}, err
+		}
+	}
+
+	err = s.storage.SaveStatsOverview(databaseID, currentStats)
+	if err != nil {
+		s.logger.ErrorContext(ctx, "save stats failed", "id", databaseID, "error", err)
+		return database.DatabaseStatsOverview{}, err
+	}
+
+	fmt.Printf("existing ---- %+v\n", existingStats)
 
 	return database.DatabaseStatsOverview{
-		ID:   helper.IntToString(pgStats.ID),
-		Name: pgStats.Name,
+		ID:   helper.IntToString(currentStats.ID),
+		Name: currentStats.Name,
 		Size: database.DatabaseSizeStaticStat{
-			SizeBytes:  pgStats.Size,
-			SizePretty: helper.PrettyByteSize(pgStats.Size),
+			SizeBytes:  currentStats.Size,
+			SizePretty: helper.PrettyByteSize(currentStats.Size),
 			Trend: database.StaticStatTrend{
 				Value:     "?",
 				Direction: database.StatDirectionUp,
 			},
 		},
 		Tables: database.DatabaseTablesStaticStat{
-			Total: pgStats.Tables,
+			Total: currentStats.Tables,
 			Trend: database.StaticStatTrend{
 				Value:     "?",
 				Direction: database.StatDirectionUp,
 			},
 		},
 		Indexes: database.DatabaseIndexesStaticStat{
-			Total: pgStats.Indexes,
+			Total: currentStats.Indexes,
 			Trend: database.StaticStatTrend{
 				Value:     "?",
 				Direction: database.StatDirectionUp,

@@ -17,6 +17,6 @@ type Cache interface {
 }
 
 type Storage interface {
-	StatsOverview(databaseID int, stats database.PostgresDbOverviewStats) (database.PostgresDbOverviewStats, error)
-	SaveStatsOverview(databaseID int, stats database.PostgresDbOverviewStats) error
+	StatsOverview(databaseID int) (database.StoredOverviewStats, error)
+	SaveStatsOverview(databaseID int, stats database.StoredOverviewStats) error
 }

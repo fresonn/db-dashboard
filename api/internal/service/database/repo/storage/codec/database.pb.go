@@ -29,7 +29,6 @@ type PostgresDbOverviewStats struct {
 	Size          int64                  `protobuf:"varint,3,opt,name=size,proto3" json:"size,omitempty"`
 	Tables        int64                  `protobuf:"varint,4,opt,name=tables,proto3" json:"tables,omitempty"`
 	Indexes       int64                  `protobuf:"varint,5,opt,name=indexes,proto3" json:"indexes,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -99,9 +98,62 @@ func (x *PostgresDbOverviewStats) GetIndexes() int64 {
 	return 0
 }
 
-func (x *PostgresDbOverviewStats) GetCreatedAt() *timestamppb.Timestamp {
+type StoredOverviewStats struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Current       *PostgresDbOverviewStats `protobuf:"bytes,1,opt,name=current,proto3" json:"current,omitempty"`
+	Previous      *PostgresDbOverviewStats `protobuf:"bytes,2,opt,name=previous,proto3" json:"previous,omitempty"`
+	ChangedAt     *timestamppb.Timestamp   `protobuf:"bytes,3,opt,name=changed_at,json=changedAt,proto3" json:"changed_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StoredOverviewStats) Reset() {
+	*x = StoredOverviewStats{}
+	mi := &file_database_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StoredOverviewStats) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StoredOverviewStats) ProtoMessage() {}
+
+func (x *StoredOverviewStats) ProtoReflect() protoreflect.Message {
+	mi := &file_database_proto_msgTypes[1]
 	if x != nil {
-		return x.CreatedAt
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StoredOverviewStats.ProtoReflect.Descriptor instead.
+func (*StoredOverviewStats) Descriptor() ([]byte, []int) {
+	return file_database_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *StoredOverviewStats) GetCurrent() *PostgresDbOverviewStats {
+	if x != nil {
+		return x.Current
+	}
+	return nil
+}
+
+func (x *StoredOverviewStats) GetPrevious() *PostgresDbOverviewStats {
+	if x != nil {
+		return x.Previous
+	}
+	return nil
+}
+
+func (x *StoredOverviewStats) GetChangedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ChangedAt
 	}
 	return nil
 }
@@ -110,15 +162,18 @@ var File_database_proto protoreflect.FileDescriptor
 
 const file_database_proto_rawDesc = "" +
 	"\n" +
-	"\x0edatabase.proto\x12\x05codec\x1a\x1fgoogle/protobuf/timestamp.proto\"\xbe\x01\n" +
+	"\x0edatabase.proto\x12\x05codec\x1a\x1fgoogle/protobuf/timestamp.proto\"\x83\x01\n" +
 	"\x17PostgresDbOverviewStats\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
 	"\x04size\x18\x03 \x01(\x03R\x04size\x12\x16\n" +
 	"\x06tables\x18\x04 \x01(\x03R\x06tables\x12\x18\n" +
-	"\aindexes\x18\x05 \x01(\x03R\aindexes\x129\n" +
+	"\aindexes\x18\x05 \x01(\x03R\aindexes\"\xc6\x01\n" +
+	"\x13StoredOverviewStats\x128\n" +
+	"\acurrent\x18\x01 \x01(\v2\x1e.codec.PostgresDbOverviewStatsR\acurrent\x12:\n" +
+	"\bprevious\x18\x02 \x01(\v2\x1e.codec.PostgresDbOverviewStatsR\bprevious\x129\n" +
 	"\n" +
-	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAtB\x0fZ\rstorage/codecb\x06proto3"
+	"changed_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tchangedAtB\x0fZ\rstorage/codecb\x06proto3"
 
 var (
 	file_database_proto_rawDescOnce sync.Once
@@ -132,18 +187,21 @@ func file_database_proto_rawDescGZIP() []byte {
 	return file_database_proto_rawDescData
 }
 
-var file_database_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_database_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_database_proto_goTypes = []any{
 	(*PostgresDbOverviewStats)(nil), // 0: codec.PostgresDbOverviewStats
-	(*timestamppb.Timestamp)(nil),   // 1: google.protobuf.Timestamp
+	(*StoredOverviewStats)(nil),     // 1: codec.StoredOverviewStats
+	(*timestamppb.Timestamp)(nil),   // 2: google.protobuf.Timestamp
 }
 var file_database_proto_depIdxs = []int32{
-	1, // 0: codec.PostgresDbOverviewStats.created_at:type_name -> google.protobuf.Timestamp
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	0, // 0: codec.StoredOverviewStats.current:type_name -> codec.PostgresDbOverviewStats
+	0, // 1: codec.StoredOverviewStats.previous:type_name -> codec.PostgresDbOverviewStats
+	2, // 2: codec.StoredOverviewStats.changed_at:type_name -> google.protobuf.Timestamp
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_database_proto_init() }
@@ -157,7 +215,7 @@ func file_database_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_database_proto_rawDesc), len(file_database_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

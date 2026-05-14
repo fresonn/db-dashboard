@@ -12,5 +12,10 @@ message PostgresDbOverviewStats {
   int64 size = 3;
   int64 tables = 4;
   int64 indexes = 5;
-  google.protobuf.Timestamp created_at = 6;
+}
+
+message StoredOverviewStats {
+  PostgresDbOverviewStats current = 1;
+  PostgresDbOverviewStats previous = 2;
+  google.protobuf.Timestamp changed_at = 3;
 }

@@ -1,5 +1,7 @@
 package database
 
+import "time"
+
 type StatDirection string
 
 const (
@@ -32,6 +34,7 @@ type DatabaseIndexesStaticStat struct {
 }
 
 type StaticStatTrend struct {
+	Diff      int64         `json:"diff"`
 	Value     string        `json:"value"`
 	Direction StatDirection `json:"direction"`
 }
@@ -42,4 +45,10 @@ type PostgresDbOverviewStats struct {
 	Size    int64
 	Tables  int64
 	Indexes int64
+}
+
+type StoredOverviewStats struct {
+	Current   PostgresDbOverviewStats
+	Previous  PostgresDbOverviewStats
+	ChangedAt time.Time
 }

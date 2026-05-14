@@ -23,29 +23,27 @@ func overviewStatsKey(id int) []byte {
 	return fmt.Appendf([]byte{}, "db:%d:stat:overview", id)
 }
 
-func (s *Storage) SaveStatsOverview(databaseID int, stats database.PostgresDbOverviewStats) error {
+func (s *Storage) SaveStatsOverview(databaseID int, stats database.StoredOverviewStats) error {
 
 	key := overviewStatsKey(databaseID)
 
-	pb := EncodeOverviewStats(stats)
+	pb := EncodeStoredOverviewStats(stats)
 
 	data, err := proto.Marshal(pb)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("key", string(key))
-
 	return s.db.Update(func(txn *badger.Txn) error {
 		return txn.Set(key, data)
 	})
 }
 
-func (s *Storage) StatsOverview(databaseID int, stats database.PostgresDbOverviewStats) (database.PostgresDbOverviewStats, error) {
+func (s *Storage) StatsOverview(databaseID int) (database.StoredOverviewStats, error) {
 
 	key := overviewStatsKey(databaseID)
 
-	var result database.PostgresDbOverviewStats
+	var result database.StoredOverviewStats
 
 	err := s.db.View(func(txn *badger.Txn) error {
 
@@ -56,22 +54,22 @@ func (s *Storage) StatsOverview(databaseID int, stats database.PostgresDbOvervie
 
 		return item.Value(func(val []byte) error {
 
-			var pbData pb.PostgresDbOverviewStats
+			var pbData pb.StoredOverviewStats
 
 			if err := proto.Unmarshal(val, &pbData); err != nil {
 				return err
 			}
 
-			result = DecodeOverviewStats(&pbData)
+			result = DecodeStoredOverviewStats(&pbData)
 			return nil
 		})
 	})
 
 	if err != nil {
 		if errors.Is(err, badger.ErrKeyNotFound) {
-			return database.PostgresDbOverviewStats{}, service.ErrStatsOverviewNotFound
+			return database.StoredOverviewStats{}, service.ErrStatsOverviewNotFound
 		}
-		return database.PostgresDbOverviewStats{}, err
+		return database.StoredOverviewStats{}, err
 	}
 
 	return result, nil

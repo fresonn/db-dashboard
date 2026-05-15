@@ -72,7 +72,7 @@ func (s *Service) StatsOverview(ctx context.Context, databaseID int) (database.D
 		storedStats = nextStored
 	}
 
-	showTrend := hasStored && time.Since(storedStats.ChangedAt) < 5*time.Minute
+	showTrend := hasStored && time.Since(storedStats.ChangedAt) < 15*time.Minute
 
 	sizeTrend := database.StaticStatTrend{}
 	tablesTrend := database.StaticStatTrend{}

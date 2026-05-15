@@ -86,7 +86,9 @@ export type {
   Roles200,
   Roles400,
   RolesQuery,
-  RolesQueryResponse
+  RolesQueryResponse,
+  TrendDirection,
+  TrendDirectionEnumKey
 } from './models.ts'
 export { clusterConnect } from './clients/clusterConnect.ts'
 export { clusterDisconnect } from './clients/clusterDisconnect.ts'
@@ -157,3 +159,4 @@ export { databasesDetailedQueryParamsOrderEnum } from './models.ts'
 export { databasesDetailedQueryParamsSortEnum } from './models.ts'
 export { roleAccessLevelEnum } from './models.ts'
 export { roleAttributesEnum } from './models.ts'
+export { trendDirection } from './models.ts'

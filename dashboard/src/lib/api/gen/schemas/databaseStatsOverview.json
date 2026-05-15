@@ -23,7 +23,14 @@
           "properties": {
             "value": { "type": "string", "example": "+1.2 MB" },
             "diff": { "type": "integer", "example": 8133 },
-            "direction": { "type": "string", "example": "up" }
+            "direction": {
+              "type": "string",
+              "description": "Represents trend direction state in stats",
+              "example": "up",
+              "enum": ["up", "down"],
+              "x-enum-varnames": ["StatDirectionUp,", "StatDirectionDown,"],
+              "x-readme-ref-name": "TrendDirection"
+            }
           }
         }
       }
@@ -39,7 +46,14 @@
           "properties": {
             "diff": { "type": "integer", "example": 1 },
             "value": { "type": "string", "example": "+1" },
-            "direction": { "type": "string", "example": "up" }
+            "direction": {
+              "type": "string",
+              "description": "Represents trend direction state in stats",
+              "example": "up",
+              "enum": ["up", "down"],
+              "x-enum-varnames": ["StatDirectionUp,", "StatDirectionDown,"],
+              "x-readme-ref-name": "TrendDirection"
+            }
           }
         }
       }
@@ -55,7 +69,14 @@
           "properties": {
             "diff": { "type": "integer", "example": 1 },
             "value": { "type": "string", "example": "-1" },
-            "direction": { "type": "string", "example": "down" }
+            "direction": {
+              "type": "string",
+              "description": "Represents trend direction state in stats",
+              "example": "up",
+              "enum": ["up", "down"],
+              "x-enum-varnames": ["StatDirectionUp,", "StatDirectionDown,"],
+              "x-readme-ref-name": "TrendDirection"
+            }
           }
         }
       }

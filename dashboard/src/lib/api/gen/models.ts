@@ -20,6 +20,19 @@ export type RequestValidationError = ErrorBase & {
   reason: string
 }
 
+export const trendDirection = {
+  'StatDirectionUp,': 'up',
+  'StatDirectionDown,': 'down'
+} as const
+
+export type TrendDirectionEnumKey = (typeof trendDirection)[keyof typeof trendDirection]
+
+/**
+ * @description Represents trend direction state in stats
+ * @example up
+ */
+export type TrendDirection = TrendDirectionEnumKey
+
 export const connectionStatus = {
   'PgConnectionStatusConnecting,': 'connecting',
   'PgConnectionStatusConnected,': 'connected',
@@ -94,9 +107,10 @@ export type DatabaseStatsOverview = {
        */
       diff: number
       /**
+       * @description Represents trend direction state in stats
        * @type string
        */
-      direction: string
+      direction: TrendDirection
     }
   }
   /**
@@ -120,9 +134,10 @@ export type DatabaseStatsOverview = {
        */
       value: string
       /**
+       * @description Represents trend direction state in stats
        * @type string
        */
-      direction: string
+      direction: TrendDirection
     }
   }
   /**
@@ -146,9 +161,10 @@ export type DatabaseStatsOverview = {
        */
       value: string
       /**
+       * @description Represents trend direction state in stats
        * @type string
        */
-      direction: string
+      direction: TrendDirection
     }
   }
 }

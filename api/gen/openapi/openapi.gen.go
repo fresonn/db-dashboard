@@ -26,6 +26,12 @@ const (
 	PgConnectionStatusError        ConnectionStatus = "error"
 )
 
+// Defines values for TrendDirection.
+const (
+	StatDirectionDown TrendDirection = "down"
+	StatDirectionUp   TrendDirection = "up"
+)
+
 // Defines values for DatabasesDetailedParamsSort.
 const (
 	Connection DatabasesDetailedParamsSort = "connection"
@@ -92,6 +98,9 @@ type RoleAttributes = roleEntities.RoleAttribute
 
 // RoleView defines model for RoleView.
 type RoleView = roleEntities.RoleView
+
+// TrendDirection Represents trend direction state in stats
+type TrendDirection string
 
 // DatabasesDetailedParams defines parameters for DatabasesDetailed.
 type DatabasesDetailedParams struct {

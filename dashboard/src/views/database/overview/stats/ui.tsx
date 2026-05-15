@@ -24,7 +24,7 @@ const trendStyle = cva('flex items-center', {
 export function StatTrend({
   trend
 }: {
-  trend: { diff: number; value: string; direction: string }
+  trend: { diff: number; value: string; direction: 'up' | 'down' }
 }) {
   if (trend.diff === 0) return null
 

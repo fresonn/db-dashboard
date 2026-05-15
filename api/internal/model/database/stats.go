@@ -11,7 +11,7 @@ const (
 
 type DatabaseStatsOverview struct {
 	ID      string                    `json:"id"`
-	Name    string                    `json:"name"`
+	DbName  string                    `json:"dbName"`
 	Size    DatabaseSizeStaticStat    `json:"size"`
 	Tables  DatabaseTablesStaticStat  `json:"tables"`
 	Indexes DatabaseIndexesStaticStat `json:"indexes"`

@@ -32,6 +32,10 @@ func (s *Service) StatsOverview(ctx context.Context, databaseID int) (database.D
 		return database.DatabaseStatsOverview{}, err
 	}
 
+	if databaseID != int(currentStats.ID) {
+		return database.DatabaseStatsOverview{}, ErrNotFound
+	}
+
 	storedStats, err := s.storage.StatsOverview(databaseID)
 
 	hasStored := err == nil
@@ -95,8 +99,8 @@ func (s *Service) StatsOverview(ctx context.Context, databaseID int) (database.D
 	}
 
 	overviewStats := database.DatabaseStatsOverview{
-		ID:   helper.IntToString(currentStats.ID),
-		Name: currentStats.Name,
+		ID:     helper.IntToString(currentStats.ID),
+		DbName: currentStats.Name,
 
 		Size: database.DatabaseSizeStaticStat{
 			SizeBytes:  currentStats.Size,

@@ -414,8 +414,17 @@ components:
         name: databaseEntities
       x-go-type-name: databaseEntities.DatabaseStatsOverview
       required:
+        - id
+        - dbName
         - size
+        - tables
       properties:
+        id:
+          type: string
+          example: 5
+        dbName:
+          type: string
+          example: postgres
         size:
           type: object
           required:
@@ -433,14 +442,68 @@ components:
               type: object
               required:
                 - value
+                - diff
                 - direction
               properties:
                 value:
                   type: string
-                  example: "1.2 MB"
+                  example: "+1.2 MB"
+                diff:
+                  type: integer
+                  example: 8133
                 direction:
                   type: string
                   example: "up"
+        tables:
+          type: object
+          required:
+            - total
+            - trend
+          properties:
+            total:
+              type: integer
+              example: 27
+            trend:
+              type: object
+              required:
+                - value
+                - diff
+                - direction
+              properties:
+                diff:
+                  type: integer
+                  example: 1
+                value:
+                  type: string
+                  example: "+1"
+                direction:
+                  type: string
+                  example: "up"
+        indexes:
+          type: object
+          required:
+            - total
+            - trend
+          properties:
+            total:
+              type: integer
+              example: 96
+            trend:
+              type: object
+              required:
+                - value
+                - diff
+                - direction
+              properties:
+                diff:
+                  type: integer
+                  example: 1
+                value:
+                  type: string
+                  example: "-1"
+                direction:
+                  type: string
+                  example: "down"
     Database:
       type: object
       description: Represents database entity

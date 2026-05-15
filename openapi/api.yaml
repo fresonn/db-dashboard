@@ -369,6 +369,14 @@ components:
               example: the body fields are invalid
           required:
             - reason
+    TrendDirection:
+      type: string
+      description: Represents trend direction state in stats
+      example: up
+      enum: [up, down]
+      x-enum-varnames:
+        - StatDirectionUp,
+        - StatDirectionDown,
     ConnectionStatus:
       type: string
       description: Represents connection state between dashboard and postgres
@@ -418,6 +426,7 @@ components:
         - dbName
         - size
         - tables
+        - indexes
       properties:
         id:
           type: string
@@ -452,8 +461,7 @@ components:
                   type: integer
                   example: 8133
                 direction:
-                  type: string
-                  example: "up"
+                  $ref: "#/components/schemas/TrendDirection"
         tables:
           type: object
           required:
@@ -477,8 +485,7 @@ components:
                   type: string
                   example: "+1"
                 direction:
-                  type: string
-                  example: "up"
+                  $ref: "#/components/schemas/TrendDirection"
         indexes:
           type: object
           required:
@@ -502,8 +509,7 @@ components:
                   type: string
                   example: "-1"
                 direction:
-                  type: string
-                  example: "down"
+                  $ref: "#/components/schemas/TrendDirection"
     Database:
       type: object
       description: Represents database entity

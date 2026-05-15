@@ -44,7 +44,7 @@ export function DatabaseHeader({
   ]
 
   return (
-    <div className="flex">
+    <div className="mb-5 flex">
       <div className="mr-4 rounded-xl bg-neutral-900 p-5">
         <Database size={30} strokeWidth={1.5} />
       </div>

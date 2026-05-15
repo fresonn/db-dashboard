@@ -1,0 +1,8 @@
+{
+  "type": "string",
+  "description": "Represents trend direction state in stats",
+  "example": "up",
+  "enum": ["up", "down"],
+  "x-enum-varnames": ["StatDirectionUp,", "StatDirectionDown,"],
+  "x-readme-ref-name": "TrendDirection"
+}

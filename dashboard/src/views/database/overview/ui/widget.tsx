@@ -29,7 +29,6 @@ export function Widget({
   skeleton: ReactNode
   icon: ReactNode
   className?: string
-  isLoading?: boolean
 }) {
   return (
     <div className={widgetContainer({ className })}>

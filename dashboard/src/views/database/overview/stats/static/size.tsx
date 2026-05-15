@@ -1,6 +1,6 @@
 import ContentLoader from 'react-content-loader'
 import { useDatabaseStatsOverviewSuspense } from '@/lib/api/gen'
-import { StatTrend, StatValue } from '../ui'
+import { StatTrend, StatValue } from '../../ui/stat-trend'
 import { CircleQuestionMark } from 'lucide-react'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/shadcn/hover-card'
 import { Typography } from '@/components/ui/typography'

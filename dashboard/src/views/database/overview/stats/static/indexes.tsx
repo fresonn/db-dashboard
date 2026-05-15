@@ -1,6 +1,6 @@
 import ContentLoader from 'react-content-loader'
 import { useDatabaseStatsOverviewSuspense } from '@/lib/api/gen'
-import { StatTrend, StatValue } from '../ui'
+import { StatTrend, StatValue } from '../../ui/stat-trend'
 
 export function IndexesWidgetSkeleton() {
   return (

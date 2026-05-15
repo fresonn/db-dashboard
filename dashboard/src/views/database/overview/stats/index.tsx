@@ -13,7 +13,7 @@ export function Stats({ databaseId }: { databaseId: string }) {
         <Widget
           title="Size"
           icon={<Database />}
-          className="col-span-3 row-span-6"
+          className="col-span-6 row-span-6 lg:col-span-3"
           skeleton={<SizeWidgetSkeleton />}
         >
           <SizeWidget databaseId={databaseId} />
@@ -21,7 +21,7 @@ export function Stats({ databaseId }: { databaseId: string }) {
         <Widget
           title="Tables"
           icon={<Sheet />}
-          className="col-span-3 row-span-6"
+          className="col-span-6 row-span-6 lg:col-span-3"
           skeleton={<TablesWidgetSkeleton />}
         >
           <TablesWidget databaseId={databaseId} />
@@ -29,7 +29,7 @@ export function Stats({ databaseId }: { databaseId: string }) {
         <Widget
           title="Indexes"
           icon={<Layers />}
-          className="col-span-3 row-span-6"
+          className="col-span-6 row-span-6 lg:col-span-3"
           skeleton={<IndexesWidgetSkeleton />}
         >
           <IndexesWidget databaseId={databaseId} />
@@ -37,7 +37,7 @@ export function Stats({ databaseId }: { databaseId: string }) {
         <Widget
           title="Connections"
           icon={<UsersRound />}
-          className="col-span-3 row-span-6"
+          className="col-span-6 row-span-6 lg:col-span-3"
           skeleton={<ConnectionsWidgetSkeleton />}
         >
           <ConnectionsWidget />

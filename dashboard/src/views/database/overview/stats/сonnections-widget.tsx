@@ -26,6 +26,6 @@ export const ConnectionsWidget = React.lazy(() => {
           </div>
         )
       })
-    }, 500)
+    }, 200)
   })
 })

@@ -58,6 +58,102 @@ export type PostgresSetting = {
 }
 
 /**
+ * @description Represents database stats overview
+ */
+export type DatabaseStatsOverview = {
+  /**
+   * @type string
+   */
+  id: string
+  /**
+   * @type string
+   */
+  dbName: string
+  /**
+   * @type object
+   */
+  size: {
+    /**
+     * @type integer
+     */
+    sizeBytes: number
+    /**
+     * @type string
+     */
+    sizePretty: string
+    /**
+     * @type object
+     */
+    trend: {
+      /**
+       * @type string
+       */
+      value: string
+      /**
+       * @type integer
+       */
+      diff: number
+      /**
+       * @type string
+       */
+      direction: string
+    }
+  }
+  /**
+   * @type object
+   */
+  tables: {
+    /**
+     * @type integer
+     */
+    total: number
+    /**
+     * @type object
+     */
+    trend: {
+      /**
+       * @type integer
+       */
+      diff: number
+      /**
+       * @type string
+       */
+      value: string
+      /**
+       * @type string
+       */
+      direction: string
+    }
+  }
+  /**
+   * @type object
+   */
+  indexes: {
+    /**
+     * @type integer
+     */
+    total: number
+    /**
+     * @type object
+     */
+    trend: {
+      /**
+       * @type integer
+       */
+      diff: number
+      /**
+       * @type string
+       */
+      value: string
+      /**
+       * @type string
+       */
+      direction: string
+    }
+  }
+}
+
+/**
  * @description Represents database entity
  */
 export type Database = {
@@ -517,6 +613,37 @@ export type DatabaseQuery = {
   Response: Database200
   PathParams: DatabasePathParams
   Errors: Database400 | Database404
+}
+
+export type DatabaseStatsOverviewPathParams = {
+  /**
+   * @description ID of database to return
+   * @type integer
+   */
+  databaseId: number
+}
+
+/**
+ * @description Successful operation
+ */
+export type DatabaseStatsOverview200 = DatabaseStatsOverview
+
+/**
+ * @description Failed attempt to get database stats overview
+ */
+export type DatabaseStatsOverview400 = ErrorBase
+
+/**
+ * @description Database not found
+ */
+export type DatabaseStatsOverview404 = ErrorBase
+
+export type DatabaseStatsOverviewQueryResponse = DatabaseStatsOverview200
+
+export type DatabaseStatsOverviewQuery = {
+  Response: DatabaseStatsOverview200
+  PathParams: DatabaseStatsOverviewPathParams
+  Errors: DatabaseStatsOverview400 | DatabaseStatsOverview404
 }
 
 export const databasesDetailedQueryParamsSortEnum = {

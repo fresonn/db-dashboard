@@ -1,6 +1,8 @@
 export type { ClusterConnectMutationKey } from './hooks/useClusterConnect.ts'
 export type { ClusterDisconnectMutationKey } from './hooks/useClusterDisconnect.ts'
 export type { DatabaseQueryKey } from './hooks/useDatabase.ts'
+export type { DatabaseStatsOverviewQueryKey } from './hooks/useDatabaseStatsOverview.ts'
+export type { DatabaseStatsOverviewSuspenseQueryKey } from './hooks/useDatabaseStatsOverviewSuspense.ts'
 export type { DatabaseSuspenseQueryKey } from './hooks/useDatabaseSuspense.ts'
 export type { DatabasesDetailedQueryKey } from './hooks/useDatabasesDetailed.ts'
 export type { DatabasesDetailedSuspenseQueryKey } from './hooks/useDatabasesDetailedSuspense.ts'
@@ -38,6 +40,13 @@ export type {
   DatabasePathParams,
   DatabaseQuery,
   DatabaseQueryResponse,
+  DatabaseStatsOverview,
+  DatabaseStatsOverview200,
+  DatabaseStatsOverview400,
+  DatabaseStatsOverview404,
+  DatabaseStatsOverviewPathParams,
+  DatabaseStatsOverviewQuery,
+  DatabaseStatsOverviewQueryResponse,
   DatabasesDetailed200,
   DatabasesDetailed400,
   DatabasesDetailed422,
@@ -82,6 +91,7 @@ export type {
 export { clusterConnect } from './clients/clusterConnect.ts'
 export { clusterDisconnect } from './clients/clusterDisconnect.ts'
 export { database } from './clients/database.ts'
+export { databaseStatsOverview } from './clients/databaseStatsOverview.ts'
 export { databasesDetailed } from './clients/databasesDetailed.ts'
 export { getStatus } from './clients/getStatus.ts'
 export { postgresUptime } from './clients/postgresUptime.ts'
@@ -97,6 +107,12 @@ export { useClusterDisconnect } from './hooks/useClusterDisconnect.ts'
 export { databaseQueryKey } from './hooks/useDatabase.ts'
 export { databaseQueryOptions } from './hooks/useDatabase.ts'
 export { useDatabase } from './hooks/useDatabase.ts'
+export { databaseStatsOverviewQueryKey } from './hooks/useDatabaseStatsOverview.ts'
+export { databaseStatsOverviewQueryOptions } from './hooks/useDatabaseStatsOverview.ts'
+export { useDatabaseStatsOverview } from './hooks/useDatabaseStatsOverview.ts'
+export { databaseStatsOverviewSuspenseQueryKey } from './hooks/useDatabaseStatsOverviewSuspense.ts'
+export { databaseStatsOverviewSuspenseQueryOptions } from './hooks/useDatabaseStatsOverviewSuspense.ts'
+export { useDatabaseStatsOverviewSuspense } from './hooks/useDatabaseStatsOverviewSuspense.ts'
 export { databaseSuspenseQueryKey } from './hooks/useDatabaseSuspense.ts'
 export { databaseSuspenseQueryOptions } from './hooks/useDatabaseSuspense.ts'
 export { useDatabaseSuspense } from './hooks/useDatabaseSuspense.ts'

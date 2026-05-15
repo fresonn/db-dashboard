@@ -1,5 +1,6 @@
 import { DatabaseHeader } from './ui/header'
 import { useDatabase } from '@/lib/api/gen'
+import { Stats } from './stats'
 import { NotFound } from '@/components/layout/not-found'
 import { PageError } from './ui/page-error'
 
@@ -27,14 +28,15 @@ export function DatabaseOverviewPage({ databaseId }: { databaseId: string }) {
   return (
     <div>
       <DatabaseHeader
-        name={data?.name}
-        owner={data?.owner}
-        encoding={data?.encoding}
+        name={data.name}
+        owner={data.owner}
+        encoding={data.encoding}
         ctype={data.ctype}
-        tablespace={data?.tablespace}
-        isTemplate={data?.isTemplate}
-        description={data?.description}
+        tablespace={data.tablespace}
+        isTemplate={data.isTemplate}
+        description={data.description}
       />
+      <Stats databaseId={data.id} />
     </div>
   )
 }

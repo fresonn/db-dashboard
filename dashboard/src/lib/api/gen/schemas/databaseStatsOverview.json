@@ -1,0 +1,65 @@
+{
+  "type": "object",
+  "description": "Represents database stats overview",
+  "x-go-type": "databaseEntities.DatabaseStatsOverview",
+  "x-go-type-import": {
+    "path": "dashboard/api/internal/model/database",
+    "name": "databaseEntities"
+  },
+  "x-go-type-name": "databaseEntities.DatabaseStatsOverview",
+  "required": ["id", "dbName", "size", "tables", "indexes"],
+  "properties": {
+    "id": { "type": "string", "example": 5 },
+    "dbName": { "type": "string", "example": "postgres" },
+    "size": {
+      "type": "object",
+      "required": ["sizeBytes", "sizePretty", "trend"],
+      "properties": {
+        "sizeBytes": { "type": "integer", "example": 10138083 },
+        "sizePretty": { "type": "string", "example": "9.7 MB" },
+        "trend": {
+          "type": "object",
+          "required": ["value", "diff", "direction"],
+          "properties": {
+            "value": { "type": "string", "example": "+1.2 MB" },
+            "diff": { "type": "integer", "example": 8133 },
+            "direction": { "type": "string", "example": "up" }
+          }
+        }
+      }
+    },
+    "tables": {
+      "type": "object",
+      "required": ["total", "trend"],
+      "properties": {
+        "total": { "type": "integer", "example": 27 },
+        "trend": {
+          "type": "object",
+          "required": ["value", "diff", "direction"],
+          "properties": {
+            "diff": { "type": "integer", "example": 1 },
+            "value": { "type": "string", "example": "+1" },
+            "direction": { "type": "string", "example": "up" }
+          }
+        }
+      }
+    },
+    "indexes": {
+      "type": "object",
+      "required": ["total", "trend"],
+      "properties": {
+        "total": { "type": "integer", "example": 96 },
+        "trend": {
+          "type": "object",
+          "required": ["value", "diff", "direction"],
+          "properties": {
+            "diff": { "type": "integer", "example": 1 },
+            "value": { "type": "string", "example": "-1" },
+            "direction": { "type": "string", "example": "down" }
+          }
+        }
+      }
+    }
+  },
+  "x-readme-ref-name": "DatabaseStatsOverview"
+}

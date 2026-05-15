@@ -8,7 +8,8 @@ const typography = cva('antialiased', {
       h2: 'scroll-m-20 text-3xl font-semibold tracking-tight',
       h3: 'scroll-m-20 text-2xl font-semibold tracking-tight',
       h4: 'scroll-m-20 text-xl font-semibold tracking-tight',
-      p: 'leading-7 [&:not(:first-child)]:mt-4',
+      h5: 'scroll-m-20 text-lg font-semibold tracking-tight',
+      p: 'leading-7',
       muted: 'text-muted-foreground text-sm font-medium',
       lead: 'text-muted-foreground text-xl',
       small: 'text-sm leading-normal',
@@ -28,6 +29,7 @@ export type TypographyTags =
   | 'h2'
   | 'h3'
   | 'h4'
+  | 'h5'
   | 'small'
   | 'code'
   | 'blockquote'

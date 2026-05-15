@@ -15,6 +15,7 @@ type Service struct {
 	validate  *validator.Validate
 	pg        PostgresRepo
 	cache     Cache
+	storage   Storage
 }
 
 type Options struct {
@@ -22,6 +23,7 @@ type Options struct {
 	Logger          logger.Logger
 	PostgresManager *postgres.Manager
 	PostgresRepo    PostgresRepo
+	Storage         Storage
 	Cache           Cache
 }
 
@@ -34,5 +36,6 @@ func New(options Options) *Service {
 		pgManager: options.PostgresManager,
 		pg:        options.PostgresRepo,
 		cache:     options.Cache,
+		storage:   options.Storage,
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"dashboard/api/gen/openapi"
 	"dashboard/api/internal/config"
 	"dashboard/api/internal/helper"
+	infraBadger "dashboard/api/internal/infra/badger"
 	"dashboard/api/internal/infra/logger"
 	"dashboard/api/internal/infra/postgres"
 	"dashboard/api/internal/service/cluster"
@@ -13,6 +14,7 @@ import (
 	"dashboard/api/internal/service/database"
 	databaseCache "dashboard/api/internal/service/database/repo/cache"
 	databasePostgresRepo "dashboard/api/internal/service/database/repo/postgres"
+	databaseStorageRepo "dashboard/api/internal/service/database/repo/storage"
 	"dashboard/api/internal/service/roles"
 	rolesPostgresRepo "dashboard/api/internal/service/roles/repo/postgres"
 	httpTransport "dashboard/api/internal/transport/http"
@@ -25,6 +27,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/dgraph-io/badger/v4"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"golang.org/x/sync/errgroup"
@@ -33,6 +36,7 @@ import (
 type App struct {
 	config config.AppConfig
 	router http.Handler
+	badger *badger.DB
 	log    logger.Logger
 }
 
@@ -41,6 +45,7 @@ func New(cfg config.AppConfig) *App {
 	slogLogger := logger.New(cfg)
 
 	pgManager := postgres.New(cfg, slogLogger)
+	badgerDB := infraBadger.New()
 
 	clusterLogger := logger.WithScopeLogger(slogLogger, "cluster")
 	clusterPostgres := clusterPostgresRepo.New(cfg, clusterLogger, pgManager)
@@ -67,6 +72,7 @@ func New(cfg config.AppConfig) *App {
 	databaseLogger := logger.WithScopeLogger(slogLogger, "database")
 	databasePostgres := databasePostgresRepo.New(cfg, databaseLogger, pgManager)
 	databaseCache := databaseCache.New(cfg, databaseLogger)
+	databaseStorage := databaseStorageRepo.New(cfg, databaseLogger, badgerDB)
 
 	databaseService := database.New(database.Options{
 		Config:          cfg,
@@ -74,6 +80,7 @@ func New(cfg config.AppConfig) *App {
 		PostgresManager: pgManager,
 		PostgresRepo:    databasePostgres,
 		Cache:           databaseCache,
+		Storage:         databaseStorage,
 	})
 
 	r := chi.NewRouter()
@@ -93,6 +100,7 @@ func New(cfg config.AppConfig) *App {
 	return &App{
 		config: cfg,
 		log:    slogLogger,
+		badger: badgerDB,
 		router: handler,
 	}
 }
@@ -139,9 +147,18 @@ func (a *App) Run() {
 		return server.Shutdown(ctx)
 	})
 
-	if err := g.Wait(); err != nil && !errors.Is(err, context.Canceled) {
-		fmt.Printf("shutdown with error: %v", err)
+	if err := g.Wait(); err != nil {
+		if !errors.Is(err, context.Canceled) &&
+			!errors.Is(err, http.ErrServerClosed) {
+			a.log.Error("shutdown with error", "error", err)
+		}
+	}
+
+	a.log.Info("✅ server shutdown gracefully")
+
+	if err := a.badger.Close(); err != nil {
+		a.log.Error("failed to close badger", "error", err)
 	} else {
-		fmt.Println("✅ server shutdown gracefully")
+		a.log.Info("✅ badger shutdown gracefully")
 	}
 }

@@ -58,3 +58,21 @@ func (h *Handler) DatabasesDetailed(ctx context.Context, req openapi.DatabasesDe
 
 	return openapi.DatabasesDetailed200JSONResponse(databases), nil
 }
+
+func (h *Handler) DatabaseStatsOverview(ctx context.Context, req openapi.DatabaseStatsOverviewRequestObject) (openapi.DatabaseStatsOverviewResponseObject, error) {
+
+	stats, err := h.database.StatsOverview(ctx, req.DatabaseId)
+	if err != nil {
+		if errors.Is(err, databaseService.ErrNotFound) {
+			return openapi.DatabaseStatsOverview404JSONResponse{
+				Message: err.Error(),
+			}, nil
+		}
+
+		return openapi.DatabaseStatsOverview400JSONResponse{
+			Message: err.Error(),
+		}, nil
+	}
+
+	return openapi.DatabaseStatsOverview200JSONResponse(stats), nil
+}

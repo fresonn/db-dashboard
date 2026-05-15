@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package codec;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "storage/codec";
+
+message PostgresDbOverviewStats {
+  int64 id = 1;
+  string name = 2;
+  int64 size = 3;
+  int64 tables = 4;
+  int64 indexes = 5;
+}
+
+message StoredOverviewStats {
+  PostgresDbOverviewStats current = 1;
+  PostgresDbOverviewStats previous = 2;
+  google.protobuf.Timestamp changed_at = 3;
+}

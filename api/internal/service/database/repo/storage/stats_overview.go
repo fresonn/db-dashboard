@@ -13,21 +13,21 @@ import (
 
 /*
 STAT:
-db:47020:stat:overview        → current value
+db:47020:stat:{domain}        → current value
 
 METRIC:
 db:47020:metric:size:{ts}     → history
 */
 
-func overviewStatsKey(id int) []byte {
-	return fmt.Appendf([]byte{}, "db:%d:stat:overview", id)
+func overviewStatKey(databaseID int, metric database.Metric) []byte {
+	return fmt.Appendf([]byte{}, "db:%d:stat:%s", databaseID, metric)
 }
 
-func (s *Storage) SaveStatsOverview(databaseID int, stats database.StoredOverviewStats) error {
+func (s *Storage) SaveOverviewStatState(databaseID int, metric database.Metric, stat database.OverviewStatState) error {
 
-	key := overviewStatsKey(databaseID)
+	key := overviewStatKey(databaseID, metric)
 
-	pb := EncodeStoredOverviewStats(stats)
+	pb := EncodeOverviewStatState(stat)
 
 	data, err := proto.Marshal(pb)
 	if err != nil {
@@ -39,11 +39,11 @@ func (s *Storage) SaveStatsOverview(databaseID int, stats database.StoredOvervie
 	})
 }
 
-func (s *Storage) StatsOverview(databaseID int) (database.StoredOverviewStats, error) {
+func (s *Storage) OverviewStatState(databaseID int, metric database.Metric) (database.OverviewStatState, error) {
 
-	key := overviewStatsKey(databaseID)
+	key := overviewStatKey(databaseID, metric)
 
-	var result database.StoredOverviewStats
+	var result database.OverviewStatState
 
 	err := s.db.View(func(txn *badger.Txn) error {
 
@@ -54,22 +54,22 @@ func (s *Storage) StatsOverview(databaseID int) (database.StoredOverviewStats, e
 
 		return item.Value(func(val []byte) error {
 
-			var pbData pb.StoredOverviewStats
+			var pbData pb.OverviewStatState
 
 			if err := proto.Unmarshal(val, &pbData); err != nil {
 				return err
 			}
 
-			result = DecodeStoredOverviewStats(&pbData)
+			result = DecodeOverviewStatState(&pbData)
 			return nil
 		})
 	})
 
 	if err != nil {
 		if errors.Is(err, badger.ErrKeyNotFound) {
-			return database.StoredOverviewStats{}, service.ErrStatsOverviewNotFound
+			return database.OverviewStatState{}, service.ErrOverviewStatStateNotFound
 		}
-		return database.StoredOverviewStats{}, err
+		return database.OverviewStatState{}, err
 	}
 
 	return result, nil

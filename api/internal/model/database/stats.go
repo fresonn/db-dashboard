@@ -9,6 +9,14 @@ const (
 	StatDirectionDown StatDirection = "down"
 )
 
+type Metric string
+
+const (
+	MetricSize    Metric = "size"
+	MetricTables  Metric = "tables"
+	MetricIndexes Metric = "indexes"
+)
+
 type DatabaseStatsOverview struct {
 	ID      string                    `json:"id"`
 	DbName  string                    `json:"dbName"`
@@ -50,5 +58,11 @@ type PostgresDbOverviewStats struct {
 type StoredOverviewStats struct {
 	Current   PostgresDbOverviewStats
 	Previous  PostgresDbOverviewStats
+	ChangedAt time.Time
+}
+
+type OverviewStatState struct {
+	Current   int64
+	Previous  int64
 	ChangedAt time.Time
 }

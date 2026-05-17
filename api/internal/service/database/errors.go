@@ -7,5 +7,5 @@ var (
 )
 
 var (
-	ErrStatsOverviewNotFound = errors.New("stats overview not found")
+	ErrOverviewStatStateNotFound = errors.New("stats overview not found")
 )

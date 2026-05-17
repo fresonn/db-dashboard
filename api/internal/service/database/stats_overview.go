@@ -23,6 +23,7 @@ func (s *Service) StatsOverview(ctx context.Context, databaseID int) (database.D
 
 	currentStats, err := s.pg.CurrentDBOverviewStats(ctx)
 	if err != nil {
+
 		if errors.Is(err, ErrNotFound) {
 			s.logger.DebugContext(ctx, "database stats not found", "id", databaseID)
 			return database.DatabaseStatsOverview{}, err
@@ -36,66 +37,21 @@ func (s *Service) StatsOverview(ctx context.Context, databaseID int) (database.D
 		return database.DatabaseStatsOverview{}, ErrNotFound
 	}
 
-	storedStats, err := s.storage.StatsOverview(databaseID)
-
-	hasStored := err == nil
-
-	if err != nil && !errors.Is(err, ErrStatsOverviewNotFound) {
-		s.logger.ErrorContext(ctx, "get stored stats failed", "id", databaseID, "error", err)
+	sizeTrend, err := s.processOverviewMetric(ctx, databaseID, database.MetricSize, currentStats.Size)
+	if err != nil {
 		return database.DatabaseStatsOverview{}, err
 	}
 
-	hasChanges := !hasStored ||
-		currentStats.Size != storedStats.Current.Size ||
-		currentStats.Tables != storedStats.Current.Tables ||
-		currentStats.Indexes != storedStats.Current.Indexes
+	sizeTrend.Value = helper.PrettyByteSize(sizeTrend.Diff)
 
-	if hasChanges {
-
-		nextStored := database.StoredOverviewStats{
-			Current:   currentStats,
-			Previous:  storedStats.Current,
-			ChangedAt: time.Now(),
-		}
-
-		// first save
-		if !hasStored {
-			nextStored.Previous = currentStats
-		}
-
-		err = s.storage.SaveStatsOverview(databaseID, nextStored)
-		if err != nil {
-			s.logger.ErrorContext(ctx, "save stats failed", "id", databaseID, "error", err)
-			return database.DatabaseStatsOverview{}, err
-		}
-
-		storedStats = nextStored
+	tablesTrend, err := s.processOverviewMetric(ctx, databaseID, database.MetricTables, currentStats.Tables)
+	if err != nil {
+		return database.DatabaseStatsOverview{}, err
 	}
 
-	showTrend := hasStored && time.Since(storedStats.ChangedAt) < 15*time.Minute
-
-	sizeTrend := database.StaticStatTrend{}
-	tablesTrend := database.StaticStatTrend{}
-	indexesTrend := database.StaticStatTrend{}
-
-	if showTrend {
-
-		sizeTrend = calculateTrend(
-			storedStats.Current.Size,
-			storedStats.Previous.Size,
-		)
-
-		sizeTrend.Value = helper.PrettyByteSize(sizeTrend.Diff)
-
-		tablesTrend = calculateTrend(
-			storedStats.Current.Tables,
-			storedStats.Previous.Tables,
-		)
-
-		indexesTrend = calculateTrend(
-			storedStats.Current.Indexes,
-			storedStats.Previous.Indexes,
-		)
+	indexesTrend, err := s.processOverviewMetric(ctx, databaseID, database.MetricIndexes, currentStats.Indexes)
+	if err != nil {
+		return database.DatabaseStatsOverview{}, err
 	}
 
 	overviewStats := database.DatabaseStatsOverview{
@@ -120,6 +76,49 @@ func (s *Service) StatsOverview(ctx context.Context, databaseID int) (database.D
 	}
 
 	return overviewStats, nil
+}
+
+func (s *Service) processOverviewMetric(ctx context.Context, databaseID int, metric database.Metric, currentValue int64) (database.StaticStatTrend, error) {
+
+	state, err := s.storage.OverviewStatState(databaseID, metric)
+
+	hasState := err == nil
+
+	if err != nil && !errors.Is(err, ErrOverviewStatStateNotFound) {
+		s.logger.ErrorContext(ctx, "get metric state failed", "id", databaseID, "metric", metric, "error", err)
+		return database.StaticStatTrend{}, err
+	}
+
+	hasChanges := !hasState || currentValue != state.Current
+
+	if hasChanges {
+
+		nextState := database.OverviewStatState{
+			Current:   currentValue,
+			Previous:  state.Current,
+			ChangedAt: time.Now(),
+		}
+
+		if !hasState {
+			nextState.Previous = currentValue
+		}
+
+		err = s.storage.SaveOverviewStatState(databaseID, metric, nextState)
+		if err != nil {
+			s.logger.ErrorContext(ctx, "save metric state failed", "id", databaseID, "metric", metric, "error", err)
+			return database.StaticStatTrend{}, err
+		}
+
+		state = nextState
+	}
+
+	showTrend := hasState && time.Since(state.ChangedAt) < 15*time.Minute
+
+	if !showTrend {
+		return database.StaticStatTrend{}, nil
+	}
+
+	return calculateTrend(state.Current, state.Previous), nil
 }
 
 func calculateTrend(current, previous int64) database.StaticStatTrend {

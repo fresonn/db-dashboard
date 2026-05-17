@@ -17,6 +17,6 @@ type Cache interface {
 }
 
 type Storage interface {
-	StatsOverview(databaseID int) (database.StoredOverviewStats, error)
-	SaveStatsOverview(databaseID int, stats database.StoredOverviewStats) error
+	OverviewStatState(databaseID int, metric database.Metric) (database.OverviewStatState, error)
+	SaveOverviewStatState(databaseID int, metric database.Metric, state database.OverviewStatState) error
 }

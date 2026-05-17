@@ -15,7 +15,11 @@ const (
 
 func PrettyByteSize(bytes int64) string {
 	if bytes <= 0 {
-		return "0 Byte"
+		return "0 B"
+	}
+
+	if bytes < KB {
+		return fmt.Sprintf("%d B", bytes)
 	}
 
 	var value float64
@@ -31,12 +35,15 @@ func PrettyByteSize(bytes int64) string {
 	case bytes >= MB:
 		value = float64(bytes) / float64(MB)
 		unit = "MB"
-	case bytes >= KB:
+	default:
 		value = float64(bytes) / float64(KB)
 		unit = "KB"
-	default:
-		return fmt.Sprintf("%d Byte", bytes)
 	}
 
-	return fmt.Sprintf("%.1f %s", value, unit)
+	// delete .00 for round numbers
+	if value == float64(int64(value)) {
+		return fmt.Sprintf("%d %s", int64(value), unit)
+	}
+
+	return fmt.Sprintf("%.2f %s", value, unit)
 }

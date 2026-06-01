@@ -1,20 +1,39 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Tooltip,
-  Legend
-} from 'chart.js'
+import { Chart as ChartJS, LinearScale, PointElement, LineElement, Tooltip, Legend } from 'chart.js'
 import { Line } from 'react-chartjs-2'
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend)
+ChartJS.register(LinearScale, PointElement, LineElement, Tooltip, Legend)
+
+const WINDOW_MS = 60_000
+const SAMPLE_INTERVAL = 1000
+const DRAW_INTERVAL = 100
 
 type Layer = 'all' | 'throughput' | 'flush' | 'latency' | 'pressure'
 
-const metrics = [
+type Point = {
+  x: number
+  y: number
+}
+
+type MetricDefinition = {
+  id: string
+  label: string
+  layer: Exclude<Layer, 'all'>
+  color: string
+  yAxisID: string
+}
+
+type MetricState = {
+  points: Point[]
+
+  previous: number
+  lastDrawAt: number
+  target: number
+
+  transitionStartedAt: number
+}
+
+const metricDefinitions: MetricDefinition[] = [
   {
     id: 'records',
     label: 'Records/sec',
@@ -94,20 +113,50 @@ function randomValue(id: string) {
   }
 }
 
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * t
+}
+
 export function WALAnalytics() {
   const chartRef = useRef<ChartJS<'line'>>(null)
+
+  const metricsRef = useRef<Record<string, MetricState>>(
+    Object.fromEntries(
+      metricDefinitions.map((metric) => {
+        const value = randomValue(metric.id)
+
+        const now = Date.now()
+
+        return [
+          metric.id,
+          {
+            points: [],
+            previous: value,
+            target: value,
+
+            transitionStartedAt: now,
+            lastDrawAt: now
+          }
+        ]
+      })
+    )
+  )
 
   const [layer, setLayer] = useState<Layer>('all')
 
   const [enabled, setEnabled] = useState<Record<string, boolean>>(
-    Object.fromEntries(metrics.map((x) => [x.id, true]))
+    Object.fromEntries(metricDefinitions.map((metric) => [metric.id, true]))
   )
 
   const visibleMetrics = useMemo(() => {
-    return metrics.filter((metric) => {
-      if (!enabled[metric.id]) return false
+    return metricDefinitions.filter((metric) => {
+      if (!enabled[metric.id]) {
+        return false
+      }
 
-      if (layer === 'all') return true
+      if (layer === 'all') {
+        return true
+      }
 
       return metric.layer === layer
     })
@@ -115,32 +164,21 @@ export function WALAnalytics() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const chart = chartRef.current
+      const now = Date.now()
 
-      if (!chart) return
+      for (const metric of metricDefinitions) {
+        const state = metricsRef.current[metric.id]
 
-      const now = new Date().toLocaleTimeString()
+        state.previous = state.target
 
-      chart.data.labels?.push(now)
+        state.target = randomValue(metric.id)
 
-      visibleMetrics.forEach((metric) => {
-        const dataset = chart.data.datasets.find((d) => d.label === metric.label)
-
-        if (!dataset) return
-
-        dataset.data.push(randomValue(metric.id))
-      })
-
-      // draft: with widnow
-      if (chart.data.labels && chart.data.labels.length > 100) {
-        chart.data.labels.shift()
-
-        chart.data.datasets.forEach((d) => d.data.shift())
+        state.transitionStartedAt = now
       }
-    }, 1000)
+    }, SAMPLE_INTERVAL)
 
     return () => clearInterval(interval)
-  }, [visibleMetrics])
+  }, [])
 
   useEffect(() => {
     let frameId: number
@@ -148,20 +186,64 @@ export function WALAnalytics() {
     const animate = () => {
       const chart = chartRef.current
 
-      if (chart) {
-        // chart.update('none')
-        chart.update()
+      if (!chart) {
+        frameId = requestAnimationFrame(animate)
+        return
       }
+
+      const now = Date.now()
+      const cutoff = now - WINDOW_MS
+
+      for (const metric of metricDefinitions) {
+        const state = metricsRef.current[metric.id]
+
+        const progress = Math.min(1, (now - state.transitionStartedAt) / SAMPLE_INTERVAL)
+
+        const current = lerp(state.previous, state.target, progress)
+
+        const points = state.points
+
+        if (now - state.lastDrawAt >= DRAW_INTERVAL) {
+          points.push({
+            x: now,
+            y: current
+          })
+
+          state.lastDrawAt = now
+        }
+
+        while (points.length && points[0].x < cutoff) {
+          points.shift()
+        }
+      }
+
+      chart.data.datasets = visibleMetrics.map((metric) => ({
+        label: metric.label,
+        data: metricsRef.current[metric.id].points,
+        borderColor: metric.color,
+        backgroundColor: metric.color,
+        yAxisID: metric.yAxisID,
+        pointRadius: 0,
+        tension: 0.3
+      }))
+
+      const x = chart.options.scales?.x
+
+      if (x) {
+        x.min = now - WINDOW_MS
+
+        x.max = now
+      }
+
+      chart.update('none')
 
       frameId = requestAnimationFrame(animate)
     }
 
     animate()
 
-    return () => {
-      cancelAnimationFrame(frameId)
-    }
-  }, [])
+    return () => cancelAnimationFrame(frameId)
+  }, [visibleMetrics])
 
   return (
     <div className="space-y-6 p-6">
@@ -174,7 +256,7 @@ export function WALAnalytics() {
       </div>
 
       <div className="flex flex-wrap gap-4">
-        {metrics.map((metric) => (
+        {metricDefinitions.map((metric) => (
           <label key={metric.id} className="flex gap-2">
             <input
               type="checkbox"
@@ -192,30 +274,36 @@ export function WALAnalytics() {
         ))}
       </div>
 
-      <div className="h-[450px]">
+      <div className="h-[500px]">
         <Line
           ref={chartRef}
+          data={{
+            datasets: []
+          }}
           options={{
             responsive: true,
             maintainAspectRatio: false,
 
-            animation: {
-              duration: 500,
-              easing: 'linear'
-            },
+            animation: false,
+
+            parsing: false,
 
             interaction: {
-              mode: 'index',
+              mode: 'nearest',
               intersect: false
             },
 
-            elements: {
-              point: {
-                radius: 0
-              }
-            },
-
             scales: {
+              x: {
+                type: 'linear',
+
+                ticks: {
+                  callback(value) {
+                    return new Date(Number(value)).toLocaleTimeString()
+                  }
+                }
+              },
+
               throughput: {
                 type: 'linear',
                 position: 'left'
@@ -242,18 +330,6 @@ export function WALAnalytics() {
                 }
               }
             }
-          }}
-          data={{
-            labels: [],
-
-            datasets: visibleMetrics.map((metric) => ({
-              label: metric.label,
-              data: [],
-              borderColor: metric.color,
-              backgroundColor: metric.color,
-              yAxisID: metric.yAxisID,
-              tension: 0.3
-            }))
           }}
         />
       </div>

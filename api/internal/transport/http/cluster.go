@@ -22,6 +22,27 @@ func (h *Handler) GetStatus(ctx context.Context, req openapi.GetStatusRequestObj
 	return openapi.GetStatus200JSONResponse(resp), nil
 }
 
+func (h *Handler) SwitchCurrentDatabase(
+	ctx context.Context,
+	req openapi.SwitchCurrentDatabaseRequestObject,
+) (openapi.SwitchCurrentDatabaseResponseObject, error) {
+
+	status, err := h.cluster.SwitchDatabase(ctx, req.Body.DatabaseId)
+	if err != nil {
+		return openapi.SwitchCurrentDatabase400JSONResponse{
+			Message: err.Error(),
+		}, nil
+	}
+
+	resp := openapi.GetStatusResponse{
+		User:             status.CurrentUser,
+		Database:         status.CurrentDatabase,
+		ConnectionStatus: openapi.ConnectionStatus(status.ConnectionStatus),
+	}
+
+	return openapi.SwitchCurrentDatabase200JSONResponse(resp), nil
+}
+
 func (h *Handler) ClusterConnect(ctx context.Context, req openapi.ClusterConnectRequestObject) (openapi.ClusterConnectResponseObject, error) {
 
 	status, err := h.cluster.Connect(ctx, cluster.NewConnection(*req.Body))

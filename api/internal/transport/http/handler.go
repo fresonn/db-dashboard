@@ -13,6 +13,7 @@ type ClusterUseCase interface {
 	PostgresStatus(ctx context.Context) cluster.Status
 	Uptime(ctx context.Context) (cluster.PostgresUptime, error)
 	Version(ctx context.Context) (cluster.PostgresVersion, error)
+	SwitchDatabase(ctx context.Context, id int) (cluster.Status, error)
 	PostmasterSettings(ctx context.Context) (cluster.PostmasterSettings, error)
 	Disconnect(ctx context.Context) error
 }

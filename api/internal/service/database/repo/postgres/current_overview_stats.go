@@ -55,7 +55,7 @@ func (s *Storage) CurrentDBOverviewStats(ctx context.Context) (database.Postgres
 	err = db.Get(&dto, CURRENT_DB_OVERVIEW_STATS_QUERY)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return database.PostgresDbOverviewStats{}, service.ErrNotFound
+			return database.PostgresDbOverviewStats{}, service.ErrDatabaseNotFound
 		}
 
 		return database.PostgresDbOverviewStats{}, err

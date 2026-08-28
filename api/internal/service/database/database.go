@@ -17,7 +17,7 @@ func (s *Service) Database(ctx context.Context, id int) (database.Database, erro
 
 	db, err := s.pg.Database(ctx, id)
 	if err != nil {
-		if errors.Is(err, ErrNotFound) {
+		if errors.Is(err, ErrDatabaseNotFound) {
 			s.logger.Warn("database not found", "id", id)
 			return database.Database{}, err
 		}

@@ -14,7 +14,7 @@ func (h *Handler) Database(ctx context.Context, req openapi.DatabaseRequestObjec
 
 	db, err := h.database.Database(ctx, req.DatabaseId)
 	if err != nil {
-		if errors.Is(err, databaseService.ErrNotFound) {
+		if errors.Is(err, databaseService.ErrDatabaseNotFound) {
 			return openapi.Database404JSONResponse{
 				Message: err.Error(),
 			}, nil
@@ -63,7 +63,7 @@ func (h *Handler) DatabaseStatsOverview(ctx context.Context, req openapi.Databas
 
 	stats, err := h.database.StatsOverview(ctx, req.DatabaseId)
 	if err != nil {
-		if errors.Is(err, databaseService.ErrNotFound) {
+		if errors.Is(err, databaseService.ErrDatabaseNotFound) {
 			return openapi.DatabaseStatsOverview404JSONResponse{
 				Message: err.Error(),
 			}, nil

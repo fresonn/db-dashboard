@@ -24,7 +24,7 @@ func (s *Service) StatsOverview(ctx context.Context, databaseID int) (database.D
 	currentStats, err := s.pg.CurrentDBOverviewStats(ctx)
 	if err != nil {
 
-		if errors.Is(err, ErrNotFound) {
+		if errors.Is(err, ErrDatabaseNotFound) {
 			s.logger.DebugContext(ctx, "database stats not found", "id", databaseID)
 			return database.DatabaseStatsOverview{}, err
 		}
@@ -34,7 +34,7 @@ func (s *Service) StatsOverview(ctx context.Context, databaseID int) (database.D
 	}
 
 	if databaseID != int(currentStats.ID) {
-		return database.DatabaseStatsOverview{}, ErrNotFound
+		return database.DatabaseStatsOverview{}, ErrDatabaseNotFound
 	}
 
 	sizeTrend, err := s.processOverviewMetric(ctx, databaseID, database.MetricSize, currentStats.Size)

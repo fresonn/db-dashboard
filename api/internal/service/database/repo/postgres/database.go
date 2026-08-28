@@ -39,7 +39,7 @@ func (s *Storage) Database(ctx context.Context, oid int) (database.Database, err
 	err = db.Get(&dto, DATABASE_BY_OID, oid)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return database.Database{}, service.ErrNotFound
+			return database.Database{}, service.ErrDatabaseNotFound
 		}
 
 		return database.Database{}, err

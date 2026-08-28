@@ -3,7 +3,7 @@ package database
 import "errors"
 
 var (
-	ErrNotFound = errors.New("database not found")
+	ErrDatabaseNotFound = errors.New("database not found")
 )
 
 var (

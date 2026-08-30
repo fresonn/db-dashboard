@@ -102,6 +102,11 @@ type RoleView = roleEntities.RoleView
 // TrendDirection Represents trend direction state in stats
 type TrendDirection string
 
+// SwitchCurrentDatabaseJSONBody defines parameters for SwitchCurrentDatabase.
+type SwitchCurrentDatabaseJSONBody struct {
+	DatabaseId int `json:"databaseId"`
+}
+
 // DatabasesDetailedParams defines parameters for DatabasesDetailed.
 type DatabasesDetailedParams struct {
 	// Sort Field to sort by
@@ -120,6 +125,9 @@ type DatabasesDetailedParamsOrder string
 // ClusterConnectJSONRequestBody defines body for ClusterConnect for application/json ContentType.
 type ClusterConnectJSONRequestBody = ClusterConnectData
 
+// SwitchCurrentDatabaseJSONRequestBody defines body for SwitchCurrentDatabase for application/json ContentType.
+type SwitchCurrentDatabaseJSONRequestBody SwitchCurrentDatabaseJSONBody
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// Connect to Postgres cluster
@@ -137,6 +145,9 @@ type ServerInterface interface {
 	// Get server current status
 	// (GET /cluster/status)
 	GetStatus(w http.ResponseWriter, r *http.Request)
+	// Set new current database
+	// (POST /cluster/switch-current-database)
+	SwitchCurrentDatabase(w http.ResponseWriter, r *http.Request)
 	// Get Postgres uptime info
 	// (GET /cluster/uptime)
 	PostgresUptime(w http.ResponseWriter, r *http.Request)
@@ -185,6 +196,12 @@ func (_ Unimplemented) Roles(w http.ResponseWriter, r *http.Request) {
 // Get server current status
 // (GET /cluster/status)
 func (_ Unimplemented) GetStatus(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Set new current database
+// (POST /cluster/switch-current-database)
+func (_ Unimplemented) SwitchCurrentDatabase(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -288,6 +305,20 @@ func (siw *ServerInterfaceWrapper) GetStatus(w http.ResponseWriter, r *http.Requ
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetStatus(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// SwitchCurrentDatabase operation middleware
+func (siw *ServerInterfaceWrapper) SwitchCurrentDatabase(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.SwitchCurrentDatabase(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -539,6 +570,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Get(options.BaseURL+"/cluster/status", wrapper.GetStatus)
 	})
 	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/cluster/switch-current-database", wrapper.SwitchCurrentDatabase)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/cluster/uptime", wrapper.PostgresUptime)
 	})
 	r.Group(func(r chi.Router) {
@@ -716,6 +750,44 @@ func (response GetStatus400JSONResponse) VisitGetStatusResponse(w http.ResponseW
 	return json.NewEncoder(w).Encode(response)
 }
 
+type SwitchCurrentDatabaseRequestObject struct {
+	Body *SwitchCurrentDatabaseJSONRequestBody
+}
+
+type SwitchCurrentDatabaseResponseObject interface {
+	VisitSwitchCurrentDatabaseResponse(w http.ResponseWriter) error
+}
+
+type SwitchCurrentDatabase200JSONResponse GetStatusResponse
+
+func (response SwitchCurrentDatabase200JSONResponse) VisitSwitchCurrentDatabaseResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type SwitchCurrentDatabase400JSONResponse ErrorBase
+
+func (response SwitchCurrentDatabase400JSONResponse) VisitSwitchCurrentDatabaseResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type SwitchCurrentDatabasedefaultJSONResponse struct {
+	Body       ErrorBase
+	StatusCode int
+}
+
+func (response SwitchCurrentDatabasedefaultJSONResponse) VisitSwitchCurrentDatabaseResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
 type PostgresUptimeRequestObject struct {
 }
 
@@ -888,6 +960,9 @@ type StrictServerInterface interface {
 	// Get server current status
 	// (GET /cluster/status)
 	GetStatus(ctx context.Context, request GetStatusRequestObject) (GetStatusResponseObject, error)
+	// Set new current database
+	// (POST /cluster/switch-current-database)
+	SwitchCurrentDatabase(ctx context.Context, request SwitchCurrentDatabaseRequestObject) (SwitchCurrentDatabaseResponseObject, error)
 	// Get Postgres uptime info
 	// (GET /cluster/uptime)
 	PostgresUptime(ctx context.Context, request PostgresUptimeRequestObject) (PostgresUptimeResponseObject, error)
@@ -1054,6 +1129,37 @@ func (sh *strictHandler) GetStatus(w http.ResponseWriter, r *http.Request) {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetStatusResponseObject); ok {
 		if err := validResponse.VisitGetStatusResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// SwitchCurrentDatabase operation middleware
+func (sh *strictHandler) SwitchCurrentDatabase(w http.ResponseWriter, r *http.Request) {
+	var request SwitchCurrentDatabaseRequestObject
+
+	var body SwitchCurrentDatabaseJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.SwitchCurrentDatabase(ctx, request.(SwitchCurrentDatabaseRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "SwitchCurrentDatabase")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(SwitchCurrentDatabaseResponseObject); ok {
+		if err := validResponse.VisitSwitchCurrentDatabaseResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

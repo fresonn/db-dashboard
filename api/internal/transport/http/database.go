@@ -12,7 +12,7 @@ import (
 
 func (h *Handler) Database(ctx context.Context, req openapi.DatabaseRequestObject) (openapi.DatabaseResponseObject, error) {
 
-	db, err := h.database.Database(ctx, req.DatabaseId)
+	db, err := h.databaseService.Database(ctx, req.DatabaseId)
 	if err != nil {
 		if errors.Is(err, databaseService.ErrDatabaseNotFound) {
 			return openapi.Database404JSONResponse{
@@ -49,7 +49,7 @@ func (h *Handler) DatabasesDetailed(ctx context.Context, req openapi.DatabasesDe
 		filter.Order = string(*params.Order)
 	}
 
-	databases, err := h.database.DatabasesDetailed(ctx, filter)
+	databases, err := h.databaseService.DatabasesDetailed(ctx, filter)
 	if err != nil {
 		return openapi.DatabasesDetailed400JSONResponse{
 			Message: err.Error(),
@@ -61,7 +61,7 @@ func (h *Handler) DatabasesDetailed(ctx context.Context, req openapi.DatabasesDe
 
 func (h *Handler) DatabaseStatsOverview(ctx context.Context, req openapi.DatabaseStatsOverviewRequestObject) (openapi.DatabaseStatsOverviewResponseObject, error) {
 
-	stats, err := h.database.StatsOverview(ctx, req.DatabaseId)
+	stats, err := h.databaseService.StatsOverview(ctx, req.DatabaseId)
 	if err != nil {
 		if errors.Is(err, databaseService.ErrDatabaseNotFound) {
 			return openapi.DatabaseStatsOverview404JSONResponse{

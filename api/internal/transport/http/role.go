@@ -7,7 +7,7 @@ import (
 
 func (h *Handler) Roles(ctx context.Context, req openapi.RolesRequestObject) (openapi.RolesResponseObject, error) {
 
-	roles, err := h.roles.Roles(ctx)
+	roles, err := h.roleService.Roles(ctx)
 	if err != nil {
 		return openapi.Roles400JSONResponse{
 			Message: err.Error(),

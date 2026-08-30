@@ -16,6 +16,7 @@ export type { PostmasterSettingsQueryKey } from './hooks/usePostmasterSettings.t
 export type { PostmasterSettingsSuspenseQueryKey } from './hooks/usePostmasterSettingsSuspense.ts'
 export type { RolesQueryKey } from './hooks/useRoles.ts'
 export type { RolesSuspenseQueryKey } from './hooks/useRolesSuspense.ts'
+export type { SwitchCurrentDatabaseMutationKey } from './hooks/useSwitchCurrentDatabase.ts'
 export type {
   ClusterConnect200,
   ClusterConnect400,
@@ -87,6 +88,12 @@ export type {
   Roles400,
   RolesQuery,
   RolesQueryResponse,
+  SwitchCurrentDatabase200,
+  SwitchCurrentDatabase400,
+  SwitchCurrentDatabaseError,
+  SwitchCurrentDatabaseMutation,
+  SwitchCurrentDatabaseMutationRequest,
+  SwitchCurrentDatabaseMutationResponse,
   TrendDirection,
   TrendDirectionEnumKey
 } from './models.ts'
@@ -100,6 +107,7 @@ export { postgresUptime } from './clients/postgresUptime.ts'
 export { postgresVersion } from './clients/postgresVersion.ts'
 export { postmasterSettings } from './clients/postmasterSettings.ts'
 export { roles } from './clients/roles.ts'
+export { switchCurrentDatabase } from './clients/switchCurrentDatabase.ts'
 export { clusterConnectMutationKey } from './hooks/useClusterConnect.ts'
 export { clusterConnectMutationOptions } from './hooks/useClusterConnect.ts'
 export { useClusterConnect } from './hooks/useClusterConnect.ts'
@@ -154,6 +162,9 @@ export { useRoles } from './hooks/useRoles.ts'
 export { rolesSuspenseQueryKey } from './hooks/useRolesSuspense.ts'
 export { rolesSuspenseQueryOptions } from './hooks/useRolesSuspense.ts'
 export { useRolesSuspense } from './hooks/useRolesSuspense.ts'
+export { switchCurrentDatabaseMutationKey } from './hooks/useSwitchCurrentDatabase.ts'
+export { switchCurrentDatabaseMutationOptions } from './hooks/useSwitchCurrentDatabase.ts'
+export { useSwitchCurrentDatabase } from './hooks/useSwitchCurrentDatabase.ts'
 export { connectionStatus } from './models.ts'
 export { databasesDetailedQueryParamsOrderEnum } from './models.ts'
 export { databasesDetailedQueryParamsSortEnum } from './models.ts'

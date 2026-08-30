@@ -11,7 +11,7 @@ import (
 
 func (h *Handler) GetStatus(ctx context.Context, req openapi.GetStatusRequestObject) (openapi.GetStatusResponseObject, error) {
 
-	status := h.cluster.PostgresStatus(ctx)
+	status := h.clusterService.PostgresStatus(ctx)
 
 	resp := openapi.GetStatusResponse{
 		User:             status.CurrentUser,
@@ -22,9 +22,30 @@ func (h *Handler) GetStatus(ctx context.Context, req openapi.GetStatusRequestObj
 	return openapi.GetStatus200JSONResponse(resp), nil
 }
 
+func (h *Handler) SwitchCurrentDatabase(
+	ctx context.Context,
+	req openapi.SwitchCurrentDatabaseRequestObject,
+) (openapi.SwitchCurrentDatabaseResponseObject, error) {
+
+	status, err := h.useCase.SwitchDatabase(ctx, req.Body.DatabaseId)
+	if err != nil {
+		return openapi.SwitchCurrentDatabase400JSONResponse{
+			Message: err.Error(),
+		}, nil
+	}
+
+	resp := openapi.GetStatusResponse{
+		User:             status.CurrentUser,
+		Database:         status.CurrentDatabase,
+		ConnectionStatus: openapi.ConnectionStatus(status.ConnectionStatus),
+	}
+
+	return openapi.SwitchCurrentDatabase200JSONResponse(resp), nil
+}
+
 func (h *Handler) ClusterConnect(ctx context.Context, req openapi.ClusterConnectRequestObject) (openapi.ClusterConnectResponseObject, error) {
 
-	status, err := h.cluster.Connect(ctx, cluster.NewConnection(*req.Body))
+	status, err := h.clusterService.Connect(ctx, cluster.NewConnection(*req.Body))
 	if err != nil {
 
 		var ve validator.ValidationErrors
@@ -49,7 +70,7 @@ func (h *Handler) ClusterConnect(ctx context.Context, req openapi.ClusterConnect
 
 func (h *Handler) ClusterDisconnect(ctx context.Context, req openapi.ClusterDisconnectRequestObject) (openapi.ClusterDisconnectResponseObject, error) {
 
-	err := h.cluster.Disconnect(ctx)
+	err := h.clusterService.Disconnect(ctx)
 	if err != nil {
 		return openapi.ClusterDisconnect400JSONResponse{
 			Message: err.Error(),
@@ -63,7 +84,7 @@ func (h *Handler) ClusterDisconnect(ctx context.Context, req openapi.ClusterDisc
 
 func (h *Handler) PostgresVersion(ctx context.Context, req openapi.PostgresVersionRequestObject) (openapi.PostgresVersionResponseObject, error) {
 
-	version, err := h.cluster.Version(ctx)
+	version, err := h.clusterService.Version(ctx)
 	if err != nil {
 		return openapi.PostgresVersion400JSONResponse{
 			Message: err.Error(),
@@ -75,7 +96,7 @@ func (h *Handler) PostgresVersion(ctx context.Context, req openapi.PostgresVersi
 
 func (h *Handler) PostgresUptime(ctx context.Context, req openapi.PostgresUptimeRequestObject) (openapi.PostgresUptimeResponseObject, error) {
 
-	uptime, err := h.cluster.Uptime(ctx)
+	uptime, err := h.clusterService.Uptime(ctx)
 	if err != nil {
 		return openapi.PostgresUptime400JSONResponse{
 			Message: err.Error(),
@@ -87,7 +108,7 @@ func (h *Handler) PostgresUptime(ctx context.Context, req openapi.PostgresUptime
 
 func (h *Handler) PostmasterSettings(ctx context.Context, req openapi.PostmasterSettingsRequestObject) (openapi.PostmasterSettingsResponseObject, error) {
 
-	settings, err := h.cluster.PostmasterSettings(ctx)
+	settings, err := h.clusterService.PostmasterSettings(ctx)
 	if err != nil {
 		return openapi.PostmasterSettings400JSONResponse{
 			Message: err.Error(),

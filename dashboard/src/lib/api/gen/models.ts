@@ -479,6 +479,39 @@ export type GetStatusQuery = {
 /**
  * @description Successful operation
  */
+export type SwitchCurrentDatabase200 = GetStatusResponse
+
+/**
+ * @description Connection attempt failed
+ */
+export type SwitchCurrentDatabase400 = ErrorBase
+
+/**
+ * @description Unexpected error
+ */
+export type SwitchCurrentDatabaseError = ErrorBase
+
+/**
+ * @description Request\'s data payload
+ */
+export type SwitchCurrentDatabaseMutationRequest = {
+  /**
+   * @type integer
+   */
+  databaseId: number
+}
+
+export type SwitchCurrentDatabaseMutationResponse = SwitchCurrentDatabase200
+
+export type SwitchCurrentDatabaseMutation = {
+  Response: SwitchCurrentDatabase200
+  Request: SwitchCurrentDatabaseMutationRequest
+  Errors: SwitchCurrentDatabase400
+}
+
+/**
+ * @description Successful operation
+ */
 export type ClusterConnect200 = GetStatusResponse
 
 /**

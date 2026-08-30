@@ -43,6 +43,45 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorBase"
+  /cluster/switch-current-database:
+    post:
+      tags:
+        - cluster
+      summary: Set new current database
+      description: Switching the database connection allows access to pg_class.
+      operationId: SwitchCurrentDatabase
+      requestBody:
+        required: true
+        description: Request's data payload
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - databaseId
+              properties:
+                databaseId:
+                  type: integer
+                  example: 5
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetStatusResponse"
+        "400":
+          description: Connection attempt failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorBase"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorBase"
   /cluster/connect:
     post:
       tags:

@@ -23,7 +23,7 @@ func (s *Service) Database(ctx context.Context, id int) (database.Database, erro
 		}
 
 		s.logger.ErrorContext(ctx, "database fetch failed", "id", id, "error", err)
-		return database.Database{}, err
+		return database.Database{}, ErrFailedGetDatabase
 	}
 
 	s.cache.SetDatabase(ctx, id, db)

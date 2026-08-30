@@ -1,45 +1,23 @@
 package http
 
 import (
-	"context"
 	"dashboard/api/gen/openapi"
-	"dashboard/api/internal/model/cluster"
-	"dashboard/api/internal/model/database"
-	"dashboard/api/internal/model/role"
 )
 
-type ClusterUseCase interface {
-	Connect(ctx context.Context, conn cluster.NewConnection) (cluster.Status, error)
-	PostgresStatus(ctx context.Context) cluster.Status
-	Uptime(ctx context.Context) (cluster.PostgresUptime, error)
-	Version(ctx context.Context) (cluster.PostgresVersion, error)
-	SwitchDatabase(ctx context.Context, id int) (cluster.Status, error)
-	PostmasterSettings(ctx context.Context) (cluster.PostmasterSettings, error)
-	Disconnect(ctx context.Context) error
-}
-
-type DatabaseUseCase interface {
-	Database(ctx context.Context, id int) (database.Database, error)
-	DatabasesDetailed(ctx context.Context, filter database.DatabasesFilter) ([]database.DatabaseDetails, error)
-	StatsOverview(ctx context.Context, databaseID int) (database.DatabaseStatsOverview, error)
-}
-
-type RoleUseCase interface {
-	Roles(ctx context.Context) ([]role.RoleView, error)
-}
-
 type Handler struct {
-	cluster  ClusterUseCase
-	roles    RoleUseCase
-	database DatabaseUseCase
+	useCase         UseCases
+	clusterService  ClusterService
+	roleService     RoleService
+	databaseService DatabaseService
 }
 
 var _ openapi.StrictServerInterface = (*Handler)(nil)
 
-func New(cluster ClusterUseCase, roles RoleUseCase, database DatabaseUseCase) *Handler {
+func New(useCase UseCases, clusterService ClusterService, roleService RoleService, databaseService DatabaseService) *Handler {
 	return &Handler{
-		cluster:  cluster,
-		roles:    roles,
-		database: database,
+		useCase:         useCase,
+		clusterService:  clusterService,
+		roleService:     roleService,
+		databaseService: databaseService,
 	}
 }

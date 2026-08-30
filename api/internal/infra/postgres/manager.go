@@ -86,6 +86,9 @@ func (m *Manager) UpdateConnection(ctx context.Context, newConn config.Connectio
 
 	db, err := sqlx.Open("pgx", dsn)
 	if err != nil {
+		m.mu.Lock()
+		m.status = StatusError
+		m.mu.Unlock()
 		return fmt.Errorf("invalid dsn: %w", err)
 	}
 
@@ -105,9 +108,11 @@ func (m *Manager) UpdateConnection(ctx context.Context, newConn config.Connectio
 
 	if err != nil {
 		db.Close()
+
 		m.mu.Lock()
 		m.status = StatusError
 		m.mu.Unlock()
+
 		return err
 	}
 

@@ -18,6 +18,7 @@ import (
 	"dashboard/api/internal/service/roles"
 	rolesPostgresRepo "dashboard/api/internal/service/roles/repo/postgres"
 	httpTransport "dashboard/api/internal/transport/http"
+	"dashboard/api/internal/usecase"
 	"errors"
 	"fmt"
 	"net"
@@ -83,6 +84,12 @@ func New(cfg config.AppConfig) *App {
 		Storage:         databaseStorage,
 	})
 
+	useCases := usecase.New(usecase.Options{
+		ClusterService:  clusterService,
+		DatabaseService: databaseService,
+		PgManager:       pgManager,
+	})
+
 	r := chi.NewRouter()
 	r.Use(httpTransport.RequestIDMiddleware)
 	r.Use(cors.Handler(cors.Options{
@@ -91,7 +98,7 @@ func New(cfg config.AppConfig) *App {
 		AllowCredentials: true,
 	}))
 
-	restHandler := httpTransport.New(clusterService, rolesService, databaseService)
+	restHandler := httpTransport.New(useCases, clusterService, rolesService, databaseService)
 
 	strictHandler := openapi.NewStrictHandler(restHandler, nil)
 

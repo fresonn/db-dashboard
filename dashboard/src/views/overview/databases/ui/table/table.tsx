@@ -116,7 +116,11 @@ export function DatabasesTable({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
-                  className="cursor-pointer"
+                  className={
+                    row.original.allowConnections
+                      ? 'cursor-pointer'
+                      : 'cursor-not-allowed opacity-50'
+                  }
                   onClick={() => {
                     if (row.getValue('allowConnections')) {
                       handleDatabaseClick(row.original.id, row.original.name)

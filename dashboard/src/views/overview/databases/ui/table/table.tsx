@@ -2,6 +2,9 @@ import { useNavigate } from '@tanstack/react-router'
 import { Typography } from '@/components/ui/typography'
 import { TableToolbar } from './toolbar'
 import { columns } from './columns'
+import { toast } from 'sonner'
+import { capitalize } from '@/lib/utils'
+import { useQueryClient } from '@tanstack/react-query'
 import type { Database } from './types'
 import {
   getCoreRowModel,
@@ -22,6 +25,7 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/shadcn/table'
+import { getStatusQueryKey, useSwitchCurrentDatabase } from '@/lib/api/gen'
 
 export type DatabasesTableProps = {
   data: Database[]
@@ -52,14 +56,37 @@ export function DatabasesTable({
   })
 
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
-  const handleDatabaseClick = (databaseId: string) => {
-    navigate({
-      to: '/database/$databaseId',
-      params: {
-        databaseId
+  const { mutate } = useSwitchCurrentDatabase()
+
+  const handleDatabaseClick = (databaseId: string, databaseName: string) => {
+    mutate(
+      {
+        data: {
+          databaseId: Number(databaseId)
+        }
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: getStatusQueryKey()
+          })
+          navigate({
+            to: '/database/$databaseId',
+            params: {
+              databaseId
+            }
+          })
+        },
+        onError: (error) => {
+          toast.error(capitalize(error.message), {
+            description: `Database name: ${databaseName}`,
+            duration: 3000
+          })
+        }
       }
-    })
+    )
   }
 
   return (
@@ -92,7 +119,7 @@ export function DatabasesTable({
                   className="cursor-pointer"
                   onClick={() => {
                     if (row.getValue('allowConnections')) {
-                      handleDatabaseClick(row.original.id)
+                      handleDatabaseClick(row.original.id, row.original.name)
                     }
                   }}
                 >

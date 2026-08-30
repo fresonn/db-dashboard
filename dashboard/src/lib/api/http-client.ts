@@ -18,6 +18,23 @@ export type ResponseConfig<TData = unknown> = {
 
 export type ResponseErrorConfig<T = unknown> = T
 
+export type ApiErrorBody = {
+  message: string
+}
+
+export class ApiError extends Error {
+  public status: number
+  public body: ApiErrorBody
+
+  constructor(status: number, body: ApiErrorBody) {
+    super(body.message)
+
+    this.name = 'ApiError'
+    this.status = status
+    this.body = body
+  }
+}
+
 const buildQueryParams = (params?: Record<string, any>): string => {
   if (!params || Object.keys(params).length === 0) return ''
   const searchParams = new URLSearchParams(
@@ -61,10 +78,7 @@ const client = async <TResponse = unknown, TData = unknown, TError = unknown>(
   const body = await parseResponseBody(response)
 
   if (!response.ok) {
-    throw {
-      status: response.status,
-      body: body as ResponseErrorConfig<TError>
-    }
+    throw new ApiError(response.status, body as ApiErrorBody)
   }
 
   return {

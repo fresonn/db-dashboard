@@ -5,6 +5,8 @@ import { NotFound } from '@/components/layout/not-found'
 import { PageError } from './ui/page-error'
 
 export function DatabaseOverviewPage({ databaseId }: { databaseId: string }) {
+  // todo: send id as string, and validate on the server
+
   const { data, isLoading, isError, error } = useDatabase(Number(databaseId), {
     query: {
       retry: false,
